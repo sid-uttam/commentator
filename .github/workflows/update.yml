@@ -10,7 +10,12 @@ name: Collect and rebuild
 #   ANTHROPIC_API_KEY  Claude API key for AI briefings (optional: without it, no AI briefings)
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      brief_now:
+        description: "Write AI briefings and suggestions now (ignore the timer)"
+        type: boolean
+        default: false
   schedule:
     - cron: "*/30 * * * *"
 
@@ -48,7 +53,7 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           cd engine
-          python run.py --out ../docs
+          python run.py --out ../docs ${{ inputs.brief_now && '--brief-now' || '' }}
 
       - name: Save collected data to the engine
         run: |
