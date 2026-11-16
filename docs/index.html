@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Commentator — feel informed about the big events</title>
+<meta name="description" content="One page per big event: the build-up, the big moments and what everyone is arguing about after. Pilot.">
+<meta property="og:title" content="Commentator — feel informed about the big events">
+<meta property="og:description" content="One page per big event: the build-up, the big moments and what everyone is arguing about after. Pilot.">
+<meta property="og:type" content="article">
+<meta name="theme-color" content="#0E1116">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E1116; --card:#161A21; --card2:#1C222B; --line:#262C36; --line2:#3A424E;
+  --ink:#EEF0F2; --ink2:#D6DADF; --muted:#A3ACB8; --faint:#8A93A0;
+  --a:#6FB6FF; --a-line:#2B4A6B; --b:#F07A3A; --b-line:#6B3A20;
+  --accent:#F2A93B; --accent-bg:#221C12; --accent-ink:#F5D9A8; --accent-line:#3A3020;
+  --good:#7FD3A8;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,-apple-system,sans-serif}
+a{color:var(--accent)} a:hover{color:#FFC56B}
+.wrap{max-width:560px;margin:0 auto;padding:20px 16px 48px;display:flex;flex-direction:column;gap:16px}
+.display{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.5px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;letter-spacing:3px;color:var(--ink);text-decoration:none}
+.chip{font-size:12px;font-weight:600;color:var(--muted);border:1px solid #2A313C;border-radius:999px;padding:6px 12px;white-space:nowrap}
+.eyebrow{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.label{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.card h3{margin:0;font-size:18px;font-weight:700;line-height:1.3}
+.card p{margin:0}
+.body{font-size:15px;line-height:1.5;color:var(--ink2)}
+.src{font-size:12px;color:var(--faint)}
+.src a{color:var(--faint);text-decoration:underline;text-underline-offset:2px}
+.src a:hover{color:var(--ink2)}
+.tag{align-self:flex-start;font-size:12px;font-weight:700;border-radius:6px;padding:4px 8px;letter-spacing:.3px;text-transform:uppercase}
+.tag-accent{color:#1A1300;background:var(--accent)}
+.tag-a{color:var(--a);border:1px solid var(--a-line)}
+.tag-b{color:var(--b);border:1px solid var(--b-line)}
+.tag-neutral{color:var(--muted);border:1px solid #2A313C}
+.card-accent{border-color:var(--accent-line)}
+.card-hl{border:1.5px solid var(--accent)}
+.why{background:var(--accent-bg);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px;font-size:14px;line-height:1.45;color:var(--accent-ink)}
+.why .label{color:var(--accent)}
+.ph{border:1.5px dashed var(--line2);border-radius:14px;padding:12px 14px;font-size:13px;line-height:1.45;color:var(--faint)}
+.ph strong{color:var(--muted);font-weight:600}
+.pill{font-size:12px;font-weight:700;border-radius:999px;padding:4px 10px;white-space:nowrap}
+.pill-divided{color:#1A1300;background:var(--accent)}
+.pill-growing{color:#0E1116;background:var(--good)}
+.pill-mixed,.pill-open,.pill-new{color:var(--ink);background:var(--line2)}
+.pill-settled,.pill-faded{color:var(--muted);border:1px solid var(--line2)}
+.status{display:flex;gap:8px;align-items:center;font-size:13px;font-weight:600;color:var(--accent)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.status-live .dot{background:#FF5A5A} .status-live{color:#FF8A8A}
+.footer{font-size:12px;line-height:1.6;color:var(--faint);padding:8px 4px 0;border-top:1px solid var(--line);margin-top:8px}
+</style>
+<style>
+.intro h1{margin:0;font-size:44px;line-height:.95}
+.intro p{margin:8px 0 0;color:var(--muted);font-size:15px}
+.ev{text-decoration:none;color:var(--ink)}
+.ev:hover .card{border-color:var(--line2)}
+.ev h3{font-family:'Barlow Condensed',sans-serif;font-size:28px;line-height:1;letter-spacing:.5px;text-transform:uppercase}
+.ev .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ev .when{font-size:14px;color:var(--muted)}
+.ev .stage{font-size:13px;color:var(--faint)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="topbar">
+  <span class="brand">COMMENTATOR</span>
+  <span class="chip">Pilot</span>
+</header>
+<section class="intro">
+  <h1 class="display">FEEL INFORMED,<br>NOT OVERLOADED.</h1>
+  <p>One page per big event: what you need to know going in, the moments that mattered, and what everyone is arguing about after. Sources are named on every card.</p>
+</section>
+<a class="ev" href="ufc-qatar-prochazka-stirling/">
+  <article class="card">
+    <div class="row"><span class="label">UFC · MMA · UFC Qatar</span><span class="status status-upcoming"><span class="dot"></span>Upcoming</span></div>
+    <h3><span style="color:var(--a)">PROCHÁZKA</span> <span style="color:var(--faint);font-size:20px">vs</span> <span style="color:var(--b)">STIRLING</span></h3>
+    <div class="when">Sat 21 Nov · main card 10pm Dubai · ABHA Arena, Doha</div>
+<div class="stage">Early look · full briefing Fri 20 Nov</div>  </article>
+</a>
+<a class="ev" href="liverpool-man-utd-2026-11-22/">
+  <article class="card">
+    <div class="row"><span class="label">Football · Premier League</span><span class="status status-upcoming"><span class="dot"></span>Upcoming</span></div>
+    <h3><span style="color:var(--a)">LIVERPOOL</span> <span style="color:var(--faint);font-size:20px">vs</span> <span style="color:var(--b)">MAN UNITED</span></h3>
+    <div class="when">Sun 22 Nov · 8:30pm Dubai · Anfield</div>
+<div class="stage">Briefing lands Sat 21 Nov</div>  </article>
+</a>
+<a class="ev" href="arsenal-dortmund-2026-11-24/">
+  <article class="card">
+    <div class="row"><span class="label">Football · Champions League</span><span class="status status-upcoming"><span class="dot"></span>Upcoming</span></div>
+    <h3><span style="color:var(--a)">ARSENAL</span> <span style="color:var(--faint);font-size:20px">vs</span> <span style="color:var(--b)">DORTMUND</span></h3>
+    <div class="when">Tue 24 Nov · midnight Dubai · Emirates Stadium, London</div>
+<div class="stage">Briefing lands Mon 23 Nov</div>  </article>
+</a>
+<a class="ev" href="ufc-335-oliveira-lopes/">
+  <article class="card">
+    <div class="row"><span class="label">UFC · MMA · UFC 335</span><span class="status status-upcoming"><span class="dot"></span>Upcoming</span></div>
+    <h3><span style="color:var(--a)">OLIVEIRA</span> <span style="color:var(--faint);font-size:20px">vs</span> <span style="color:var(--b)">LOPES</span></h3>
+    <div class="when">Sat 12 Dec (US) · early Sun 13 Dec in Dubai · T-Mobile Arena, Las Vegas</div>
+<div class="stage">Briefing lands Fri 11 Dec</div>  </article>
+</a>
+<a class="ev" href="ufc-334-gane-hokit/">
+  <article class="card">
+    <div class="row"><span class="label">UFC · MMA · UFC 334</span><span class="status status-finished"><span class="dot"></span>Finished</span></div>
+    <h3><span style="color:var(--a)">GANE</span> <span style="color:var(--faint);font-size:20px">vs</span> <span style="color:var(--b)">HOKIT</span></h3>
+    <div class="when">Sat 14 Nov · Madison Square Garden, New York</div>
+<div class="stage">Example page from before the pilot · fan sections not filled</div>  </article>
+</a>
+<footer class="footer">
+  Commentator is a pilot. Sources are named on every card. Unofficial; not affiliated with the UFC, the Premier League or UEFA.<br>
+  Built 2026-11-16 17:11 UTC.
+</footer>
+</div>
+</body>
+</html>
