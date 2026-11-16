@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sid's week · Commentator</title>
-<meta name="description" content="The 6 things Sid is following this week, one keycard each.">
+<meta name="description" content="The 6 keycards Sid is focusing on this week.">
 <meta property="og:title" content="Sid's week · Commentator">
-<meta property="og:description" content="The 6 things Sid is following this week, one keycard each.">
+<meta property="og:description" content="The 6 keycards Sid is focusing on this week.">
 <meta property="og:type" content="article">
 <meta name="theme-color" content="#0E1116">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -60,89 +60,177 @@ a{color:var(--accent)} a:hover{color:#FFC56B}
 .footer{font-size:12px;line-height:1.6;color:var(--faint);padding:8px 4px 0;border-top:1px solid var(--line);margin-top:8px}
 </style>
 <style>
+.hero{display:flex;flex-direction:column;gap:6px}
 .hero h1{margin:0;font-size:48px;line-height:.95}
-.pick{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:var(--ink)}
-.pick:hover{color:var(--ink)}
-.pick .card:hover{border-color:var(--line2)}
-.num{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:var(--faint);letter-spacing:1px}
-.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.pick h3{margin:0;font-family:'Barlow Condensed',sans-serif;font-size:26px;letter-spacing:.5px;text-transform:uppercase;line-height:1}
-.nx{font-size:14px;color:var(--ink2);line-height:1.4}
-.nx b{color:var(--accent);font-weight:600}
-.ang{background:var(--accent-bg);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
-.ang .l{font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.5px;text-transform:uppercase}
-.ang span{font-size:14px;color:var(--accent-ink);line-height:1.4}
-.hl{font-size:13px;color:var(--faint);line-height:1.4}
+.hero .vs{color:var(--faint);font-size:28px}
+.meta{font-size:14px;color:var(--muted)}
+.local{font-size:13px;color:var(--faint)}
+.story{font-size:16px;line-height:1.5}
+.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;background:var(--card);border-radius:14px;padding:4px;position:sticky;top:8px;z-index:5;box-shadow:0 0 0 8px var(--bg)}
+.tabs a{display:flex;align-items:center;justify-content:center;min-height:44px;text-decoration:none;font-size:14px;font-weight:600;color:var(--muted);border-radius:10px}
+.tabs a[aria-current="true"]{color:var(--bg);background:var(--ink);font-weight:700}
+.phase{display:flex;flex-direction:column;gap:14px;scroll-margin-top:72px}
+.js .phase{display:none}
+.js .phase.on{display:flex}
+.phase h2{margin:2px 0 0;font-size:20px;text-transform:uppercase;color:var(--muted)}
+.phase h2 + .src{margin-top:-8px}
+.timeline{display:flex;flex-direction:column;gap:14px;border-left:2px solid var(--line);margin-left:6px;padding-left:16px}
+.rounds{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:6px}
+.rounds div{display:flex;flex-direction:column;align-items:center;gap:6px}
+.rounds i{display:block;width:100%;height:40px;border-radius:8px}
+.rounds span{font-size:12px;color:var(--muted);text-align:center}
+.result-h{margin:0;font-size:30px;line-height:1}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.stat{background:var(--card2);border-radius:12px;padding:12px}
+.stat b{display:block;font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700}
+.stat span{font-size:12px;color:var(--muted);line-height:1.35}
+.tp-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.sidebox{background:var(--card2);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:4px}
+.sidebox .label{font-size:12px}
+.sidebox p{font-size:14px;line-height:1.45;color:var(--ink2)}
+.creators{display:flex;flex-direction:column;gap:12px}
+.creator{display:flex;flex-direction:column;gap:2px}
+.creator b{font-size:14px}
+.creator p{font-size:14px;color:var(--ink2);line-height:1.45}
+.fanbases{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.track{display:flex;flex-direction:column;gap:12px;border-left:2px solid var(--line);margin-left:4px;padding-left:14px}
+.track div{display:flex;flex-direction:column;gap:2px}
+.track .when{font-size:12px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.5px}
+.track .when.next{color:var(--accent)}
+.track .hl{font-size:15px;font-weight:600}
+.track .note{font-size:14px;color:var(--muted);line-height:1.4}
+.updates{font-size:12px;color:var(--faint);line-height:1.6}
+.feed{gap:14px}
+.feed-group{display:flex;flex-direction:column;gap:2px}
+.feed-h{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.feed-note{font-weight:500;color:var(--faint);font-size:12px}
+.feed-row{display:flex;flex-direction:column;gap:2px;padding:8px 0;border-top:1px solid var(--line);text-decoration:none}
+.feed-row:first-of-type{border-top:0}
+.feed-t{font-size:14px;line-height:1.4;color:var(--ink2)}
+.quote .feed-t{font-style:italic}
+.feed-m{font-size:12px;color:var(--faint)}
+.pulse{display:flex;align-items:flex-end;gap:1px;height:80px;margin-top:4px}
+.pulse i{flex:1;background:var(--accent);opacity:.75;border-radius:2px 2px 0 0;min-height:2px}
+.peaks{display:flex;flex-direction:column;gap:8px}
+.peak{display:flex;flex-direction:column;gap:2px;padding-top:8px;border-top:1px solid var(--line)}
+.peak b{font-size:13px;color:var(--accent)}
+.peak span{font-size:14px;color:var(--ink2)}
+.next-btn{display:flex;align-items:center;justify-content:center;min-height:48px;text-decoration:none;font-size:15px;font-weight:700;color:var(--bg);background:var(--accent);border-radius:14px}
+.next-btn:hover{color:var(--bg);filter:brightness(1.08)}
+.brief .bp{display:flex;flex-direction:column;gap:3px;padding:9px 0;border-top:1px solid var(--line)}
+.brief .bp:first-of-type{border-top:0}
+.bt{font-size:15px;line-height:1.45;color:var(--ink2)}
+.bs{font-size:12px;color:var(--faint)}.bs a{color:var(--faint);text-decoration:underline;text-underline-offset:2px}
+.lbl{align-self:flex-start;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;border-radius:6px;padding:2px 7px}
+.lbl-confirmed{color:#0E1116;background:var(--good)}
+.lbl-reported{color:var(--ink);background:var(--line2)}
+.lbl-rumour{color:#1A1300;background:var(--accent)}
+.lbl-opinion{color:var(--a);border:1px solid var(--a-line)}
+.lbl-ai-interpretation{color:var(--muted);border:1px dashed var(--line2)}
+.lbl-fan-view{color:var(--b);border:1px solid var(--b-line)}
+/* ---- compact keycard ---- */
+.kc-hero{display:flex;flex-direction:column;gap:6px}
+.kc-title{margin:0;font-size:40px;line-height:.95;color:var(--ink)}
+.kc-cur{font-size:13px;color:var(--muted)}.kc-cur b{color:var(--ink)}
+.kc-status{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:var(--accent);margin-top:2px}
+.kc-status .dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
+.kc-status-live{color:#FF6B6B}.kc-status-finished,.kc-status-ongoing{color:var(--good)}
+.kc-status b,.kc-status time{color:inherit}
+.kc-fine{font-size:12px;color:var(--faint);line-height:1.4}
+.kc-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.kc-head{margin:0;font-size:18px;line-height:1.35;font-weight:700;color:var(--ink)}
+.kc-body{margin:0;font-size:15px;line-height:1.5;color:var(--ink2)}
+.kc-pts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.kc-pt{font-size:15px;line-height:1.45;color:var(--ink2)}
+.kc-lbl{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;border-radius:5px;padding:1px 6px;margin-right:2px;vertical-align:2px}
+.kc-lbl-confirmed{color:#0E1116;background:var(--good)}
+.kc-lbl-reported{color:var(--ink);background:var(--line2)}
+.kc-lbl-rumour{color:#1A1300;background:var(--accent)}
+.kc-lbl-opinion{color:var(--a);border:1px solid var(--a-line)}
+.kc-lbl-fan-view{color:var(--b);border:1px solid var(--b-line)}
+.kc-lbl-ai-interpretation,.kc-lbl-differ{color:var(--muted);border:1px dashed var(--line2)}
+.kc-src{font-size:12px;color:var(--faint);white-space:normal}
+.kc-src a{color:var(--faint);text-decoration:underline;text-underline-offset:2px}
+.kc-more summary,.kc-fold summary{cursor:pointer;list-style:none}
+.kc-more summary::-webkit-details-marker,.kc-fold summary::-webkit-details-marker{display:none}
+.kc-more summary{font-size:14px;font-weight:600;color:var(--accent);min-height:36px;display:flex;align-items:center}
+.kc-more[open] summary{margin-bottom:8px}
+.kc-you-row{display:flex;flex-direction:column;gap:6px;padding-top:10px;border-top:1px solid var(--line)}
+.kc-you-row:first-of-type{border-top:0;padding-top:0}
+.kc-you-k{font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.4px;text-transform:uppercase}
+.kc-you-k span{color:var(--muted);text-transform:none;font-weight:600;letter-spacing:0}
+.kc-link{font-size:13px;color:var(--ink2);text-decoration:none;border-left:2px solid var(--accent);padding-left:8px}
+.kc-folds{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.kc-fold{border-top:1px solid var(--line)}.kc-fold:first-child{border-top:0}
+.kc-fold summary{display:flex;justify-content:space-between;align-items:center;min-height:52px;padding:0 16px;font-size:15px;font-weight:600;color:var(--ink)}
+.kc-fold summary::after{content:"›";color:var(--faint);font-size:20px;margin-left:8px;transition:transform .15s}
+.kc-fold[open] summary::after{transform:rotate(90deg)}
+.kc-count{margin-left:auto;font-size:13px;color:var(--faint);font-weight:500}
+.kc-fold-body{padding:0 16px 10px}
+.kc-row{display:flex;flex-direction:column;gap:2px;padding:9px 0;border-top:1px solid var(--line);text-decoration:none}
+.kc-row:first-child{border-top:0}
+.kc-row-t{font-size:14px;line-height:1.4;color:var(--ink2)}
+.kc-row-m{font-size:12px;color:var(--faint)}
+a.kc-row:hover .kc-row-t{color:var(--ink)}
+.kc-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.kc-fact{background:var(--card2);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.kc-fact b{font-size:15px;color:var(--ink)}.kc-fact span{font-size:12px;color:var(--muted);line-height:1.35}
+.kc-list{display:flex;flex-direction:column}
+.kc-li{display:grid;grid-template-columns:1fr auto;gap:0 10px;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.kc-li:first-child{border-top:0}
+.kc-li b{font-weight:600;color:var(--ink)}.kc-li i{font-style:normal;font-size:12px;color:var(--faint);grid-column:1}
+.kc-li em{font-style:normal;grid-row:1/3;grid-column:2;align-self:center;font-weight:700;font-size:13px;text-align:right}
+</style><style>
+.pk{display:flex;flex-direction:column;gap:5px;padding:14px 0;border-top:1px solid var(--line);text-decoration:none}
+.pk:first-of-type{border-top:0;padding-top:4px}
+.pk b{font-family:'Barlow Condensed',sans-serif;font-size:24px;letter-spacing:.4px;text-transform:uppercase;line-height:1;color:var(--ink)}
+.pk .s{font-size:13px;font-weight:600;color:var(--accent)}
+.pk .h{font-size:15px;line-height:1.4;color:var(--ink2)}
+.pk .y{font-size:13px;line-height:1.4;color:var(--accent-ink);background:var(--accent-bg);border-radius:10px;padding:8px 10px}
+.pk .y i{font-style:normal;font-weight:700;color:var(--accent)}
 .sg{display:flex;flex-direction:column;gap:2px;padding:8px 0;border-top:1px solid var(--line);text-decoration:none}
+.sg:first-of-type{border-top:0}
 .sg b{font-size:15px;color:var(--ink);font-weight:600}.sg span{font-size:14px;color:var(--ink2);line-height:1.4}
 </style>
 </head>
 <body>
 <div class="wrap">
-<header class="topbar">
-  <a class="brand" href="../../">COMMENTATOR</a>
-  <span class="chip">My week</span>
-</header>
-
-<section class="hero" style="display:flex;flex-direction:column;gap:6px">
+<header class="topbar"><a class="brand" href="../../">COMMENTATOR</a><span class="chip">My week</span></header>
+<section class="kc-hero">
   <div class="eyebrow">16–22 Nov</div>
-  <h1 class="display">SID'S WEEK</h1>
-  <div class="meta" style="font-size:14px;color:var(--muted)">6 keycards, committed for the week. Everything else can wait.</div>
+  <h1 class="display kc-title">Sid's week</h1>
+  <div class="kc-fine" style="font-size:14px">6 keycards. Everything else can wait.</div>
 </section>
 
-<a class="pick" href="../../topic-ufc/">
-  <article class="card">
-    <div class="row"><span class="num">01 · TOPIC KEYCARD</span><span class="pill pill-new">Default</span></div>
-    <h3>UFC</h3>
-<div class="nx">Next: <b>Procházka vs Stirling</b> · Sat 21 Nov · main card 10pm Dubai</div><div class="hl">Latest: Bilal Hasan breaks social media silence after stunning upset loss at UFC 334 · BJPenn.com</div>  </article>
-</a>
-<a class="pick" href="../../topic-iran-usa/">
-  <article class="card">
-    <div class="row"><span class="num">02 · NEWS STORY KEYCARD</span><span class="pill pill-settled">Personal</span></div>
-    <h3>Iran–USA</h3>
-<div class="hl">Latest: JD Vance promises Iran won’t turn into ‘forever war’ — and Trump will end it by 2028 · New York Post</div>  </article>
-</a>
-<a class="pick" href="../../topic-premier-league/">
-  <article class="card">
-    <div class="row"><span class="num">03 · TOPIC KEYCARD</span><span class="pill pill-new">Default</span></div>
-    <h3>Premier League</h3>
-<div class="nx">Next: <b>Liverpool vs Man United</b> · Sun 22 Nov · 8:30pm Dubai</div><div class="hl">Latest: Declan Rice contract: Arsenal midfielder verbally agrees new deal with the Premier League champions · Sky Sports</div>  </article>
-</a>
-<a class="pick" href="../../topic-fpl/#angle-creators">
-  <article class="card">
-    <div class="row"><span class="num">04 · GAMEWEEK KEYCARD</span><span class="pill pill-new">Default</span></div>
-    <h3>FPL</h3>
-<div class="nx">Gameweek 11 deadline <b><time data-t="2026-11-21T11:00:00Z">2026-11-21T11:00</time></b> · in <span data-countdown="2026-11-21T11:00:00Z" data-done="passed">…</span></div>    <div class="ang"><span class="l">+ Sid's angle</span><span>What my 3 FPL creators are doing this week</span><span style="font-size:13px;opacity:.85">Latest: TOP 10 FPL GW11 MIDFIELDERS TO BUY! 💰 PALMER OUT? 🥶 #fpl #premierleague #chelsea · FPL Harry</span></div>
-<div class="hl">Latest: Jackson, Barry, Mbeumo, Hall: Buy, keep or sell in Gameweek 11? · Fantasy Football Scout</div>  </article>
-</a>
-<a class="pick" href="../../gta-6-launch/#angle-speed">
-  <article class="card">
-    <div class="row"><span class="num">05 · LAUNCH KEYCARD</span><span class="pill pill-new">Default</span></div>
-    <h3>GTA VI</h3>
-<div class="nx">Unlocks in <b data-countdown="2026-11-19T00:00:00+04:00" data-done="out now">…</b> · Thu 19 Nov · unlocks midnight Dubai time</div>    <div class="ang"><span class="l">+ Sid's angle</span><span>How IShowSpeed is playing GTA VI</span></div>
-<div class="hl">Latest: &#39;GTA VI&#39; release: Where to buy in Texas, what players should know · MySA</div>  </article>
-</a>
-<a class="pick" href="../../topic-ai-tech-stocks/#angle-focus">
-  <article class="card">
-    <div class="row"><span class="num">06 · TOPIC KEYCARD</span><span class="pill pill-new">Default</span></div>
-    <h3>AI &amp; Tech Stocks</h3>
-<div class="nx">Next: <b>Nvidia Earnings</b> · Tue 17 Nov (US) · results ~1:20am, call 2am Wed Dubai</div>    <div class="ang"><span class="l">+ Sid's angle</span><span>Nvidia, AI infrastructure and chips</span></div>
-    <div class="ang" style="background:var(--card2)"><span class="l" style="color:var(--ink2)">This week only · until 2026-11-22</span><span style="color:var(--ink2);font-style:italic">“Nvidia reports tonight. Tell me the numbers vs what was expected, what the new CEO said, and how the market reacted.”</span><span style="color:var(--ink);font-weight:600">Nvidia reports tonight, but the material has no results or consensus numbers, and the new CEO has not spoken on the results yet.</span></div>
-<div class="hl">Latest: Nasdaq slides 2.3% as AI stocks slump ahead of Nvidia results, Anthropic IPO · Moneycontrol.com</div>  </article>
-</a>
-
-<section class="card card-hl">
-  <div class="tp-head"><span class="label">Suggested for your week</span><span class="pill pill-new">AI · you decide</span></div>
-<div class="feed-h" style="margin-top:6px">Could drop</div><a class="sg" href="../../topic-iran-usa/"><b>− Iran–USA</b><span>Heavy news load; drop it if you want to keep to six picks.</span></a><div class="feed-h" style="margin-top:6px">Keep</div><a class="sg" href="../../topic-ufc/"><b>✓ UFC</b><span>UFC Qatar on Saturday covers your UFC interest, so its fights are already included.</span></a><a class="sg" href="../../topic-iran-usa/"><b>✓ Iran–USA</b><span>The story is still moving, with a third US carrier now in the Middle East.</span></a><a class="sg" href="../../topic-premier-league/"><b>✓ Premier League</b><span>Rice&#39;s reported Arsenal deal and the Pochettino news keep this one active.</span></a><a class="sg" href="../../topic-fpl/"><b>✓ FPL</b><span>Your three-creator comparison fits the Gameweek 11 deadline on 21 November.</span></a><a class="sg" href="../../gta-6-launch/"><b>✓ GTA VI</b><span>GTA VI launches Thursday, and IShowSpeed&#39;s coverage is your angle.</span></a><a class="sg" href="../../topic-ai-tech-stocks/"><b>✓ AI &amp; Tech Stocks</b><span>Nvidia reports earnings this week, which matches your Nvidia and chips focus.</span></a><div class="feed-h" style="margin-top:6px">Ideas for new keycards</div><div class="sg"><b>Arsenal vs Borussia Dortmund</b><span>Champions League match on 24 Nov; a natural companion to your Arsenal news. · not built yet</span></div><div class="sg"><b>Nvidia CEO succession and probe</b><span>Jensen Huang&#39;s resignation and return debate could shape how the AI stock story develops. · not built yet</span></div><div class="sg"><b>Anthropic IPO</b><span>Reported alongside Nvidia&#39;s earnings; a related AI-sector event worth tracking. · not built yet</span></div>  <div class="src">Based only on your keycards, your angles and what's coming up · checked <time data-t="2026-11-16T21:25:28Z">2026-11-16</time></div>
+<section class="card">
+  <a class="pk" href="../../topic-ufc/">
+    <b>UFC</b>
+<span class="s">Next: UFC Fight Night Qatar: Procházka vs Stirling · in <span data-countdown="2026-11-21T22:00:00+04:00" data-done="now">…</span></span><span class="h">UFC 334 results dominate: Ciryl Gane kept his heavyweight title, Kayla Harrison beat Amanda Nunes, and Josh Hokit lost to Gane.</span>  </a>
+  <a class="pk" href="../../topic-iran-usa/">
+    <b>Iran–USA</b>
+<span class="s">Headlines only · 8 outlets side by side</span><span class="h">A third US aircraft carrier has reached the Middle East as the US-Iran war continues, with Trump keeping options open on renewed strikes.</span>  </a>
+  <a class="pk" href="../../topic-premier-league/">
+    <b>Premier League</b>
+<span class="s">Next: Liverpool vs Manchester United · in <span data-countdown="2026-11-22T20:30:00+04:00" data-done="now">…</span></span><span class="h">Declan Rice has verbally agreed a new long-term Arsenal contract, reported as five years, while Manchester United appoint Mauricio Pochettino as head…</span>  </a>
+  <a class="pk" href="../../topic-fpl/">
+    <b>FPL</b>
+<span class="s">Gameweek 11 deadline <time data-t="2026-11-21T11:00:00Z">Sat 21 Nov</time> · in <span data-countdown="2026-11-21T11:00:00Z" data-done="passed">…</span></span><span class="h">Gameweek 11 deadline is 21 November; João Pedro and Gvardiol are the most-sold players while Jackson and Evanilson lead transfers in.</span><span class="y"><i>Your angle:</i> The three creators agree that midfield is thin and that Palmer is a sell question, but their specific picks are not fully shown in the material.</span>  </a>
+  <a class="pk" href="../../gta-6-launch/">
+    <b>GTA VI</b>
+<span class="s">Thu 19 Nov · unlocks midnight Dubai time</span><span class="h">GTA VI launches Thursday, 19 November, and the build-up is intense: preorders are reported above $1 billion and a hacker has pleaded guilty.</span><span class="y"><i>Your angle:</i> The material has no IShowSpeed coverage: no livestream, reaction, or gameplay video from him is included.</span>  </a>
+  <a class="pk" href="../../topic-ai-tech-stocks/">
+    <b>AI &amp; Tech Stocks</b>
+<span class="s">Next: Nvidia Q3 FY2027 earnings · in <span data-countdown="2026-11-18T01:20:00+04:00" data-done="now">…</span></span><span class="y"><i>This week:</i> Nvidia reports tonight, but the material has no results or consensus numbers, and the new CEO has not spoken on the results yet.</span>
+  </a>
 </section>
 
-<section class="card" style="border-style:dashed">
-  <div class="label">Coming soon</div>
-  <p class="body">Every Sunday: pick and commit to your topics for the week, add your own angle to any keycard, then get a short recap at the end of the week and keep, swap or drop each one.</p>
-</section>
+<details class="kc-folds" style="padding:0"><summary class="kc-fold" style="list-style:none"><div style="display:flex;justify-content:space-between;align-items:center;min-height:52px;padding:0 16px;font-weight:600">Suggestions for your week<span class="kc-fine">AI · you decide</span></div></summary>
+  <div class="kc-fold-body">
+<a class="sg" href="../../topic-iran-usa/"><b>− Iran–USA</b><span>Heavy news load; drop it if you want to keep to six picks.</span></a><div class="sg"><b>Idea: Arsenal vs Borussia Dortmund</b><span>Champions League match on 24 Nov; a natural companion to your Arsenal news. · not built yet</span></div><div class="sg"><b>Idea: Nvidia CEO succession and probe</b><span>Jensen Huang&#39;s resignation and return debate could shape how the AI stock story develops. · not built yet</span></div><div class="sg"><b>Idea: Anthropic IPO</b><span>Reported alongside Nvidia&#39;s earnings; a related AI-sector event worth tracking. · not built yet</span></div>  </div>
+</details>
 <footer class="footer">
   Commentator is a pilot. Sources are named on every card. Unofficial; not affiliated with any league, promotion or company covered here.<br>
-  Built 2026-11-16 21:54 UTC.
+  Built 2026-11-16 22:12 UTC.
 </footer>
 </div>
 <script>
@@ -150,6 +238,11 @@ a{color:var(--accent)} a:hover{color:#FFC56B}
   var fmt = { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' };
   document.querySelectorAll('time[data-t]').forEach(function (t) {
     try { var d = new Date(t.dataset.t); if (!isNaN(d)) t.textContent = d.toLocaleString(undefined, fmt); } catch (err) {}
+  });
+  document.querySelectorAll('time[data-ago]').forEach(function (t) {
+    var m = Math.round((new Date() - new Date(t.dataset.ago)) / 60000);
+    if (isNaN(m)) return;
+    t.textContent = m < 1 ? 'just now' : m < 60 ? m + 'm ago' : m < 1440 ? Math.round(m / 60) + 'h ago' : Math.round(m / 1440) + 'd ago';
   });
   // Countdowns: <span data-countdown="ISO" data-done="text when passed">
   function tick() {

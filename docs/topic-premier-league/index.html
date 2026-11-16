@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Premier League keycard · Commentator</title>
-<meta name="description" content="The Premier League returns this weekend after the international break. The big games: Newcastle vs Arsenal on Saturday and Liverpool vs Manchester United at Anfield on Sunday. Arsenal then host Dortmund in the Champions League on Tuesday.">
-<meta property="og:title" content="Premier League keycard · Commentator">
-<meta property="og:description" content="The Premier League returns this weekend after the international break. The big games: Newcastle vs Arsenal on Saturday and Liverpool vs Manchester United at Anfield on Sunday. Arsenal then host Dortmund in the Champions League on Tuesday.">
+<title>Premier League · Commentator</title>
+<meta name="description" content="Declan Rice has verbally agreed a new long-term Arsenal contract, reported as five years, while Manchester United appoint Mauricio Pochettino as head coach.">
+<meta property="og:title" content="Premier League · Commentator">
+<meta property="og:description" content="Declan Rice has verbally agreed a new long-term Arsenal contract, reported as five years, while Manchester United appoint Mauricio Pochettino as head coach.">
 <meta property="og:type" content="article">
 <meta name="theme-color" content="#0E1116">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -72,7 +72,7 @@ a{color:var(--accent)} a:hover{color:#FFC56B}
 .phase{display:flex;flex-direction:column;gap:14px;scroll-margin-top:72px}
 .js .phase{display:none}
 .js .phase.on{display:flex}
-.phase h2{margin:4px 0 0;font-size:26px;text-transform:uppercase}
+.phase h2{margin:2px 0 0;font-size:20px;text-transform:uppercase;color:var(--muted)}
 .phase h2 + .src{margin-top:-8px}
 .timeline{display:flex;flex-direction:column;gap:14px;border-left:2px solid var(--line);margin-left:6px;padding-left:16px}
 .rounds{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:6px}
@@ -128,189 +128,112 @@ a{color:var(--accent)} a:hover{color:#FFC56B}
 .lbl-opinion{color:var(--a);border:1px solid var(--a-line)}
 .lbl-ai-interpretation{color:var(--muted);border:1px dashed var(--line2)}
 .lbl-fan-view{color:var(--b);border:1px solid var(--b-line)}
-</style><style>
-.hero{display:flex;flex-direction:column;gap:6px}
-.hero h1{margin:0;font-size:48px;line-height:.95}
-.meta{font-size:14px;color:var(--muted)}
-.story{font-size:16px;line-height:1.5}
-.ev-row{display:flex;flex-direction:column;gap:3px;padding:10px 0;border-top:1px solid var(--line);text-decoration:none;color:var(--ink)}
-.ev-row:first-of-type{border-top:0}
-.ev-row b{font-family:'Barlow Condensed',sans-serif;font-size:22px;letter-spacing:.5px;text-transform:uppercase;line-height:1}
-.ev-row .ev-m{font-size:13px;color:var(--faint)}
-.section-h{margin:4px 0 0;font-size:26px;text-transform:uppercase}
-</style>
-</head>
+/* ---- compact keycard ---- */
+.kc-hero{display:flex;flex-direction:column;gap:6px}
+.kc-title{margin:0;font-size:40px;line-height:.95;color:var(--ink)}
+.kc-cur{font-size:13px;color:var(--muted)}.kc-cur b{color:var(--ink)}
+.kc-status{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:var(--accent);margin-top:2px}
+.kc-status .dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
+.kc-status-live{color:#FF6B6B}.kc-status-finished,.kc-status-ongoing{color:var(--good)}
+.kc-status b,.kc-status time{color:inherit}
+.kc-fine{font-size:12px;color:var(--faint);line-height:1.4}
+.kc-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.kc-head{margin:0;font-size:18px;line-height:1.35;font-weight:700;color:var(--ink)}
+.kc-body{margin:0;font-size:15px;line-height:1.5;color:var(--ink2)}
+.kc-pts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.kc-pt{font-size:15px;line-height:1.45;color:var(--ink2)}
+.kc-lbl{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;border-radius:5px;padding:1px 6px;margin-right:2px;vertical-align:2px}
+.kc-lbl-confirmed{color:#0E1116;background:var(--good)}
+.kc-lbl-reported{color:var(--ink);background:var(--line2)}
+.kc-lbl-rumour{color:#1A1300;background:var(--accent)}
+.kc-lbl-opinion{color:var(--a);border:1px solid var(--a-line)}
+.kc-lbl-fan-view{color:var(--b);border:1px solid var(--b-line)}
+.kc-lbl-ai-interpretation,.kc-lbl-differ{color:var(--muted);border:1px dashed var(--line2)}
+.kc-src{font-size:12px;color:var(--faint);white-space:normal}
+.kc-src a{color:var(--faint);text-decoration:underline;text-underline-offset:2px}
+.kc-more summary,.kc-fold summary{cursor:pointer;list-style:none}
+.kc-more summary::-webkit-details-marker,.kc-fold summary::-webkit-details-marker{display:none}
+.kc-more summary{font-size:14px;font-weight:600;color:var(--accent);min-height:36px;display:flex;align-items:center}
+.kc-more[open] summary{margin-bottom:8px}
+.kc-you-row{display:flex;flex-direction:column;gap:6px;padding-top:10px;border-top:1px solid var(--line)}
+.kc-you-row:first-of-type{border-top:0;padding-top:0}
+.kc-you-k{font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.4px;text-transform:uppercase}
+.kc-you-k span{color:var(--muted);text-transform:none;font-weight:600;letter-spacing:0}
+.kc-link{font-size:13px;color:var(--ink2);text-decoration:none;border-left:2px solid var(--accent);padding-left:8px}
+.kc-folds{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.kc-fold{border-top:1px solid var(--line)}.kc-fold:first-child{border-top:0}
+.kc-fold summary{display:flex;justify-content:space-between;align-items:center;min-height:52px;padding:0 16px;font-size:15px;font-weight:600;color:var(--ink)}
+.kc-fold summary::after{content:"›";color:var(--faint);font-size:20px;margin-left:8px;transition:transform .15s}
+.kc-fold[open] summary::after{transform:rotate(90deg)}
+.kc-count{margin-left:auto;font-size:13px;color:var(--faint);font-weight:500}
+.kc-fold-body{padding:0 16px 10px}
+.kc-row{display:flex;flex-direction:column;gap:2px;padding:9px 0;border-top:1px solid var(--line);text-decoration:none}
+.kc-row:first-child{border-top:0}
+.kc-row-t{font-size:14px;line-height:1.4;color:var(--ink2)}
+.kc-row-m{font-size:12px;color:var(--faint)}
+a.kc-row:hover .kc-row-t{color:var(--ink)}
+.kc-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.kc-fact{background:var(--card2);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.kc-fact b{font-size:15px;color:var(--ink)}.kc-fact span{font-size:12px;color:var(--muted);line-height:1.35}
+.kc-list{display:flex;flex-direction:column}
+.kc-li{display:grid;grid-template-columns:1fr auto;gap:0 10px;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.kc-li:first-child{border-top:0}
+.kc-li b{font-weight:600;color:var(--ink)}.kc-li i{font-style:normal;font-size:12px;color:var(--faint);grid-column:1}
+.kc-li em{font-style:normal;grid-row:1/3;grid-column:2;align-self:center;font-weight:700;font-size:13px;text-align:right}
+</style></head>
 <body>
 <div class="wrap">
 <header class="topbar">
   <a class="brand" href="../">COMMENTATOR</a>
-  <span class="chip">Topic keycard</span>
 </header>
-
-<section class="hero">
-  <div class="eyebrow">Football · Topic</div>
-  <h1 class="display"><span style="color:var(--a)">PREMIER LEAGUE</span></h1>
-  <div class="meta">Ongoing · refreshed every 30 minutes</div>
+<section class="kc-hero">
+  <div class="eyebrow">Football</div>
+  <h1 class="display kc-title">Premier League</h1>
+<div class="kc-status kc-status-ongoing"><span class="dot"></span><span>Next: Liverpool vs Manchester United · in <span data-countdown="2026-11-22T20:30:00+04:00" data-done="now">…</span></span></div></section>
+<section class="card kc-now">
+  <div class="kc-h"><span class="label">Right now</span><span class="kc-fine"><time data-ago="2026-11-16T21:25:13Z">updated</time></span></div>
+<p class="kc-head">Declan Rice has verbally agreed a new long-term Arsenal contract, reported as five years, while Manchester United appoint Mauricio Pochettino as head coach.</p>  <ul class="kc-pts"><li class="kc-pt"><span class="kc-lbl kc-lbl-reported">reported</span> Declan Rice has verbally agreed terms on a new long-term Arsenal contract, Sky Sports reports. <span class="kc-src"><a href="https://news.google.com/rss/articles/CBMi9wFBVV95cUxNanlSenFWRHJRRUZLYV9ZeVFBV244UG8wd1ZrVmtvUUIxNU1mX1hibmkwcC04TFl6OGJsNUd0akI4Z2dRQ004WWo0eWZ4NFBVTFVYSlUzd1hYc044aUJpRTAwcEgxOW5xNDdZc0E3ZFo5bHJ6azdWVDZIT3d3SUpLNEVpal9HdVVrc0dkTmVaVVVtRWVaZlh3WEQ0M1RIZW5mTmFkWVptdmRnLURuVWdpUnN0NENVanZORGxRR3I2dkRYNER1SGNneER6YXpEUktoMUluVFk1MjgxZTlLX3dEVW9INHc5LVhWN1RGQXVKckZZMjNpVUVV?oc=5" target="_blank" rel="noopener">Sky Sports</a></span></li><li class="kc-pt"><span class="kc-lbl kc-lbl-reported">reported</span> Yahoo Sports and The Athletic say the new Rice deal is five years. The deal is not yet signed. <span class="kc-src"><a href="https://news.google.com/rss/articles/CBMihAFBVV95cUxQX09KdEM1MDNwaEFXc0xaVkNlNEpxN012bkZoYlV1WDExRmlTN01fbjJpN2pialBmOGNWWFYwZS00bDNRZGVNOTU1bUdGaUFiRTlIMUtONkpZX0NIcExkRXphZzJjeG55eExwb1lhVUFpdVdTdndjWTd6ZzRxQWtzZnVMREg?oc=5" target="_blank" rel="noopener">Yahoo Sports</a> · <a href="https://news.google.com/rss/articles/CBMikgFBVV95cUxOWm1mSFVzUmtNVGdrREZ5NmRrTl9aZEQwTmx6TER5TWp2V2NhS05OWllZMEJlZ01lYXZPRlZXeEtSRlplOUNrLTRfUlV0Zk85UDNLSlVwOEhXSG5EUVdfR2VweGczZ0E0M010VHJCNnNPbS0tb2FlQkZZc0R3N3NMMlhQMWNNeXNScEdfUFBxeERPQQ?oc=5" target="_blank" rel="noopener">The New York Times</a></span></li><li class="kc-pt"><span class="kc-lbl kc-lbl-reported">reported</span> Jurrien Timber is set to sign an Arsenal contract extension, per two outlets. <span class="kc-src"><a href="https://news.google.com/rss/articles/CBMijgFBVV95cUxNLVVSOXB1dGJhWjd4Njl5eVlQcUpTSURMNnZvdENYMnhwMmZrajB1RVBkMGVnRDc4Rlhsb1VUSEliMHpfSTk2UTR4cE40R0tNdkJlbUNpQUlUblFnank5Z2kzX0NiSUVrU3RkWVp6SnhxVmJLaDM4b3E1UXNXUGJJQ0M4M3JEZVdvbEFnNXN3?oc=5" target="_blank" rel="noopener">Yahoo Sports</a> · <a href="https://news.google.com/rss/articles/CBMijAFBVV95cUxNd3dGY0NYa3JXclMzOUE3TEpsbGZiemZKNUFqc2xrLVF1QXJHR21KYTN0bXl2U2tXV1Jfa0RydzcySC1UMldFeEdhUUV2eHlDQmNJNGVHNkFjV2h3Umt0bFBqbnV4ZW03QnNxZlViWmdZX0RrMmR6STNGU1Jlb2R3T1hOOGt3TW0wcll4Mg?oc=5" target="_blank" rel="noopener">The New York Times</a></span></li></ul>
+  <details class="kc-more"><summary>Where sources differ + 2 more</summary>
+    <ul class="kc-pts"><li class="kc-pt"><span class="kc-lbl kc-lbl-reported">reported</span> Mauricio Pochettino has been appointed Manchester United boss but has not yet arrived at Old Trafford. United face Liverpool at the weekend. <span class="kc-src"><a href="https://www.manchestereveningnews.co.uk/sport/football/football-news/man-united-news-live-pochettino-34915986" target="_blank" rel="noopener">Manchester Evening News</a> · <a href="https://news.google.com/rss/articles/CBMimAFBVV95cUxNVWRfLTJqaTJxckpJVDJiRkJ4U01LU3U3RFUya2huaDRId3FYbHBNYUZSZ3ByeDRLVlJURlVSVEw4d0w1Ry1RX2tSSnpMREpLTXZoTzdzVGwtN1pyZUtHb283ejBjNXpvbW5UaEc2eF9GdnlzS2hEZ05SaWxHTEtBS3ZDQ1JNSFB6cmVRRjREc1ZwUUhPVk1CTA?oc=5" target="_blank" rel="noopener">Yahoo Sports</a></span></li><li class="kc-pt"><span class="kc-lbl kc-lbl-confirmed">confirmed</span> Thomas Frank has been confirmed as Crystal Palace manager. Palace are last in the table. <span class="kc-src"><a href="https://news.google.com/rss/articles/CBMitAFBVV95cUxPbVFoTDQ0MVhWRE9pUlIyQlJPSy1XSWY2NDZURncxRXhEYkszRi1mM19EMFN3WU5XRjIyZ1YyQ3A3cE9tODJnZ004TGdzc3FyS29aSmF5YzRnWDFWcEZNZzJXSzAyblhmRVNCNkV6Y244dnhDbEhMMW9acmp5emNzYTZ3b090TU41bGM5M0RMSzY4LUE3cmxvMkp1TjBhRTVpRVR2RlEwRkc0OEhwMG8xV0hLU3k?oc=5" target="_blank" rel="noopener">FOX Sports</a> · <a href="https://www.bbc.co.uk/sport/football/articles/cmge3y2qjlyro?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener">BBC Sport</a> · <a href="https://news.google.com/rss/articles/CBMiiwFBVV95cUxQSzFSM2ZoOE9hREJ3eTdXdjVmdWl0ZGctdHRidGxkMFlkNEh5and3UXBveXZKdVNUVDdZcG80TjQxc1hNNG9uZGNSbUIzLS03MmlWNHUxSlpfcUR0SWZQeDQ2cGJUNjk3djNzVmhvS09UUmV1STItcy0ybFRSSGcteVpFcVY4eklYdGRV?oc=5" target="_blank" rel="noopener">Yahoo Sports</a></span></li><li class="kc-pt"><span class="kc-lbl kc-lbl-differ">differ</span> Sky Sports says Rice agreed a long-term deal. Yahoo and The Athletic add that it is five years. Sky does not give the length. <span class="kc-src"><a href="https://www.skysports.com/football/news/12040/13612986/declan-rice-contract-arsenal-midfielder-verbally-agrees-new-320000-a-week-deal-with-the-premier-league-champions" target="_blank" rel="noopener">Sky Sports</a> · <a href="https://news.google.com/rss/articles/CBMihAFBVV95cUxQX09KdEM1MDNwaEFXc0xaVkNlNEpxN012bkZoYlV1WDExRmlTN01fbjJpN2pialBmOGNWWFYwZS00bDNRZGVNOTU1bUdGaUFiRTlIMUtONkpZX0NIcExkRXphZzJjeG55eExwb1lhVUFpdVdTdndjWTd6ZzRxQWtzZnVMREg?oc=5" target="_blank" rel="noopener">Yahoo Sports</a> · <a href="https://news.google.com/rss/articles/CBMikgFBVV95cUxOWm1mSFVzUmtNVGdrREZ5NmRrTl9aZEQwTmx6TER5TWp2V2NhS05OWllZMEJlZ01lYXZPRlZXeEtSRlplOUNrLTRfUlV0Zk85UDNLSlVwOEhXSG5EUVdfR2VweGczZ0E0M010VHJCNnNPbS0tb2FlQkZZc0R3N3NMMlhQMWNNeXNScEdfUFBxeERPQQ?oc=5" target="_blank" rel="noopener">The New York Times</a></span></li><li class="kc-pt"><span class="kc-lbl kc-lbl-differ">differ</span> Some outlets say Pochettino has already begun work at United. Others say he has not yet arrived. <span class="kc-src"><a href="https://news.google.com/rss/articles/CBMimAFBVV95cUxNVWRfLTJqaTJxckpJVDJiRkJ4U01LU3U3RFUya2huaDRId3FYbHBNYUZSZ3ByeDRLVlJURlVSVEw4d0w1Ry1RX2tSSnpMREpLTXZoTzdzVGwtN1pyZUtHb283ejBjNXpvbW5UaEc2eF9GdnlzS2hEZ05SaWxHTEtBS3ZDQ1JNSFB6cmVRRjREc1ZwUUhPVk1CTA?oc=5" target="_blank" rel="noopener">Yahoo Sports</a> · <a href="https://www.theguardian.com/football/2026/nov/16/mauricio-pochettino-assistants-manchester-united-usmnt" target="_blank" rel="noopener">The Guardian</a> · <a href="https://www.manchestereveningnews.co.uk/sport/football/football-news/mauricio-pochettino-fires-warning-liverpool-34920930" target="_blank" rel="noopener">Manchester Evening News</a></span></li></ul>
+  </details>
+  <div class="kc-fine">AI summary of this keycard's sources only. Labels show how solid each point is.</div>
 </section>
-
-<section class="card">
-  <div class="label">This week in 20 seconds</div>
-    <p class="story">The Premier League returns this weekend after the international break. The big games: Newcastle vs Arsenal on Saturday and Liverpool vs Manchester United at Anfield on Sunday. Arsenal then host Dortmund in the Champions League on Tuesday.</p>
-<div class="src">Updated Tue 17 Nov</div></section>
-
-<section class="card brief">
-  <div class="tp-head"><span class="label">AI briefing</span><span class="pill pill-new">From this keycard's sources</span></div>
-<p class="story" style="font-weight:600">Declan Rice has verbally agreed a new long-term Arsenal contract, reported as five years, while Manchester United appoint Mauricio Pochettino as head coach.</p>  <div class="bp"><span class="lbl lbl-reported">reported</span><span class="bt">Declan Rice has verbally agreed terms on a new long-term Arsenal contract, Sky Sports reports.</span>
-<span class="bs"><a href="https://news.google.com/rss/articles/CBMi9wFBVV95cUxNanlSenFWRHJRRUZLYV9ZeVFBV244UG8wd1ZrVmtvUUIxNU1mX1hibmkwcC04TFl6OGJsNUd0akI4Z2dRQ004WWo0eWZ4NFBVTFVYSlUzd1hYc044aUJpRTAwcEgxOW5xNDdZc0E3ZFo5bHJ6azdWVDZIT3d3SUpLNEVpal9HdVVrc0dkTmVaVVVtRWVaZlh3WEQ0M1RIZW5mTmFkWVptdmRnLURuVWdpUnN0NENVanZORGxRR3I2dkRYNER1SGNneER6YXpEUktoMUluVFk1MjgxZTlLX3dEVW9INHc5LVhWN1RGQXVKckZZMjNpVUVV?oc=5" target="_blank" rel="noopener">Sky Sports</a></span></div>
-<div class="bp"><span class="lbl lbl-reported">reported</span><span class="bt">Yahoo Sports and The Athletic say the new Rice deal is five years. The deal is not yet signed.</span>
-<span class="bs"><a href="https://news.google.com/rss/articles/CBMihAFBVV95cUxQX09KdEM1MDNwaEFXc0xaVkNlNEpxN012bkZoYlV1WDExRmlTN01fbjJpN2pialBmOGNWWFYwZS00bDNRZGVNOTU1bUdGaUFiRTlIMUtONkpZX0NIcExkRXphZzJjeG55eExwb1lhVUFpdVdTdndjWTd6ZzRxQWtzZnVMREg?oc=5" target="_blank" rel="noopener">Yahoo Sports</a> · <a href="https://news.google.com/rss/articles/CBMikgFBVV95cUxOWm1mSFVzUmtNVGdrREZ5NmRrTl9aZEQwTmx6TER5TWp2V2NhS05OWllZMEJlZ01lYXZPRlZXeEtSRlplOUNrLTRfUlV0Zk85UDNLSlVwOEhXSG5EUVdfR2VweGczZ0E0M010VHJCNnNPbS0tb2FlQkZZc0R3N3NMMlhQMWNNeXNScEdfUFBxeERPQQ?oc=5" target="_blank" rel="noopener">The New York Times</a></span></div>
-<div class="bp"><span class="lbl lbl-reported">reported</span><span class="bt">Jurrien Timber is set to sign an Arsenal contract extension, per two outlets.</span>
-<span class="bs"><a href="https://news.google.com/rss/articles/CBMijgFBVV95cUxNLVVSOXB1dGJhWjd4Njl5eVlQcUpTSURMNnZvdENYMnhwMmZrajB1RVBkMGVnRDc4Rlhsb1VUSEliMHpfSTk2UTR4cE40R0tNdkJlbUNpQUlUblFnank5Z2kzX0NiSUVrU3RkWVp6SnhxVmJLaDM4b3E1UXNXUGJJQ0M4M3JEZVdvbEFnNXN3?oc=5" target="_blank" rel="noopener">Yahoo Sports</a> · <a href="https://news.google.com/rss/articles/CBMijAFBVV95cUxNd3dGY0NYa3JXclMzOUE3TEpsbGZiemZKNUFqc2xrLVF1QXJHR21KYTN0bXl2U2tXV1Jfa0RydzcySC1UMldFeEdhUUV2eHlDQmNJNGVHNkFjV2h3Umt0bFBqbnV4ZW03QnNxZlViWmdZX0RrMmR6STNGU1Jlb2R3T1hOOGt3TW0wcll4Mg?oc=5" target="_blank" rel="noopener">The New York Times</a></span></div>
-<div class="bp"><span class="lbl lbl-reported">reported</span><span class="bt">Mauricio Pochettino has been appointed Manchester United boss but has not yet arrived at Old Trafford. United face Liverpool at the weekend.</span>
-<span class="bs"><a href="https://www.manchestereveningnews.co.uk/sport/football/football-news/man-united-news-live-pochettino-34915986" target="_blank" rel="noopener">Manchester Evening News</a> · <a href="https://news.google.com/rss/articles/CBMimAFBVV95cUxNVWRfLTJqaTJxckpJVDJiRkJ4U01LU3U3RFUya2huaDRId3FYbHBNYUZSZ3ByeDRLVlJURlVSVEw4d0w1Ry1RX2tSSnpMREpLTXZoTzdzVGwtN1pyZUtHb283ejBjNXpvbW5UaEc2eF9GdnlzS2hEZ05SaWxHTEtBS3ZDQ1JNSFB6cmVRRjREc1ZwUUhPVk1CTA?oc=5" target="_blank" rel="noopener">Yahoo Sports</a></span></div>
-<div class="bp"><span class="lbl lbl-confirmed">confirmed</span><span class="bt">Thomas Frank has been confirmed as Crystal Palace manager. Palace are last in the table.</span>
-<span class="bs"><a href="https://news.google.com/rss/articles/CBMitAFBVV95cUxPbVFoTDQ0MVhWRE9pUlIyQlJPSy1XSWY2NDZURncxRXhEYkszRi1mM19EMFN3WU5XRjIyZ1YyQ3A3cE9tODJnZ004TGdzc3FyS29aSmF5YzRnWDFWcEZNZzJXSzAyblhmRVNCNkV6Y244dnhDbEhMMW9acmp5emNzYTZ3b090TU41bGM5M0RMSzY4LUE3cmxvMkp1TjBhRTVpRVR2RlEwRkc0OEhwMG8xV0hLU3k?oc=5" target="_blank" rel="noopener">FOX Sports</a> · <a href="https://www.bbc.co.uk/sport/football/articles/cmge3y2qjlyro?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener">BBC Sport</a> · <a href="https://news.google.com/rss/articles/CBMiiwFBVV95cUxQSzFSM2ZoOE9hREJ3eTdXdjVmdWl0ZGctdHRidGxkMFlkNEh5and3UXBveXZKdVNUVDdZcG80TjQxc1hNNG9uZGNSbUIzLS03MmlWNHUxSlpfcUR0SWZQeDQ2cGJUNjk3djNzVmhvS09UUmV1STItcy0ybFRSSGcteVpFcVY4eklYdGRV?oc=5" target="_blank" rel="noopener">Yahoo Sports</a></span></div>
-
-  <div class="feed-h" style="margin-top:6px">Where sources differ</div>
-<div class="bp"><span class="bt">Sky Sports says Rice agreed a long-term deal. Yahoo and The Athletic add that it is five years. Sky does not give the length.</span><span class="bs"><a href="https://www.skysports.com/football/news/12040/13612986/declan-rice-contract-arsenal-midfielder-verbally-agrees-new-320000-a-week-deal-with-the-premier-league-champions" target="_blank" rel="noopener">Sky Sports</a> · <a href="https://news.google.com/rss/articles/CBMihAFBVV95cUxQX09KdEM1MDNwaEFXc0xaVkNlNEpxN012bkZoYlV1WDExRmlTN01fbjJpN2pialBmOGNWWFYwZS00bDNRZGVNOTU1bUdGaUFiRTlIMUtONkpZX0NIcExkRXphZzJjeG55eExwb1lhVUFpdVdTdndjWTd6ZzRxQWtzZnVMREg?oc=5" target="_blank" rel="noopener">Yahoo Sports</a> · <a href="https://news.google.com/rss/articles/CBMikgFBVV95cUxOWm1mSFVzUmtNVGdrREZ5NmRrTl9aZEQwTmx6TER5TWp2V2NhS05OWllZMEJlZ01lYXZPRlZXeEtSRlplOUNrLTRfUlV0Zk85UDNLSlVwOEhXSG5EUVdfR2VweGczZ0E0M010VHJCNnNPbS0tb2FlQkZZc0R3N3NMMlhQMWNNeXNScEdfUFBxeERPQQ?oc=5" target="_blank" rel="noopener">The New York Times</a></span></div><div class="bp"><span class="bt">Some outlets say Pochettino has already begun work at United. Others say he has not yet arrived.</span><span class="bs"><a href="https://news.google.com/rss/articles/CBMimAFBVV95cUxNVWRfLTJqaTJxckpJVDJiRkJ4U01LU3U3RFUya2huaDRId3FYbHBNYUZSZ3ByeDRLVlJURlVSVEw4d0w1Ry1RX2tSSnpMREpLTXZoTzdzVGwtN1pyZUtHb283ejBjNXpvbW5UaEc2eF9GdnlzS2hEZ05SaWxHTEtBS3ZDQ1JNSFB6cmVRRjREc1ZwUUhPVk1CTA?oc=5" target="_blank" rel="noopener">Yahoo Sports</a> · <a href="https://www.theguardian.com/football/2026/nov/16/mauricio-pochettino-assistants-manchester-united-usmnt" target="_blank" rel="noopener">The Guardian</a> · <a href="https://www.manchestereveningnews.co.uk/sport/football/football-news/mauricio-pochettino-fires-warning-liverpool-34920930" target="_blank" rel="noopener">Manchester Evening News</a></span></div>  <div class="src">Written by AI only from the 57 items on this keycard, every point linked · checked <time data-t="2026-11-16T21:25:13Z">2026-11-16</time> · labels: confirmed, reported, rumour, opinion, fan view, AI interpretation</div>
-</section>
-
-
-
 
 
 <section class="card">
-  <div class="label">Moments in this keycard</div>
-  <div>
-    <a class="ev-row" href="../liverpool-man-utd-2026-11-22/">
-      <span class="status status-upcoming"><span class="dot"></span>Upcoming</span>
-      <b><span style="color:var(--a)">LIVERPOOL</span> <span style="color:var(--faint);font-size:16px">vs</span> <span style="color:var(--b)">MAN UNITED</span></b>
-      <span class="ev-m">Sun 22 Nov · 8:30pm Dubai · Briefing lands Sat 21 Nov</span>
-    </a>
-    <a class="ev-row" href="../arsenal-dortmund-2026-11-24/">
-      <span class="status status-upcoming"><span class="dot"></span>Upcoming</span>
-      <b><span style="color:var(--a)">ARSENAL</span> <span style="color:var(--faint);font-size:16px">vs</span> <span style="color:var(--b)">DORTMUND</span></b>
-      <span class="ev-m">Tue 24 Nov · midnight Dubai · Briefing lands Mon 23 Nov</span>
-    </a>
-  </div>
-</section>
+  <div class="kc-h"><span class="label">Moments</span></div>
+<a class="kc-row" href="../liverpool-man-utd-2026-11-22/"><span class="kc-row-t">Liverpool vs Manchester United</span><span class="kc-row-m">Upcoming · Sun 22 Nov · 8:30pm Dubai</span></a><a class="kc-row" href="../arsenal-dortmund-2026-11-24/"><span class="kc-row-t">Arsenal vs Borussia Dortmund</span><span class="kc-row-m">Upcoming · Tue 24 Nov · midnight Dubai</span></a></section>
 
-
-<section class="card feed">
-  <div class="tp-head"><span class="label">This week from the sources</span><span class="pill pill-new">Auto-collected</span></div>
-  <div class="feed-group">
-    <div class="feed-h">Latest headlines</div>
-<a class="feed-row" href="https://news.google.com/rss/articles/CBMi9wFBVV95cUxNanlSenFWRHJRRUZLYV9ZeVFBV244UG8wd1ZrVmtvUUIxNU1mX1hibmkwcC04TFl6OGJsNUd0akI4Z2dRQ004WWo0eWZ4NFBVTFVYSlUzd1hYc044aUJpRTAwcEgxOW5xNDdZc0E3ZFo5bHJ6azdWVDZIT3d3SUpLNEVpal9HdVVrc0dkTmVaVVVtRWVaZlh3WEQ0M1RIZW5mTmFkWVptdmRnLURuVWdpUnN0NENVanZORGxRR3I2dkRYNER1SGNneER6YXpEUktoMUluVFk1MjgxZTlLX3dEVW9INHc5LVhWN1RGQXVKckZZMjNpVUVV?oc=5" target="_blank" rel="noopener"><span class="feed-t">Declan Rice contract: Arsenal midfielder verbally agrees new deal with the Premier League champions</span><span class="feed-m">Sky Sports · <time data-t="2026-11-16T21:18:00Z">2026-11-16</time></span></a><a class="feed-row" href="https://www.skysports.com/football/news/12040/13612986/declan-rice-contract-arsenal-midfielder-verbally-agrees-new-320000-a-week-deal-with-the-premier-league-champions" target="_blank" rel="noopener"><span class="feed-t">Rice verbally agrees new Arsenal contract</span><span class="feed-m">Sky Sports · <time data-t="2026-11-16T21:12:00Z">2026-11-16</time></span></a><a class="feed-row" href="https://news.google.com/rss/articles/CBMihAFBVV95cUxQX09KdEM1MDNwaEFXc0xaVkNlNEpxN012bkZoYlV1WDExRmlTN01fbjJpN2pialBmOGNWWFYwZS00bDNRZGVNOTU1bUdGaUFiRTlIMUtONkpZX0NIcExkRXphZzJjeG55eExwb1lhVUFpdVdTdndjWTd6ZzRxQWtzZnVMREg?oc=5" target="_blank" rel="noopener"><span class="feed-t">Declan Rice agrees terms on new five-year Arsenal contract</span><span class="feed-m">Yahoo Sports · <time data-t="2026-11-16T21:04:00Z">2026-11-16</time></span></a><a class="feed-row" href="https://news.google.com/rss/articles/CBMikgFBVV95cUxOWm1mSFVzUmtNVGdrREZ5NmRrTl9aZEQwTmx6TER5TWp2V2NhS05OWllZMEJlZ01lYXZPRlZXeEtSRlplOUNrLTRfUlV0Zk85UDNLSlVwOEhXSG5EUVdfR2VweGczZ0E0M010VHJCNnNPbS0tb2FlQkZZc0R3N3NMMlhQMWNNeXNScEdfUFBxeERPQQ?oc=5" target="_blank" rel="noopener"><span class="feed-t">Declan Rice agrees new five-year Arsenal deal - The Athletic</span><span class="feed-m">The New York Times · <time data-t="2026-11-16T20:55:07Z">2026-11-16</time></span></a><a class="feed-row" href="https://news.google.com/rss/articles/CBMikgFBVV95cUxQZDMyY3BLeFQxa0Z5YnhZTXRlbzVlWmR6SVFES2lKMmVzblBIbHZKcXZCeExqbHdWRV9lcWNRUzJYbE9tRjRKTHpHdW16UmRqd0NxRW9pRmF5d1hjUHp2aGctNXdxalVfMmRyZXhKZlA5czlDWmQtb1NBbzVYQ3ZFZGp6YXQxcll2Z1BKdExBR3Bzdw?oc=5" target="_blank" rel="noopener"><span class="feed-t">Premier League Giants Prepare to Break Bank for Barcelona Star Fermin Lopez—Report</span><span class="feed-m">Sports Illustrated · <time data-t="2026-11-16T20:50:25Z">2026-11-16</time></span></a><a class="feed-row" href="https://news.google.com/rss/articles/CBMijgFBVV95cUxNLVVSOXB1dGJhWjd4Njl5eVlQcUpTSURMNnZvdENYMnhwMmZrajB1RVBkMGVnRDc4Rlhsb1VUSEliMHpfSTk2UTR4cE40R0tNdkJlbUNpQUlUblFnank5Z2kzX0NiSUVrU3RkWVp6SnhxVmJLaDM4b3E1UXNXUGJJQ0M4M3JEZVdvbEFnNXN3?oc=5" target="_blank" rel="noopener"><span class="feed-t">Jurrien Timber to sign Arsenal contract extension</span><span class="feed-m">Yahoo Sports · <time data-t="2026-11-16T20:27:39Z">2026-11-16</time></span></a>  </div>
-  <div class="feed-group">
-    <div class="feed-h">Creator videos</div>
-<a class="feed-row" href="https://www.youtube.com/watch?v=MVGoix-ambE" target="_blank" rel="noopener"><span class="feed-t">Man Utd 4-4 Aston Villa | Extended Highlights</span><span class="feed-m">Manchester United · 2,303,815 views</span></a><a class="feed-row" href="https://www.youtube.com/watch?v=_bv4eOUyw60" target="_blank" rel="noopener"><span class="feed-t">LONG SALIBA PASS BEFORE ARSENAL SCORE!</span><span class="feed-m">Arsenal · 1,598,603 views</span></a><a class="feed-row" href="https://www.youtube.com/watch?v=4cg2OLg51LQ" target="_blank" rel="noopener"><span class="feed-t">John McGinn Told The Referee He Was Nervous 😅</span><span class="feed-m">Premier League · 1,023,724 views</span></a><a class="feed-row" href="https://www.youtube.com/watch?v=NPehs0EtShw" target="_blank" rel="noopener"><span class="feed-t">THIS TACKLE FROM EZRI KONSA 😮‍💨</span><span class="feed-m">Arsenal · 712,684 views</span></a>  </div>
-  <div class="feed-group">
-    <div class="feed-h">Most-liked comments <span class="feed-note">likes show engagement, not who's right</span></div>
-<a class="feed-row quote" href="https://www.youtube.com/watch?v=DI5HlcEdml8&amp;lc=UgzBkwICAlMVYWUB11l4AaABAg" target="_blank" rel="noopener"><span class="feed-t">“POCH SACKED! sorry, just practicing for may”</span><span class="feed-m">3,218 likes · on The United Stand: “Carrick Sacked! Goldbridge Man Utd News”</span></a><a class="feed-row quote" href="https://www.youtube.com/watch?v=4cg2OLg51LQ&amp;lc=UgytfNMCPMubWljvqEl4AaABAg" target="_blank" rel="noopener"><span class="feed-t">“Gosh he is hilarious, absolute legend. He&#39;s glad the ref did not see his missed penalty!”</span><span class="feed-m">1,351 likes · on Premier League: “John McGinn Told The Referee He Was Nervous 😅”</span></a><a class="feed-row quote" href="https://www.youtube.com/watch?v=V7r3_t_FlPY&amp;lc=UgwHs7ahObP0s-UL4VJ4AaABAg" target="_blank" rel="noopener"><span class="feed-t">“Highly recommend everyone goes back and watches Goldbridge’s reaction to Amorim getting sacked - was absolutely spot on about everything.”</span><span class="feed-m">1,286 likes · on The United Stand: “Carrick SACKING Imminent! Man Utd News”</span></a><a class="feed-row quote" href="https://www.youtube.com/watch?v=j8A8-kPAnmw&amp;lc=Ugz4e2M21doJz9Ax4ut4AaABAg" target="_blank" rel="noopener"><span class="feed-t">“Glad Goldbridge has his platform. We like him cause he calls out what all of us fans feel in the moment. This platform helps for these players to speak there truth and give us there side, which is gr…”</span><span class="feed-m">1,267 likes · on The United Stand: “Conte WOULDN’T Work! Carrick Sacked? &amp; Ashley Young Joins |…”</span></a><a class="feed-row quote" href="https://www.youtube.com/watch?v=DI5HlcEdml8&amp;lc=UgxTnsuBA5y-Fzdnzgd4AaABAg" target="_blank" rel="noopener"><span class="feed-t">“The broken car is getting a new driver 🗿”</span><span class="feed-m">1,136 likes · on The United Stand: “Carrick Sacked! Goldbridge Man Utd News”</span></a>  </div>
-  <div class="feed-group">
-    <div class="feed-h">Busiest sources this event <span class="feed-note">reach and activity, not quality</span></div>
-    <div class="feed-m" style="font-size:13px;line-height:1.6;color:var(--ink2)">The United Stand · 4,990,429 views<br>Arsenal · 3,370,485 views<br>Premier League · 3,071,447 views<br>Manchester United · 2,303,815 views</div>
-  </div>
-  <div class="src">From 141 news stories (46 outlets), 30 YouTube videos incl. Manchester United, Arsenal, Premier League and 2,336 comments · Reddit added by hand · X not included · checked <time data-t="2026-11-16T21:24:38Z">2026-11-16</time></div>
-</section>
-
-
-
-<details class="card">
-  <summary class="tp-head" style="cursor:pointer;list-style:none;min-height:44px"><span class="label">Sources on this keycard (18)</span><span class="pill pill-new">Default pack · tap to see</span></summary>
-  <div class="feed-group">
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">Arsenal</b></span>
-      <span class="feed-m">Official · YouTube · good for official · collected automatically</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">Liverpool FC</b></span>
-      <span class="feed-m">Official · YouTube · good for official · collected automatically</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">Manchester United</b></span>
-      <span class="feed-m">Official · YouTube · good for official · collected automatically</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">Premier League</b></span>
-      <span class="feed-m">Official · YouTube · good for official, highlights · collected automatically</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">NBC Sports Soccer</b></span>
-      <span class="feed-m">Broadcaster · YouTube · good for live watch-along · collected automatically</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">Sky Sports Football</b></span>
-      <span class="feed-m">Broadcaster · YouTube · good for highlights, live watch-along · collected automatically</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">AFTV</b></span>
-      <span class="feed-m">Fans · YouTube · good for fan mood, live watch-along · collected automatically</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">The Anfield Wrap</b></span>
-      <span class="feed-m">Fans · YouTube · good for fan mood, live watch-along · collected automatically</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">The Redmen TV</b></span>
-      <span class="feed-m">Fans · YouTube · good for fan mood, live watch-along · collected automatically</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">The United Stand</b></span>
-      <span class="feed-m">Fans · YouTube · good for fan mood, live watch-along · collected automatically</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">r/soccer</b></span>
-      <span class="feed-m">Fans · Reddit · good for fan mood, debate · added by hand</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">BBC Sport</b></span>
-      <span class="feed-m">News · Website · good for news · collected automatically</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">ESPN FC</b></span>
-      <span class="feed-m">News · Website · good for news · collected automatically</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">Liverpool Echo</b></span>
-      <span class="feed-m">News · Website · good for club news · collected automatically</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">Manchester Evening News</b></span>
-      <span class="feed-m">News · Website · good for club news · collected automatically</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">Sky Sports</b></span>
-      <span class="feed-m">News · Website · good for news · collected automatically</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">The Guardian</b></span>
-      <span class="feed-m">News · Website · good for news, analysis · collected automatically</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">Google News search</b></span>
-      <span class="feed-m">News search · Web · good for wider coverage · collected automatically</span>
-    </div>
-  </div>
-  <div class="src">Coming soon: make this keycard your own. Add or remove sources, then share or compare it with a friend.</div>
-</details>
-
-
-<section class="updates">
-  <div class="label" style="margin-bottom:4px">Keycard updates</div>
-<div>Tue 17 Nov — Topic keycard created.</div></section>
+<section class="kc-folds">
+<details class="kc-fold"><summary><span>Latest headlines</span><span class="kc-count">6</span></summary><div class="kc-fold-body"><a class="kc-row" href="https://news.google.com/rss/articles/CBMi9wFBVV95cUxNanlSenFWRHJRRUZLYV9ZeVFBV244UG8wd1ZrVmtvUUIxNU1mX1hibmkwcC04TFl6OGJsNUd0akI4Z2dRQ004WWo0eWZ4NFBVTFVYSlUzd1hYc044aUJpRTAwcEgxOW5xNDdZc0E3ZFo5bHJ6azdWVDZIT3d3SUpLNEVpal9HdVVrc0dkTmVaVVVtRWVaZlh3WEQ0M1RIZW5mTmFkWVptdmRnLURuVWdpUnN0NENVanZORGxRR3I2dkRYNER1SGNneER6YXpEUktoMUluVFk1MjgxZTlLX3dEVW9INHc5LVhWN1RGQXVKckZZMjNpVUVV?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">Declan Rice contract: Arsenal midfielder verbally agrees new deal with the Premier League champions</span><span class="kc-row-m">Sky Sports · Mon 16 Nov</span></a><a class="kc-row" href="https://www.skysports.com/football/news/12040/13612986/declan-rice-contract-arsenal-midfielder-verbally-agrees-new-320000-a-week-deal-with-the-premier-league-champions" target="_blank" rel="noopener"><span class="kc-row-t">Rice verbally agrees new Arsenal contract</span><span class="kc-row-m">Sky Sports · Mon 16 Nov</span></a><a class="kc-row" href="https://news.google.com/rss/articles/CBMihAFBVV95cUxQX09KdEM1MDNwaEFXc0xaVkNlNEpxN012bkZoYlV1WDExRmlTN01fbjJpN2pialBmOGNWWFYwZS00bDNRZGVNOTU1bUdGaUFiRTlIMUtONkpZX0NIcExkRXphZzJjeG55eExwb1lhVUFpdVdTdndjWTd6ZzRxQWtzZnVMREg?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">Declan Rice agrees terms on new five-year Arsenal contract</span><span class="kc-row-m">Yahoo Sports · Mon 16 Nov</span></a><a class="kc-row" href="https://news.google.com/rss/articles/CBMikgFBVV95cUxOWm1mSFVzUmtNVGdrREZ5NmRrTl9aZEQwTmx6TER5TWp2V2NhS05OWllZMEJlZ01lYXZPRlZXeEtSRlplOUNrLTRfUlV0Zk85UDNLSlVwOEhXSG5EUVdfR2VweGczZ0E0M010VHJCNnNPbS0tb2FlQkZZc0R3N3NMMlhQMWNNeXNScEdfUFBxeERPQQ?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">Declan Rice agrees new five-year Arsenal deal - The Athletic</span><span class="kc-row-m">The New York Times · Mon 16 Nov</span></a><a class="kc-row" href="https://news.google.com/rss/articles/CBMikgFBVV95cUxQZDMyY3BLeFQxa0Z5YnhZTXRlbzVlWmR6SVFES2lKMmVzblBIbHZKcXZCeExqbHdWRV9lcWNRUzJYbE9tRjRKTHpHdW16UmRqd0NxRW9pRmF5d1hjUHp2aGctNXdxalVfMmRyZXhKZlA5czlDWmQtb1NBbzVYQ3ZFZGp6YXQxcll2Z1BKdExBR3Bzdw?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">Premier League Giants Prepare to Break Bank for Barcelona Star Fermin Lopez—Report</span><span class="kc-row-m">Sports Illustrated · Mon 16 Nov</span></a><a class="kc-row" href="https://news.google.com/rss/articles/CBMijgFBVV95cUxNLVVSOXB1dGJhWjd4Njl5eVlQcUpTSURMNnZvdENYMnhwMmZrajB1RVBkMGVnRDc4Rlhsb1VUSEliMHpfSTk2UTR4cE40R0tNdkJlbUNpQUlUblFnank5Z2kzX0NiSUVrU3RkWVp6SnhxVmJLaDM4b3E1UXNXUGJJQ0M4M3JEZVdvbEFnNXN3?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">Jurrien Timber to sign Arsenal contract extension</span><span class="kc-row-m">Yahoo Sports · Mon 16 Nov</span></a></div></details><details class="kc-fold"><summary><span>Videos</span><span class="kc-count">4</span></summary><div class="kc-fold-body"><a class="kc-row" href="https://www.youtube.com/watch?v=MVGoix-ambE" target="_blank" rel="noopener"><span class="kc-row-t">Man Utd 4-4 Aston Villa | Extended Highlights</span><span class="kc-row-m">Manchester United · 2,303,815 views</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=_bv4eOUyw60" target="_blank" rel="noopener"><span class="kc-row-t">LONG SALIBA PASS BEFORE ARSENAL SCORE!</span><span class="kc-row-m">Arsenal · 1,598,603 views</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=4cg2OLg51LQ" target="_blank" rel="noopener"><span class="kc-row-t">John McGinn Told The Referee He Was Nervous 😅</span><span class="kc-row-m">Premier League · 1,023,724 views</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=NPehs0EtShw" target="_blank" rel="noopener"><span class="kc-row-t">THIS TACKLE FROM EZRI KONSA 😮‍💨</span><span class="kc-row-m">Arsenal · 712,684 views</span></a></div></details><details class="kc-fold"><summary><span>What fans are saying</span><span class="kc-count">5</span></summary><div class="kc-fold-body"><div class="kc-fine" style="padding:6px 0">Most-liked comments. Likes show engagement, not who's right.</div><a class="kc-row" href="https://www.youtube.com/watch?v=DI5HlcEdml8&amp;lc=UgzBkwICAlMVYWUB11l4AaABAg" target="_blank" rel="noopener"><span class="kc-row-t">“POCH SACKED! sorry, just practicing for may”</span><span class="kc-row-m">3,218 likes · The United Stand</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=4cg2OLg51LQ&amp;lc=UgytfNMCPMubWljvqEl4AaABAg" target="_blank" rel="noopener"><span class="kc-row-t">“Gosh he is hilarious, absolute legend. He&#39;s glad the ref did not see his missed penalty!”</span><span class="kc-row-m">1,351 likes · Premier League</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=V7r3_t_FlPY&amp;lc=UgwHs7ahObP0s-UL4VJ4AaABAg" target="_blank" rel="noopener"><span class="kc-row-t">“Highly recommend everyone goes back and watches Goldbridge’s reaction to Amorim getting sacked - was absolutely spot on about everything.”</span><span class="kc-row-m">1,286 likes · The United Stand</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=j8A8-kPAnmw&amp;lc=Ugz4e2M21doJz9Ax4ut4AaABAg" target="_blank" rel="noopener"><span class="kc-row-t">“Glad Goldbridge has his platform. We like him cause he calls out what all of us fans feel in the moment. This platform helps for these players to speak there truth and give us there side, which is gr…”</span><span class="kc-row-m">1,267 likes · The United Stand</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=DI5HlcEdml8&amp;lc=UgxTnsuBA5y-Fzdnzgd4AaABAg" target="_blank" rel="noopener"><span class="kc-row-t">“The broken car is getting a new driver 🗿”</span><span class="kc-row-m">1,136 likes · The United Stand</span></a></div></details>  
+<details class="kc-fold"><summary><span>Sources on this keycard</span><span class="kc-count">18</span></summary><div class="kc-fold-body"><div class="kc-row"><span class="kc-row-t">Arsenal</span><span class="kc-row-m">Official · YouTube · good for official</span></div><div class="kc-row"><span class="kc-row-t">Liverpool FC</span><span class="kc-row-m">Official · YouTube · good for official</span></div><div class="kc-row"><span class="kc-row-t">Manchester United</span><span class="kc-row-m">Official · YouTube · good for official</span></div><div class="kc-row"><span class="kc-row-t">Premier League</span><span class="kc-row-m">Official · YouTube · good for official, highlights</span></div><div class="kc-row"><span class="kc-row-t">NBC Sports Soccer</span><span class="kc-row-m">Broadcaster · YouTube · good for live watch-along</span></div><div class="kc-row"><span class="kc-row-t">Sky Sports Football</span><span class="kc-row-m">Broadcaster · YouTube · good for highlights, live watch-along</span></div><div class="kc-row"><span class="kc-row-t">AFTV</span><span class="kc-row-m">Fans · YouTube · good for fan mood, live watch-along</span></div><div class="kc-row"><span class="kc-row-t">The Anfield Wrap</span><span class="kc-row-m">Fans · YouTube · good for fan mood, live watch-along</span></div><div class="kc-row"><span class="kc-row-t">The Redmen TV</span><span class="kc-row-m">Fans · YouTube · good for fan mood, live watch-along</span></div><div class="kc-row"><span class="kc-row-t">The United Stand</span><span class="kc-row-m">Fans · YouTube · good for fan mood, live watch-along</span></div><div class="kc-row"><span class="kc-row-t">r/soccer</span><span class="kc-row-m">Fans · Reddit · good for fan mood, debate · added by hand</span></div><div class="kc-row"><span class="kc-row-t">BBC Sport</span><span class="kc-row-m">News · Website · good for news</span></div><div class="kc-row"><span class="kc-row-t">ESPN FC</span><span class="kc-row-m">News · Website · good for news</span></div><div class="kc-row"><span class="kc-row-t">Liverpool Echo</span><span class="kc-row-m">News · Website · good for club news</span></div><div class="kc-row"><span class="kc-row-t">Manchester Evening News</span><span class="kc-row-m">News · Website · good for club news</span></div><div class="kc-row"><span class="kc-row-t">Sky Sports</span><span class="kc-row-m">News · Website · good for news</span></div><div class="kc-row"><span class="kc-row-t">The Guardian</span><span class="kc-row-m">News · Website · good for news, analysis</span></div><div class="kc-row"><span class="kc-row-t">Google News search</span><span class="kc-row-m">News search · Web · good for wider coverage</span></div><div class="kc-fine" style="padding-top:8px">Coming soon: copy this keycard and make it your own.</div></div></details><details class="kc-fold"><summary><span>Keycard updates</span><span class="kc-count">1</span></summary><div class="kc-fold-body"><div class="kc-row"><span class="kc-row-t">Topic keycard created.</span><span class="kc-row-m">Tue 17 Nov</span></div></div></details></section>
 <footer class="footer">
   Commentator is a pilot. Sources are named on every card. Unofficial; not affiliated with any league, promotion or company covered here.<br>
-  Built 2026-11-16 21:54 UTC.
+  Built 2026-11-16 22:12 UTC.
 </footer>
 </div>
 <script>
-document.querySelectorAll('time[data-t]').forEach(function (t) {
-  try {
-    var d = new Date(t.dataset.t);
-    if (!isNaN(d)) t.textContent = d.toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
-  } catch (err) {}
-});
-</script>
-</body>
+(function () {
+  var fmt = { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' };
+  document.querySelectorAll('time[data-t]').forEach(function (t) {
+    try { var d = new Date(t.dataset.t); if (!isNaN(d)) t.textContent = d.toLocaleString(undefined, fmt); } catch (err) {}
+  });
+  document.querySelectorAll('time[data-ago]').forEach(function (t) {
+    var m = Math.round((new Date() - new Date(t.dataset.ago)) / 60000);
+    if (isNaN(m)) return;
+    t.textContent = m < 1 ? 'just now' : m < 60 ? m + 'm ago' : m < 1440 ? Math.round(m / 60) + 'h ago' : Math.round(m / 1440) + 'd ago';
+  });
+  // Countdowns: <span data-countdown="ISO" data-done="text when passed">
+  function tick() {
+    document.querySelectorAll('[data-countdown]').forEach(function (el) {
+      var ms = new Date(el.dataset.countdown) - new Date();
+      if (isNaN(ms)) return;
+      if (ms <= 0) { el.textContent = el.dataset.done || 'Now'; return; }
+      var m = Math.floor(ms / 60000), d = Math.floor(m / 1440), h = Math.floor((m % 1440) / 60), mm = m % 60;
+      el.textContent = (d ? d + 'd ' : '') + (d || h ? h + 'h ' : '') + mm + 'm';
+    });
+  }
+  tick(); setInterval(tick, 30000);
+})();
+</script></body>
 </html>

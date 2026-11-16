@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GTA VI launch keycard · Commentator</title>
-<meta name="description" content="GTA VI unlocks at midnight local time on Thursday 19 November, on PS5 and Xbox Series X|S. In Dubai that&#39;s midnight on Wednesday night. Preloads opened on 12 November. The game was delayed twice: first from 2025, then from May 2026.">
-<meta property="og:title" content="GTA VI launch keycard · Commentator">
-<meta property="og:description" content="GTA VI unlocks at midnight local time on Thursday 19 November, on PS5 and Xbox Series X|S. In Dubai that&#39;s midnight on Wednesday night. Preloads opened on 12 November. The game was delayed twice: first from 2025, then from May 2026.">
+<title>GTA VI launch · Commentator</title>
+<meta name="description" content="GTA VI: countdown, launch day and first verdicts.">
+<meta property="og:title" content="GTA VI launch · Commentator">
+<meta property="og:description" content="GTA VI: countdown, launch day and first verdicts.">
 <meta property="og:type" content="article">
 <meta name="theme-color" content="#0E1116">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -72,7 +72,7 @@ a{color:var(--accent)} a:hover{color:#FFC56B}
 .phase{display:flex;flex-direction:column;gap:14px;scroll-margin-top:72px}
 .js .phase{display:none}
 .js .phase.on{display:flex}
-.phase h2{margin:4px 0 0;font-size:26px;text-transform:uppercase}
+.phase h2{margin:2px 0 0;font-size:20px;text-transform:uppercase;color:var(--muted)}
 .phase h2 + .src{margin-top:-8px}
 .timeline{display:flex;flex-direction:column;gap:14px;border-left:2px solid var(--line);margin-left:6px;padding-left:16px}
 .rounds{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:6px}
@@ -128,193 +128,106 @@ a{color:var(--accent)} a:hover{color:#FFC56B}
 .lbl-opinion{color:var(--a);border:1px solid var(--a-line)}
 .lbl-ai-interpretation{color:var(--muted);border:1px dashed var(--line2)}
 .lbl-fan-view{color:var(--b);border:1px solid var(--b-line)}
-</style><style>
-.count{font-family:'Barlow Condensed',sans-serif;font-size:44px;font-weight:700;line-height:1;color:var(--accent)}
-.ut{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
-.ut:first-child{border-top:0}
-.ut b{font-weight:600}.ut span{color:var(--muted);text-align:right}
-</style>
-</head>
+/* ---- compact keycard ---- */
+.kc-hero{display:flex;flex-direction:column;gap:6px}
+.kc-title{margin:0;font-size:40px;line-height:.95;color:var(--ink)}
+.kc-cur{font-size:13px;color:var(--muted)}.kc-cur b{color:var(--ink)}
+.kc-status{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:var(--accent);margin-top:2px}
+.kc-status .dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
+.kc-status-live{color:#FF6B6B}.kc-status-finished,.kc-status-ongoing{color:var(--good)}
+.kc-status b,.kc-status time{color:inherit}
+.kc-fine{font-size:12px;color:var(--faint);line-height:1.4}
+.kc-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.kc-head{margin:0;font-size:18px;line-height:1.35;font-weight:700;color:var(--ink)}
+.kc-body{margin:0;font-size:15px;line-height:1.5;color:var(--ink2)}
+.kc-pts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.kc-pt{font-size:15px;line-height:1.45;color:var(--ink2)}
+.kc-lbl{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;border-radius:5px;padding:1px 6px;margin-right:2px;vertical-align:2px}
+.kc-lbl-confirmed{color:#0E1116;background:var(--good)}
+.kc-lbl-reported{color:var(--ink);background:var(--line2)}
+.kc-lbl-rumour{color:#1A1300;background:var(--accent)}
+.kc-lbl-opinion{color:var(--a);border:1px solid var(--a-line)}
+.kc-lbl-fan-view{color:var(--b);border:1px solid var(--b-line)}
+.kc-lbl-ai-interpretation,.kc-lbl-differ{color:var(--muted);border:1px dashed var(--line2)}
+.kc-src{font-size:12px;color:var(--faint);white-space:normal}
+.kc-src a{color:var(--faint);text-decoration:underline;text-underline-offset:2px}
+.kc-more summary,.kc-fold summary{cursor:pointer;list-style:none}
+.kc-more summary::-webkit-details-marker,.kc-fold summary::-webkit-details-marker{display:none}
+.kc-more summary{font-size:14px;font-weight:600;color:var(--accent);min-height:36px;display:flex;align-items:center}
+.kc-more[open] summary{margin-bottom:8px}
+.kc-you-row{display:flex;flex-direction:column;gap:6px;padding-top:10px;border-top:1px solid var(--line)}
+.kc-you-row:first-of-type{border-top:0;padding-top:0}
+.kc-you-k{font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.4px;text-transform:uppercase}
+.kc-you-k span{color:var(--muted);text-transform:none;font-weight:600;letter-spacing:0}
+.kc-link{font-size:13px;color:var(--ink2);text-decoration:none;border-left:2px solid var(--accent);padding-left:8px}
+.kc-folds{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.kc-fold{border-top:1px solid var(--line)}.kc-fold:first-child{border-top:0}
+.kc-fold summary{display:flex;justify-content:space-between;align-items:center;min-height:52px;padding:0 16px;font-size:15px;font-weight:600;color:var(--ink)}
+.kc-fold summary::after{content:"›";color:var(--faint);font-size:20px;margin-left:8px;transition:transform .15s}
+.kc-fold[open] summary::after{transform:rotate(90deg)}
+.kc-count{margin-left:auto;font-size:13px;color:var(--faint);font-weight:500}
+.kc-fold-body{padding:0 16px 10px}
+.kc-row{display:flex;flex-direction:column;gap:2px;padding:9px 0;border-top:1px solid var(--line);text-decoration:none}
+.kc-row:first-child{border-top:0}
+.kc-row-t{font-size:14px;line-height:1.4;color:var(--ink2)}
+.kc-row-m{font-size:12px;color:var(--faint)}
+a.kc-row:hover .kc-row-t{color:var(--ink)}
+.kc-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.kc-fact{background:var(--card2);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.kc-fact b{font-size:15px;color:var(--ink)}.kc-fact span{font-size:12px;color:var(--muted);line-height:1.35}
+.kc-list{display:flex;flex-direction:column}
+.kc-li{display:grid;grid-template-columns:1fr auto;gap:0 10px;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.kc-li:first-child{border-top:0}
+.kc-li b{font-weight:600;color:var(--ink)}.kc-li i{font-style:normal;font-size:12px;color:var(--faint);grid-column:1}
+.kc-li em{font-style:normal;grid-row:1/3;grid-column:2;align-self:center;font-weight:700;font-size:13px;text-align:right}
+</style><style>.count{font-family:'Barlow Condensed',sans-serif;font-size:44px;font-weight:700;line-height:1;color:var(--accent)}</style></head>
 <body>
 <div class="wrap">
 <header class="topbar">
   <a class="brand" href="../">COMMENTATOR</a>
-  <span class="chip">Launch keycard</span>
 </header>
-
-<section class="hero">
+<section class="kc-hero">
   <div class="eyebrow">Gaming · Rockstar Games · PS5 &amp; Xbox Series X|S</div>
-  <h1 class="display"><span style="color:var(--a)">GTA VI</span></h1>
-  <div class="meta">Thu 19 Nov · unlocks midnight Dubai time</div>
-  <div class="status status-upcoming" style="margin-top:6px"><span class="dot"></span><span>Upcoming · launch day Thursday</span></div>
-</section>
-
+  <h1 class="display kc-title">GTA VI</h1>
+<div class="kc-status kc-status-upcoming"><span class="dot"></span><span>Thu 19 Nov · unlocks midnight Dubai time</span></div></section>
 <section class="card">
-  <div class="label">Unlocks in Dubai in</div>
+  <div class="kc-h"><span class="label">Unlocks in Dubai in</span></div>
   <div class="count" data-countdown="2026-11-19T00:00:00+04:00" data-done="Out now">…</div>
-  <div><div class="ut"><b>New Zealand (first)</b><span>Wed 18 Nov, 3pm Dubai</span></div><div class="ut"><b>UAE</b><span>Thu 19 Nov, midnight</span></div><div class="ut"><b>UK</b><span>Thu 19 Nov, 4am Dubai</span></div><div class="ut"><b>US East Coast</b><span>Thu 19 Nov, 9am Dubai</span></div></div>
-  <div class="src"><a href="https://tbreak.com/gta-6-release-time-uae-midnight-november-19/" target="_blank" rel="noopener">tbreak (UAE)</a> · <a href="https://www.toy-people.com/en/?p=114147" target="_blank" rel="noopener">Toy People (NZ)</a> · <a href="https://www.freepressjournal.in/tech/gta-6s-worldwide-release-times-revealed-new-zealand-gets-it-nearly-a-day-before-some-countries" target="_blank" rel="noopener">Free Press Journal (UK)</a> · <a href="https://stevivor.com/news/gta-6-ps5-unlock-schedule-shows-australia-among-the-first-in-hours-before-north/" target="_blank" rel="noopener">Stevivor (US)</a></div>
+<details class="kc-more"><summary>Unlock times elsewhere</summary><div class="kc-row"><span class="kc-row-t">New Zealand (first)</span><span class="kc-row-m">Wed 18 Nov, 3pm Dubai</span></div><div class="kc-row"><span class="kc-row-t">UAE</span><span class="kc-row-m">Thu 19 Nov, midnight</span></div><div class="kc-row"><span class="kc-row-t">UK</span><span class="kc-row-m">Thu 19 Nov, 4am Dubai</span></div><div class="kc-row"><span class="kc-row-t">US East Coast</span><span class="kc-row-m">Thu 19 Nov, 9am Dubai</span></div><div class="kc-fine" style="padding-top:6px"><a href="https://tbreak.com/gta-6-release-time-uae-midnight-november-19/" target="_blank" rel="noopener" style="color:var(--faint)">tbreak (UAE)</a> · <a href="https://www.toy-people.com/en/?p=114147" target="_blank" rel="noopener" style="color:var(--faint)">Toy People (NZ)</a> · <a href="https://www.freepressjournal.in/tech/gta-6s-worldwide-release-times-revealed-new-zealand-gets-it-nearly-a-day-before-some-countries" target="_blank" rel="noopener" style="color:var(--faint)">Free Press Journal (UK)</a> · <a href="https://stevivor.com/news/gta-6-ps5-unlock-schedule-shows-australia-among-the-first-in-hours-before-north/" target="_blank" rel="noopener" style="color:var(--faint)">Stevivor (US)</a></div></details></section>
+<section class="card kc-now">
+  <div class="kc-h"><span class="label">Right now</span><span class="kc-fine"><time data-ago="2026-11-16T21:24:42Z">updated</time></span></div>
+<p class="kc-head">GTA VI launches Thursday, 19 November, and the build-up is intense: preorders are reported above $1 billion and a hacker has pleaded guilty.</p>  <ul class="kc-pts"><li class="kc-pt"><span class="kc-lbl kc-lbl-reported">reported</span> The game&#39;s launch is set for Thursday, 19 November. Several outlets say so. <span class="kc-src"><a href="https://www.gamespot.com/articles/delete-gta-6-for-a-chance-to-win-another-game/" target="_blank" rel="noopener">GameSpot</a> · <a href="https://news.google.com/rss/articles/CBMi0gFBVV95cUxQWVhOOTc3UGUyZTVwZ0xlUVJ4NEpmMFJtYW9Ebm12QVVTdWdURGFGRTl5eThlcmU1cnRNX3pLZjNReVdKQXZwZ2hIeDB4bDlkN3ZoWHdqMDNJLVFZWWpFZzlHVWkzaUN1QXBBLVhUT2VLemJaU1haMXByVUFhQ1M3dTk1SW03SmdzdUtsa3o2a2RpYXF6SnBYZEI2WEN4Tzg1c3RkU0lSTGljbDFEQUY2bUNaUWxlMEg2bEtoT3lnX0tsZHo5TEtsN2lZaU05bERiNXc?oc=5" target="_blank" rel="noopener">KITV</a> · <a href="https://www.youtube.com/watch?v=npREFTBRmWk" target="_blank" rel="noopener">IGN</a></span></li><li class="kc-pt"><span class="kc-lbl kc-lbl-reported">reported</span> Ynetnews reports GTA VI preorders have topped $1 billion, and that millions plan to skip work. <span class="kc-src"><a href="https://news.google.com/rss/articles/CBMibkFVX3lxTFBWclE2YTU5d1JTLXVhNHJjbFJDbVdYMzEyU0Zha0tvQWswMnVjSGhRNmJjeFBWYVlaY3lVUXNSNExtN3psb3E2T0hKSlJUVW4xYkh2QnVROGNnZTA0ZmRzWHNJUzNxY3VQUzh5M0hn?oc=5" target="_blank" rel="noopener">Ynetnews</a></span></li><li class="kc-pt"><span class="kc-lbl kc-lbl-reported">reported</span> The 2022 leaker, Arion Kurtaj, has pleaded guilty to hacking Rockstar. Reports put the cost at about $5 million. <span class="kc-src"><a href="https://news.google.com/rss/articles/CBMijgFBVV95cUxPYmJ0YjBIS2V0bWZIQlUxb2pFVmt6VXV3anhVVmNqT1RNVnBXSzhHRE1pSGplU3lNZDQxRkphbThXQ2VRRWJaUDI2X3Q5VFpLRDlBcmZTSmphMXJWc1lEQ2pEVVpIcGtIb19nRlRIYUdRejJTdmIxZ3FPWTZ2Mjk4dS1wb1I2bDBSTVN4T3Zn?oc=5" target="_blank" rel="noopener">Complex</a> · <a href="https://news.google.com/rss/articles/CBMikgFBVV95cUxPVXhZSWNnclM0cVRYSXRYSUkyRzdjZkgyd2R4SmV4NGhvMHlqclo1WjNJRDJyYlNFOXZlSDV1NndOek1sdmN5cFUxWVExNi14cUp4NTZiLUJaM19RZ24xWFQtS2xUN1RKYng0ZUlyQ2JXNnlWck9yRDlyUVhFMUVmRjJ1ckFocURyT0J4Nzk4NFBqQQ?oc=5" target="_blank" rel="noopener">shattered.io</a> · <a href="https://news.google.com/rss/articles/CBMiZ0FVX3lxTE1MWkYtWkJ5SjhTNi1CX2J0ZWV0TXlkY2RPc2lBQ255QndvM25SYnhmZE44aGdwdkxjTWRBVFRSVlk1RnFRUl9yaWZIcWJHWFV0X3pra2NtUVZxNFV4VGZSSk1aTmFXVVU?oc=5" target="_blank" rel="noopener">qz.com</a> +1</span></li></ul>
+  <details class="kc-more"><summary>Where sources differ + 2 more</summary>
+    <ul class="kc-pts"><li class="kc-pt"><span class="kc-lbl kc-lbl-reported">reported</span> Physical-copy buyers say they got discs with no code, and say they are bitterly disappointed. <span class="kc-src"><a href="https://news.google.com/rss/articles/CBMigAFBVV95cUxQcjY2ZkhTaUhiLWt3QWtIZWlDTWJnb3hsWDJXUDlZY0lWbDhMaXMzaGVZaEtyZHBONUZBNFVCLWNMaEVoTXNKZm1HVWxHMkc3VjVWWXJlYlJHY1VtaklJM2Q0N1p5SFBtOWh3dnNrRUVNa2UtVEU4SklERlZWS0JoZw?oc=5" target="_blank" rel="noopener">Yahoo Tech</a></span></li><li class="kc-pt"><span class="kc-lbl kc-lbl-ai-interpretation">ai interpretation</span> No review verdicts or first-day player reactions are in this material yet. Reviews are only a poll question so far. <span class="kc-src"><a href="https://news.google.com/rss/articles/CBMimwFBVV95cUxOWHZGN0pHeHNjYjllWWdPcnZtQkJ6c3o2TDRRcjJzRm55R1lHa0VHTVV3LV8tMXFIYUNrUXM0MTBzRWJpSC1RdEl6RU0xT2JvYWVHSl93bnk0bTNDdTcxU254RFVWellyVmt3MnhNQmM5Y3RWUlR3Um0zVGNlZ0FlbHhQZWZqbmFnREhLbFJPUnQ3SldWRDBTQ0FuRQ?oc=5" target="_blank" rel="noopener">Pure Xbox</a> · <a href="https://www.youtube.com/watch?v=CDaswaIfjVY" target="_blank" rel="noopener">KhrazeGaming</a></span></li><li class="kc-pt"><span class="kc-lbl kc-lbl-differ">differ</span> Yahoo Tech reports buyers of physical copies say the disc had no code. Other items do not cover this, so it is a single-source claim. <span class="kc-src"><a href="https://news.google.com/rss/articles/CBMigAFBVV95cUxQcjY2ZkhTaUhiLWt3QWtIZWlDTWJnb3hsWDJXUDlZY0lWbDhMaXMzaGVZaEtyZHBONUZBNFVCLWNMaEVoTXNKZm1HVWxHMkc3VjVWWXJlYlJHY1VtaklJM2Q0N1p5SFBtOWh3dnNrRUVNa2UtVEU4SklERlZWS0JoZw?oc=5" target="_blank" rel="noopener">Yahoo Tech</a></span></li><li class="kc-pt"><span class="kc-lbl kc-lbl-differ">differ</span> Ynetnews frames the preorder figure as a sign of hype. Kemi Badenoch&#39;s comments focus on playing time, not the game&#39;s content. <span class="kc-src"><a href="https://news.google.com/rss/articles/CBMibkFVX3lxTFBWclE2YTU5d1JTLXVhNHJjbFJDbVdYMzEyU0Zha0tvQWswMnVjSGhRNmJjeFBWYVlaY3lVUXNSNExtN3psb3E2T0hKSlJUVW4xYkh2QnVROGNnZTA0ZmRzWHNJUzNxY3VQUzh5M0hn?oc=5" target="_blank" rel="noopener">Ynetnews</a> · <a href="https://www.eurogamer.net/uk-conservative-kemi-badenoch-gta-6" target="_blank" rel="noopener">Eurogamer</a></span></li></ul>
+  </details>
+  <div class="kc-fine">AI summary of this keycard's sources only. Labels show how solid each point is.</div>
 </section>
 
-<section class="card">
-  <div class="label">The story in 20 seconds</div>
-<p class="story">GTA VI unlocks at midnight local time on Thursday 19 November, on PS5 and Xbox Series X|S. In Dubai that&#39;s midnight on Wednesday night. Preloads opened on 12 November. The game was delayed twice: first from 2025, then from May 2026.</p><div class="src">Updated Tue 17 Nov</div></section>
-
-<section class="card brief">
-  <div class="tp-head"><span class="label">AI briefing</span><span class="pill pill-new">From this keycard's sources</span></div>
-<p class="story" style="font-weight:600">GTA VI launches Thursday, 19 November, and the build-up is intense: preorders are reported above $1 billion and a hacker has pleaded guilty.</p>  <div class="bp"><span class="lbl lbl-reported">reported</span><span class="bt">The game&#39;s launch is set for Thursday, 19 November. Several outlets say so.</span>
-<span class="bs"><a href="https://www.gamespot.com/articles/delete-gta-6-for-a-chance-to-win-another-game/" target="_blank" rel="noopener">GameSpot</a> · <a href="https://news.google.com/rss/articles/CBMi0gFBVV95cUxQWVhOOTc3UGUyZTVwZ0xlUVJ4NEpmMFJtYW9Ebm12QVVTdWdURGFGRTl5eThlcmU1cnRNX3pLZjNReVdKQXZwZ2hIeDB4bDlkN3ZoWHdqMDNJLVFZWWpFZzlHVWkzaUN1QXBBLVhUT2VLemJaU1haMXByVUFhQ1M3dTk1SW03SmdzdUtsa3o2a2RpYXF6SnBYZEI2WEN4Tzg1c3RkU0lSTGljbDFEQUY2bUNaUWxlMEg2bEtoT3lnX0tsZHo5TEtsN2lZaU05bERiNXc?oc=5" target="_blank" rel="noopener">KITV</a> · <a href="https://www.youtube.com/watch?v=npREFTBRmWk" target="_blank" rel="noopener">IGN</a></span></div>
-<div class="bp"><span class="lbl lbl-reported">reported</span><span class="bt">Ynetnews reports GTA VI preorders have topped $1 billion, and that millions plan to skip work.</span>
-<span class="bs"><a href="https://news.google.com/rss/articles/CBMibkFVX3lxTFBWclE2YTU5d1JTLXVhNHJjbFJDbVdYMzEyU0Zha0tvQWswMnVjSGhRNmJjeFBWYVlaY3lVUXNSNExtN3psb3E2T0hKSlJUVW4xYkh2QnVROGNnZTA0ZmRzWHNJUzNxY3VQUzh5M0hn?oc=5" target="_blank" rel="noopener">Ynetnews</a></span></div>
-<div class="bp"><span class="lbl lbl-reported">reported</span><span class="bt">The 2022 leaker, Arion Kurtaj, has pleaded guilty to hacking Rockstar. Reports put the cost at about $5 million.</span>
-<span class="bs"><a href="https://news.google.com/rss/articles/CBMijgFBVV95cUxPYmJ0YjBIS2V0bWZIQlUxb2pFVmt6VXV3anhVVmNqT1RNVnBXSzhHRE1pSGplU3lNZDQxRkphbThXQ2VRRWJaUDI2X3Q5VFpLRDlBcmZTSmphMXJWc1lEQ2pEVVpIcGtIb19nRlRIYUdRejJTdmIxZ3FPWTZ2Mjk4dS1wb1I2bDBSTVN4T3Zn?oc=5" target="_blank" rel="noopener">Complex</a> · <a href="https://news.google.com/rss/articles/CBMikgFBVV95cUxPVXhZSWNnclM0cVRYSXRYSUkyRzdjZkgyd2R4SmV4NGhvMHlqclo1WjNJRDJyYlNFOXZlSDV1NndOek1sdmN5cFUxWVExNi14cUp4NTZiLUJaM19RZ24xWFQtS2xUN1RKYng0ZUlyQ2JXNnlWck9yRDlyUVhFMUVmRjJ1ckFocURyT0J4Nzk4NFBqQQ?oc=5" target="_blank" rel="noopener">shattered.io</a> · <a href="https://news.google.com/rss/articles/CBMiZ0FVX3lxTE1MWkYtWkJ5SjhTNi1CX2J0ZWV0TXlkY2RPc2lBQ255QndvM25SYnhmZE44aGdwdkxjTWRBVFRSVlk1RnFRUl9yaWZIcWJHWFV0X3pra2NtUVZxNFV4VGZSSk1aTmFXVVU?oc=5" target="_blank" rel="noopener">qz.com</a> · <a href="https://news.google.com/rss/articles/CBMilgFBVV95cUxOTnppTG1DWGI3SlotX01ta0R5OFNHMVEyYzNSWHVBU3ZZc0pxc0c1MDJUd2sxVTFCRnc5V19FRE9fRDdoRVBUWU9ETFVuaFE4cjl4c3hqc0N6dnRnWUJZQnhGbGpfQkNFdTNRbEs1a2NiMkVpc0dTc256eTUzeWJtUXRGMHNYemxFT3pFY3hlSHZJZVpGZ2c?oc=5" target="_blank" rel="noopener">Beinsure</a></span></div>
-<div class="bp"><span class="lbl lbl-reported">reported</span><span class="bt">Physical-copy buyers say they got discs with no code, and say they are bitterly disappointed.</span>
-<span class="bs"><a href="https://news.google.com/rss/articles/CBMigAFBVV95cUxQcjY2ZkhTaUhiLWt3QWtIZWlDTWJnb3hsWDJXUDlZY0lWbDhMaXMzaGVZaEtyZHBONUZBNFVCLWNMaEVoTXNKZm1HVWxHMkc3VjVWWXJlYlJHY1VtaklJM2Q0N1p5SFBtOWh3dnNrRUVNa2UtVEU4SklERlZWS0JoZw?oc=5" target="_blank" rel="noopener">Yahoo Tech</a></span></div>
-<div class="bp"><span class="lbl lbl-ai-interpretation">ai interpretation</span><span class="bt">No review verdicts or first-day player reactions are in this material yet. Reviews are only a poll question so far.</span>
-<span class="bs"><a href="https://news.google.com/rss/articles/CBMimwFBVV95cUxOWHZGN0pHeHNjYjllWWdPcnZtQkJ6c3o2TDRRcjJzRm55R1lHa0VHTVV3LV8tMXFIYUNrUXM0MTBzRWJpSC1RdEl6RU0xT2JvYWVHSl93bnk0bTNDdTcxU254RFVWellyVmt3MnhNQmM5Y3RWUlR3Um0zVGNlZ0FlbHhQZWZqbmFnREhLbFJPUnQ3SldWRDBTQ0FuRQ?oc=5" target="_blank" rel="noopener">Pure Xbox</a> · <a href="https://www.youtube.com/watch?v=CDaswaIfjVY" target="_blank" rel="noopener">KhrazeGaming</a></span></div>
-
-  <div class="feed-h" style="margin-top:6px">Where sources differ</div>
-<div class="bp"><span class="bt">Yahoo Tech reports buyers of physical copies say the disc had no code. Other items do not cover this, so it is a single-source claim.</span><span class="bs"><a href="https://news.google.com/rss/articles/CBMigAFBVV95cUxQcjY2ZkhTaUhiLWt3QWtIZWlDTWJnb3hsWDJXUDlZY0lWbDhMaXMzaGVZaEtyZHBONUZBNFVCLWNMaEVoTXNKZm1HVWxHMkc3VjVWWXJlYlJHY1VtaklJM2Q0N1p5SFBtOWh3dnNrRUVNa2UtVEU4SklERlZWS0JoZw?oc=5" target="_blank" rel="noopener">Yahoo Tech</a></span></div><div class="bp"><span class="bt">Ynetnews frames the preorder figure as a sign of hype. Kemi Badenoch&#39;s comments focus on playing time, not the game&#39;s content.</span><span class="bs"><a href="https://news.google.com/rss/articles/CBMibkFVX3lxTFBWclE2YTU5d1JTLXVhNHJjbFJDbVdYMzEyU0Zha0tvQWswMnVjSGhRNmJjeFBWYVlaY3lVUXNSNExtN3psb3E2T0hKSlJUVW4xYkh2QnVROGNnZTA0ZmRzWHNJUzNxY3VQUzh5M0hn?oc=5" target="_blank" rel="noopener">Ynetnews</a> · <a href="https://www.eurogamer.net/uk-conservative-kemi-badenoch-gta-6" target="_blank" rel="noopener">Eurogamer</a></span></div>  <div class="src">Written by AI only from the 57 items on this keycard, every point linked · checked <time data-t="2026-11-16T21:24:42Z">2026-11-16</time> · labels: confirmed, reported, rumour, opinion, fan view, AI interpretation</div>
-</section>
-
-
-
-<section class="card card-hl" id="angle-speed">
-  <div class="tp-head"><span class="label">Sid&#39;s angle</span><span class="pill pill-divided">Personal</span></div>
-  <h3>How IShowSpeed is playing GTA VI</h3>
-  <div class="brief" style="display:flex;flex-direction:column;gap:2px"><p class="body" style="font-weight:600;color:var(--ink)">The material has no IShowSpeed coverage: no livestream, reaction, or gameplay video from him is included.</p><div class="bp"><span class="lbl lbl-fan-view">fan view</span><span class="bt">Creator gameplay videos are in the material, showing realistic graphics. Fans say the footage looks real.</span>
-<span class="bs"><a href="https://www.youtube.com/watch?v=ui-3oTYh4X0" target="_blank" rel="noopener">Hollow</a> · <a href="https://www.youtube.com/watch?v=FgJRIzc6LPw" target="_blank" rel="noopener">TGG</a> · <a href="https://www.youtube.com/watch?v=FgJRIzc6LPw" target="_blank" rel="noopener">comment on TGG</a></span></div>
-<div class="src">AI summary of your instruction, from these sources only</div></div>
-  <div class="ph"><strong>Watching IShowSpeed</strong><br>Their latest videos and streams on this land here automatically.</div>
-  <div class="src">Default keycard + this angle · extra sources: IShowSpeed</div>
-</section>
-
-
-<nav class="tabs" aria-label="Launch phases">
-  <a href="#buildup" data-tab="buildup">Countdown</a>
-  <a href="#live" data-tab="live">Launch day</a>
-  <a href="#aftermath" data-tab="aftermath">Verdicts</a>
-</nav>
-
-<section class="phase" id="buildup">
-  <h2 class="display">Before it drops</h2>
-  <article class="card"><span class="tag tag-neutral">Two delays</span><h3>From 2025, to May 2026, to 19 November</h3><p class="body">Rockstar first targeted 2025, then moved to 26 May 2026, then to 19 November, saying the extra months were for polish.</p><div class="src"><a href="https://www.gamesradar.com/games/grand-theft-auto/gta-6-delayed-6-more-months-as-rockstar-commits-to-november-2026-and-says-sorry" target="_blank" rel="noopener">GamesRadar</a> · <a href="https://www.pcgamer.com/games/action/grand-theft-auto-6-is-delayed-to-november-these-extra-months-will-allow-us-to-finish-the-game-with-the-level-of-polish-you-have-come-to-expect-and-deserve" target="_blank" rel="noopener">PC Gamer</a></div></article>
-  <article class="card"><span class="tag tag-neutral">Consoles only</span><h3>No PC version announced</h3><p class="body">Launch is PS5 and Xbox Series X|S only. Rockstar hasn&#39;t announced a PC version.</p><div class="src"><a href="https://www.gtaboom.com/gta-6-release-date-and-delay-history-9f6b" target="_blank" rel="noopener">gtaboom</a></div></article>
-  <section class="card feed">
-  <div class="tp-head"><span class="label">The build-up</span><span class="pill pill-new">Auto-collected</span></div>
-  <div class="feed-group">
-    <div class="feed-h">Latest headlines</div>
-<a class="feed-row" href="https://news.google.com/rss/articles/CBMigwFBVV95cUxPWFUyRVlsWV9OVXBvVExQQk5xY3Q1eFlrQ19sZXVBQW9Kanp2NUxUcnNnZzJKYTFENjhjUEhHSTNvNUI4TXlTRXRVU0hDVjJ1OUpfT3FMR2V3bWszdnhhcXlLTXBzTFc5R1ZxZGFBdnFBYm01RTVOQ1VPOURnWDRNM0dHbw?oc=5" target="_blank" rel="noopener"><span class="feed-t">&#39;GTA VI&#39; release: Where to buy in Texas, what players should know</span><span class="feed-m">MySA · <time data-t="2026-11-16T21:09:36Z">2026-11-16</time></span></a><a class="feed-row" href="https://news.google.com/rss/articles/CBMid0FVX3lxTFA0bHRzbF9tSEFyR3FUVjF3a2x3Wk1GYlpNZ2NFWXptc3E0VnFaRWoxZllUUGEteGxLZS16NFgydGU3OFVwOW9ldnNSdGtjN2FHcjMxNkJWQUwtOWw2Wk9VeWd1Z2RMTWQ5ZERLNEhSQXN6N2VpLUhF?oc=5" target="_blank" rel="noopener"><span class="feed-t">Who Is Raul Bautista In GTA 6? The Bank Robber Explained</span><span class="feed-m">SVG · <time data-t="2026-11-16T21:00:00Z">2026-11-16</time></span></a><a class="feed-row" href="https://news.google.com/rss/articles/CBMifEFVX3lxTE5YbF9uRHIzdDFQdVpuWUZ6RzMxOEpIXzQ4aXZoelZaTU5uR0EzUlQzN2RaaWxuTHhvY0loaWVSSnZFaWxXMUthSVM3R3otM29tQ2tDeXVPYmk2MEJpWHQ1MW5URy03bkZPdHJ0MVV0WFE2bFFBMXVNc09GM0o?oc=5" target="_blank" rel="noopener"><span class="feed-t">GTA 6 online rumors: When might the inevitable multiplayer launch happen?</span><span class="feed-m">PC Gamer · <time data-t="2026-11-16T20:57:03Z">2026-11-16</time></span></a><a class="feed-row" href="https://news.google.com/rss/articles/CBMijgFBVV95cUxPYmJ0YjBIS2V0bWZIQlUxb2pFVmt6VXV3anhVVmNqT1RNVnBXSzhHRE1pSGplU3lNZDQxRkphbThXQ2VRRWJaUDI2X3Q5VFpLRDlBcmZTSmphMXJWc1lEQ2pEVVpIcGtIb19nRlRIYUdRejJTdmIxZ3FPWTZ2Mjk4dS1wb1I2bDBSTVN4T3Zn?oc=5" target="_blank" rel="noopener"><span class="feed-t">‘GTA 6’ Hacker Pleads Guilty After Using Hotel TV to Pull Off $5M Rockstar Breach</span><span class="feed-m">Complex · <time data-t="2026-11-16T20:45:14Z">2026-11-16</time></span></a><a class="feed-row" href="https://www.gamespot.com/articles/delete-gta-6-for-a-chance-to-win-another-game/" target="_blank" rel="noopener"><span class="feed-t">Delete GTA 6 For A Chance To Win Another Game</span><span class="feed-m">GameSpot · <time data-t="2026-11-16T20:27:02Z">2026-11-16</time></span></a><a class="feed-row" href="https://news.google.com/rss/articles/CBMigAFBVV95cUxQcjY2ZkhTaUhiLWt3QWtIZWlDTWJnb3hsWDJXUDlZY0lWbDhMaXMzaGVZaEtyZHBONUZBNFVCLWNMaEVoTXNKZm1HVWxHMkc3VjVWWXJlYlJHY1VtaklJM2Q0N1p5SFBtOWh3dnNrRUVNa2UtVEU4SklERlZWS0JoZw?oc=5" target="_blank" rel="noopener"><span class="feed-t">GTA 6 fans ready for game to drop, but some physical release buyers already say they are bitterly disappointed: ‘They sold me a game with no code’</span><span class="feed-m">Yahoo Tech · <time data-t="2026-11-16T20:15:00Z">2026-11-16</time></span></a>  </div>
-  <div class="feed-group">
-    <div class="feed-h">Creator videos</div>
-<a class="feed-row" href="https://www.youtube.com/watch?v=0e746-1G_sE" target="_blank" rel="noopener"><span class="feed-t">NBA 2K27 x GTA 6 (Grand Theft Auto 6) - Official Vice City Crossover Trailer</span><span class="feed-m">IGN · 549,495 views</span></a><a class="feed-row" href="https://www.youtube.com/watch?v=npREFTBRmWk" target="_blank" rel="noopener"><span class="feed-t">Where will YOU be on November 19? #gta6 #gta #28dayslater #gaming #ign</span><span class="feed-m">IGN · 71,056 views</span></a><a class="feed-row" href="https://www.youtube.com/watch?v=wiW1mpHZb_Y" target="_blank" rel="noopener"><span class="feed-t">New GTA 6 Gameplay Just Blew Everyones Mind..</span><span class="feed-m">Hollow · 2,276,374 views</span></a><a class="feed-row" href="https://www.youtube.com/watch?v=QRGdAVqJSD8" target="_blank" rel="noopener"><span class="feed-t">GTA 6: NEW Gameplay Looks So Realistic That Everyone Thought it Was Fake</span><span class="feed-m">TGG · 1,310,922 views</span></a>  </div>
-  <div class="feed-group">
-    <div class="feed-h">Most-liked comments <span class="feed-note">likes show engagement, not who's right</span></div>
-<a class="feed-row quote" href="https://www.youtube.com/watch?v=0e746-1G_sE&amp;lc=UgylZx28ly-5oqjWHhd4AaABAg" target="_blank" rel="noopener"><span class="feed-t">“Got scared. Thought that was gta 6 graphics for a sec”</span><span class="feed-m">5,102 likes · on IGN: “NBA 2K27 x GTA 6 (Grand Theft Auto 6) - Official Vice City …”</span></a><a class="feed-row quote" href="https://www.youtube.com/watch?v=QRGdAVqJSD8&amp;lc=Ugzsrh25duPrdV6FVJ94AaABAg" target="_blank" rel="noopener"><span class="feed-t">“Those NPCs ain’t gonna know what hit em next week 😂”</span><span class="feed-m">3,569 likes · on TGG: “GTA 6: NEW Gameplay Looks So Realistic That Everyone Though…”</span></a><a class="feed-row quote" href="https://www.youtube.com/watch?v=wiW1mpHZb_Y&amp;lc=Ugwm60NzdfOR2bJs0rB4AaABAg" target="_blank" rel="noopener"><span class="feed-t">“The first boot-up of GTA 6 is genuinely gonna bring me to tears bro”</span><span class="feed-m">3,566 likes · on Hollow: “New GTA 6 Gameplay Just Blew Everyones Mind..”</span></a><a class="feed-row quote" href="https://www.youtube.com/watch?v=QRGdAVqJSD8&amp;lc=UgwasOPFUx85Io48Yf54AaABAg" target="_blank" rel="noopener"><span class="feed-t">“The guy filming is Jason and you can even see Lucia filming the street pov if you look closer, its insane.”</span><span class="feed-m">2,963 likes · on TGG: “GTA 6: NEW Gameplay Looks So Realistic That Everyone Though…”</span></a><a class="feed-row quote" href="https://www.youtube.com/watch?v=0e746-1G_sE&amp;lc=UgzzC_zEXRG_cB69UJx4AaABAg" target="_blank" rel="noopener"><span class="feed-t">“Funny part is for a lot of people, 2k27 is getting deleted for space for GTA 6😂”</span><span class="feed-m">2,556 likes · on IGN: “NBA 2K27 x GTA 6 (Grand Theft Auto 6) - Official Vice City …”</span></a>  </div>
-  <div class="feed-group">
-    <div class="feed-h">Busiest sources this event <span class="feed-note">reach and activity, not quality</span></div>
-    <div class="feed-m" style="font-size:13px;line-height:1.6;color:var(--ink2)">Hollow · 3,964,421 views<br>TGG · 2,292,591 views<br>IGN · 620,551 views<br>ProjectSupreme · 1,035,495 views</div>
+<section class="card kc-you">
+  <div class="kc-h"><span class="label">For you</span></div>
+  <div class="kc-you-row" id="angle-speed">
+    <div class="kc-you-k">Sid&#39;s angle · <span>How IShowSpeed is playing GTA VI</span></div>
+<p class="kc-body" style="font-weight:600;color:var(--ink)">The material has no IShowSpeed coverage: no livestream, reaction, or gameplay video from him is included.</p><ul class="kc-pts"><li class="kc-pt"><span class="kc-lbl kc-lbl-fan-view">fan view</span> Creator gameplay videos are in the material, showing realistic graphics. Fans say the footage looks real. <span class="kc-src"><a href="https://www.youtube.com/watch?v=ui-3oTYh4X0" target="_blank" rel="noopener">Hollow</a> · <a href="https://www.youtube.com/watch?v=FgJRIzc6LPw" target="_blank" rel="noopener">TGG</a> · <a href="https://www.youtube.com/watch?v=FgJRIzc6LPw" target="_blank" rel="noopener">comment on TGG</a></span></li></ul>
   </div>
-  <div class="src">From 128 news stories (68 outlets), 17 YouTube videos incl. IGN, Hollow, TGG and 1,695 comments · Reddit added by hand · X not included · checked <time data-t="2026-11-16T21:24:38Z">2026-11-16</time></div>
 </section>
 
-  <a class="next-btn" href="#live" data-tab="live">Next: Launch day →</a>
-</section>
-
-<section class="phase" id="live">
-  <h2 class="display">Launch day</h2>
-    <div class="ph"><strong>Live chat pulse</strong><br>Recorded from the biggest creator streams while people play for the first time: how busy the chat gets and what it&#39;s saying at each spike.</div>
-
-  <div class="ph"><strong>Since launch</strong><br>First streams, reactions and news after unlock land here automatically.</div>
-
-  <a class="next-btn" href="#aftermath" data-tab="aftermath">Next: Verdicts →</a>
-</section>
-
-<section class="phase" id="aftermath">
-  <h2 class="display">First verdicts</h2>
-  <section class="card feed">
-    <div class="tp-head"><span class="label">Reviews and verdicts</span><span class="pill pill-new">Auto-collected</span></div>
-    <div class="feed-group"><a class="feed-row" href="https://news.google.com/rss/articles/CBMimwFBVV95cUxOWHZGN0pHeHNjYjllWWdPcnZtQkJ6c3o2TDRRcjJzRm55R1lHa0VHTVV3LV8tMXFIYUNrUXM0MTBzRWJpSC1RdEl6RU0xT2JvYWVHSl93bnk0bTNDdTcxU254RFVWellyVmt3MnhNQmM5Y3RWUlR3Um0zVGNlZ0FlbHhQZWZqbmFnREhLbFJPUnQ3SldWRDBTQ0FuRQ?oc=5" target="_blank" rel="noopener"><span class="feed-t">Poll: What Do You Think The Metacritic Score Will Be For GTA 6?</span><span class="feed-m">Pure Xbox · <time data-t="2026-11-16T18:30:00Z">2026-11-16</time></span></a><a class="feed-row" href="https://news.google.com/rss/articles/CBMiW0FVX3lxTFBTVnVtYmh0V0VrUFpmNWxiMm92T3NtXzNvMlI5cnpEUGpVeDJybFdmelpyWUJUMHJ2TUhTa21GZnhJY2tPQzFnblhnZDdhVkRvaVotZUs2bXhSZlU?oc=5" target="_blank" rel="noopener"><span class="feed-t">The 2026 Game Awards Nominations Will Spoil GTA 6 Reviews</span><span class="feed-m">Polygon.com · <time data-t="2026-11-16T16:02:17Z">2026-11-16</time></span></a></div>
-  </section>
-</section>
-
-<details class="card">
-  <summary class="tp-head" style="cursor:pointer;list-style:none;min-height:44px"><span class="label">Sources on this keycard (10)</span><span class="pill pill-new">Default pack · tap to see</span></summary>
-  <div class="feed-group">
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">Rockstar Games</b></span>
-      <span class="feed-m">Official · YouTube · good for official, trailers · collected automatically</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">IGN</b></span>
-      <span class="feed-m">Broadcaster · YouTube · good for news, reviews · collected automatically</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">IShowSpeed</b></span>
-      <span class="feed-m">Creator · YouTube · good for live reactions, streams · collected automatically</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">r/GTA6</b></span>
-      <span class="feed-m">Fans · Reddit · good for community, reactions · added by hand</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">Eurogamer</b></span>
-      <span class="feed-m">News · Website · good for news, reviews · collected automatically</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">GameSpot</b></span>
-      <span class="feed-m">News · Website · good for news, reviews · collected automatically</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">IGN</b></span>
-      <span class="feed-m">News · Website · good for news, reviews · collected automatically</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">Polygon</b></span>
-      <span class="feed-m">News · Website · good for news, culture · collected automatically</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">VGC</b></span>
-      <span class="feed-m">News · Website · good for news · collected automatically</span>
-    </div>
-    <div class="feed-row" style="cursor:default">
-      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">Google News search</b></span>
-      <span class="feed-m">News search · Web · good for wider coverage · collected automatically</span>
-    </div>
-  </div>
-  <div class="src">Coming soon: make this keycard your own. Add or remove sources, then share or compare it with a friend.</div>
-</details>
-
-<section class="updates">
-  <div class="label" style="margin-bottom:4px">Keycard updates</div>
-<div>Tue 17 Nov — Launch keycard created, with Sid&#39;s IShowSpeed angle.</div></section>
-
-<footer class="footer">
+<section class="kc-folds">
+<details class="kc-fold"><summary><span>Latest headlines</span><span class="kc-count">6</span></summary><div class="kc-fold-body"><a class="kc-row" href="https://news.google.com/rss/articles/CBMigwFBVV95cUxPWFUyRVlsWV9OVXBvVExQQk5xY3Q1eFlrQ19sZXVBQW9Kanp2NUxUcnNnZzJKYTFENjhjUEhHSTNvNUI4TXlTRXRVU0hDVjJ1OUpfT3FMR2V3bWszdnhhcXlLTXBzTFc5R1ZxZGFBdnFBYm01RTVOQ1VPOURnWDRNM0dHbw?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">&#39;GTA VI&#39; release: Where to buy in Texas, what players should know</span><span class="kc-row-m">MySA · Mon 16 Nov</span></a><a class="kc-row" href="https://news.google.com/rss/articles/CBMid0FVX3lxTFA0bHRzbF9tSEFyR3FUVjF3a2x3Wk1GYlpNZ2NFWXptc3E0VnFaRWoxZllUUGEteGxLZS16NFgydGU3OFVwOW9ldnNSdGtjN2FHcjMxNkJWQUwtOWw2Wk9VeWd1Z2RMTWQ5ZERLNEhSQXN6N2VpLUhF?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">Who Is Raul Bautista In GTA 6? The Bank Robber Explained</span><span class="kc-row-m">SVG · Mon 16 Nov</span></a><a class="kc-row" href="https://news.google.com/rss/articles/CBMifEFVX3lxTE5YbF9uRHIzdDFQdVpuWUZ6RzMxOEpIXzQ4aXZoelZaTU5uR0EzUlQzN2RaaWxuTHhvY0loaWVSSnZFaWxXMUthSVM3R3otM29tQ2tDeXVPYmk2MEJpWHQ1MW5URy03bkZPdHJ0MVV0WFE2bFFBMXVNc09GM0o?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">GTA 6 online rumors: When might the inevitable multiplayer launch happen?</span><span class="kc-row-m">PC Gamer · Mon 16 Nov</span></a><a class="kc-row" href="https://news.google.com/rss/articles/CBMijgFBVV95cUxPYmJ0YjBIS2V0bWZIQlUxb2pFVmt6VXV3anhVVmNqT1RNVnBXSzhHRE1pSGplU3lNZDQxRkphbThXQ2VRRWJaUDI2X3Q5VFpLRDlBcmZTSmphMXJWc1lEQ2pEVVpIcGtIb19nRlRIYUdRejJTdmIxZ3FPWTZ2Mjk4dS1wb1I2bDBSTVN4T3Zn?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">‘GTA 6’ Hacker Pleads Guilty After Using Hotel TV to Pull Off $5M Rockstar Breach</span><span class="kc-row-m">Complex · Mon 16 Nov</span></a><a class="kc-row" href="https://www.gamespot.com/articles/delete-gta-6-for-a-chance-to-win-another-game/" target="_blank" rel="noopener"><span class="kc-row-t">Delete GTA 6 For A Chance To Win Another Game</span><span class="kc-row-m">GameSpot · Mon 16 Nov</span></a><a class="kc-row" href="https://news.google.com/rss/articles/CBMigAFBVV95cUxQcjY2ZkhTaUhiLWt3QWtIZWlDTWJnb3hsWDJXUDlZY0lWbDhMaXMzaGVZaEtyZHBONUZBNFVCLWNMaEVoTXNKZm1HVWxHMkc3VjVWWXJlYlJHY1VtaklJM2Q0N1p5SFBtOWh3dnNrRUVNa2UtVEU4SklERlZWS0JoZw?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">GTA 6 fans ready for game to drop, but some physical release buyers already say they are bitterly disappointed: ‘They sold me a game with no code’</span><span class="kc-row-m">Yahoo Tech · Mon 16 Nov</span></a></div></details><details class="kc-fold"><summary><span>Videos</span><span class="kc-count">4</span></summary><div class="kc-fold-body"><a class="kc-row" href="https://www.youtube.com/watch?v=0e746-1G_sE" target="_blank" rel="noopener"><span class="kc-row-t">NBA 2K27 x GTA 6 (Grand Theft Auto 6) - Official Vice City Crossover Trailer</span><span class="kc-row-m">IGN · 549,495 views</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=npREFTBRmWk" target="_blank" rel="noopener"><span class="kc-row-t">Where will YOU be on November 19? #gta6 #gta #28dayslater #gaming #ign</span><span class="kc-row-m">IGN · 71,056 views</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=wiW1mpHZb_Y" target="_blank" rel="noopener"><span class="kc-row-t">New GTA 6 Gameplay Just Blew Everyones Mind..</span><span class="kc-row-m">Hollow · 2,276,374 views</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=QRGdAVqJSD8" target="_blank" rel="noopener"><span class="kc-row-t">GTA 6: NEW Gameplay Looks So Realistic That Everyone Thought it Was Fake</span><span class="kc-row-m">TGG · 1,310,922 views</span></a></div></details><details class="kc-fold"><summary><span>What fans are saying</span><span class="kc-count">5</span></summary><div class="kc-fold-body"><div class="kc-fine" style="padding:6px 0">Most-liked comments. Likes show engagement, not who's right.</div><a class="kc-row" href="https://www.youtube.com/watch?v=0e746-1G_sE&amp;lc=UgylZx28ly-5oqjWHhd4AaABAg" target="_blank" rel="noopener"><span class="kc-row-t">“Got scared. Thought that was gta 6 graphics for a sec”</span><span class="kc-row-m">5,102 likes · IGN</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=QRGdAVqJSD8&amp;lc=Ugzsrh25duPrdV6FVJ94AaABAg" target="_blank" rel="noopener"><span class="kc-row-t">“Those NPCs ain’t gonna know what hit em next week 😂”</span><span class="kc-row-m">3,569 likes · TGG</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=wiW1mpHZb_Y&amp;lc=Ugwm60NzdfOR2bJs0rB4AaABAg" target="_blank" rel="noopener"><span class="kc-row-t">“The first boot-up of GTA 6 is genuinely gonna bring me to tears bro”</span><span class="kc-row-m">3,566 likes · Hollow</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=QRGdAVqJSD8&amp;lc=UgwasOPFUx85Io48Yf54AaABAg" target="_blank" rel="noopener"><span class="kc-row-t">“The guy filming is Jason and you can even see Lucia filming the street pov if you look closer, its insane.”</span><span class="kc-row-m">2,963 likes · TGG</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=0e746-1G_sE&amp;lc=UgzzC_zEXRG_cB69UJx4AaABAg" target="_blank" rel="noopener"><span class="kc-row-t">“Funny part is for a lot of people, 2k27 is getting deleted for space for GTA 6😂”</span><span class="kc-row-m">2,556 likes · IGN</span></a></div></details>  <details class="kc-fold"><summary><span>Background</span><span class="kc-count">2</span></summary><div class="kc-fold-body"><div class="kc-row"><span class="kc-row-t">From 2025, to May 2026, to 19 November</span><span class="kc-row-m">Rockstar first targeted 2025, then moved to 26 May 2026, then to 19 November, saying the extra months were for polish.</span></div><div class="kc-row"><span class="kc-row-t">No PC version announced</span><span class="kc-row-m">Launch is PS5 and Xbox Series X|S only. Rockstar hasn&#39;t announced a PC version.</span></div></div></details>
+<details class="kc-fold"><summary><span>Sources on this keycard</span><span class="kc-count">10</span></summary><div class="kc-fold-body"><div class="kc-row"><span class="kc-row-t">Rockstar Games</span><span class="kc-row-m">Official · YouTube · good for official, trailers</span></div><div class="kc-row"><span class="kc-row-t">IGN</span><span class="kc-row-m">Broadcaster · YouTube · good for news, reviews</span></div><div class="kc-row"><span class="kc-row-t">IShowSpeed</span><span class="kc-row-m">Creator · YouTube · good for live reactions, streams</span></div><div class="kc-row"><span class="kc-row-t">r/GTA6</span><span class="kc-row-m">Fans · Reddit · good for community, reactions · added by hand</span></div><div class="kc-row"><span class="kc-row-t">Eurogamer</span><span class="kc-row-m">News · Website · good for news, reviews</span></div><div class="kc-row"><span class="kc-row-t">GameSpot</span><span class="kc-row-m">News · Website · good for news, reviews</span></div><div class="kc-row"><span class="kc-row-t">IGN</span><span class="kc-row-m">News · Website · good for news, reviews</span></div><div class="kc-row"><span class="kc-row-t">Polygon</span><span class="kc-row-m">News · Website · good for news, culture</span></div><div class="kc-row"><span class="kc-row-t">VGC</span><span class="kc-row-m">News · Website · good for news</span></div><div class="kc-row"><span class="kc-row-t">Google News search</span><span class="kc-row-m">News search · Web · good for wider coverage</span></div><div class="kc-fine" style="padding-top:8px">Coming soon: copy this keycard and make it your own.</div></div></details><details class="kc-fold"><summary><span>Keycard updates</span><span class="kc-count">1</span></summary><div class="kc-fold-body"><div class="kc-row"><span class="kc-row-t">Launch keycard created, with Sid&#39;s IShowSpeed angle.</span><span class="kc-row-m">Tue 17 Nov</span></div></div></details></section><footer class="footer">
   Commentator is a pilot. Sources are named on every card. Unofficial; not affiliated with any league, promotion or company covered here.<br>
-  Built 2026-11-16 21:54 UTC.
+  Built 2026-11-16 22:12 UTC.
 </footer>
 </div>
-<script>
-(function () {
-  document.documentElement.classList.add('js');
-  var tabs = document.querySelectorAll('.tabs a'), phases = document.querySelectorAll('.phase');
-  function show(id, scroll) {
-    phases.forEach(function (p) { p.classList.toggle('on', p.id === id); });
-    tabs.forEach(function (t) { t.setAttribute('aria-current', t.dataset.tab === id ? 'true' : 'false'); });
-    if (scroll) document.querySelector('.tabs').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-  document.querySelectorAll('[data-tab]').forEach(function (a) {
-    a.addEventListener('click', function (ev) { ev.preventDefault(); show(a.dataset.tab, true); history.replaceState(null, '', '#' + a.dataset.tab); });
-  });
-  var h = location.hash.replace('#', '');
-  show(['buildup', 'live', 'aftermath'].indexOf(h) > -1 ? h : 'buildup', false);
-})();
-</script>
 <script>
 (function () {
   var fmt = { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' };
   document.querySelectorAll('time[data-t]').forEach(function (t) {
     try { var d = new Date(t.dataset.t); if (!isNaN(d)) t.textContent = d.toLocaleString(undefined, fmt); } catch (err) {}
+  });
+  document.querySelectorAll('time[data-ago]').forEach(function (t) {
+    var m = Math.round((new Date() - new Date(t.dataset.ago)) / 60000);
+    if (isNaN(m)) return;
+    t.textContent = m < 1 ? 'just now' : m < 60 ? m + 'm ago' : m < 1440 ? Math.round(m / 60) + 'h ago' : Math.round(m / 1440) + 'd ago';
   });
   // Countdowns: <span data-countdown="ISO" data-done="text when passed">
   function tick() {
