@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Premier League keycard · Commentator</title>
+<meta name="description" content="The Premier League returns this weekend after the international break. The big games: Newcastle vs Arsenal on Saturday and Liverpool vs Manchester United at Anfield on Sunday. Arsenal then host Dortmund in the Champions League on Tuesday.">
+<meta property="og:title" content="Premier League keycard · Commentator">
+<meta property="og:description" content="The Premier League returns this weekend after the international break. The big games: Newcastle vs Arsenal on Saturday and Liverpool vs Manchester United at Anfield on Sunday. Arsenal then host Dortmund in the Champions League on Tuesday.">
+<meta property="og:type" content="article">
+<meta name="theme-color" content="#0E1116">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E1116; --card:#161A21; --card2:#1C222B; --line:#262C36; --line2:#3A424E;
+  --ink:#EEF0F2; --ink2:#D6DADF; --muted:#A3ACB8; --faint:#8A93A0;
+  --a:#6FB6FF; --a-line:#2B4A6B; --b:#F07A3A; --b-line:#6B3A20;
+  --accent:#F2A93B; --accent-bg:#221C12; --accent-ink:#F5D9A8; --accent-line:#3A3020;
+  --good:#7FD3A8;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,-apple-system,sans-serif}
+a{color:var(--accent)} a:hover{color:#FFC56B}
+.wrap{max-width:560px;margin:0 auto;padding:20px 16px 48px;display:flex;flex-direction:column;gap:16px}
+.display{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.5px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;letter-spacing:3px;color:var(--ink);text-decoration:none}
+.chip{font-size:12px;font-weight:600;color:var(--muted);border:1px solid #2A313C;border-radius:999px;padding:6px 12px;white-space:nowrap}
+.eyebrow{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.label{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.card h3{margin:0;font-size:18px;font-weight:700;line-height:1.3}
+.card p{margin:0}
+.body{font-size:15px;line-height:1.5;color:var(--ink2)}
+.src{font-size:12px;color:var(--faint)}
+.src a{color:var(--faint);text-decoration:underline;text-underline-offset:2px}
+.src a:hover{color:var(--ink2)}
+.tag{align-self:flex-start;font-size:12px;font-weight:700;border-radius:6px;padding:4px 8px;letter-spacing:.3px;text-transform:uppercase}
+.tag-accent{color:#1A1300;background:var(--accent)}
+.tag-a{color:var(--a);border:1px solid var(--a-line)}
+.tag-b{color:var(--b);border:1px solid var(--b-line)}
+.tag-neutral{color:var(--muted);border:1px solid #2A313C}
+.card-accent{border-color:var(--accent-line)}
+.card-hl{border:1.5px solid var(--accent)}
+.why{background:var(--accent-bg);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px;font-size:14px;line-height:1.45;color:var(--accent-ink)}
+.why .label{color:var(--accent)}
+.ph{border:1.5px dashed var(--line2);border-radius:14px;padding:12px 14px;font-size:13px;line-height:1.45;color:var(--faint)}
+.ph strong{color:var(--muted);font-weight:600}
+.pill{font-size:12px;font-weight:700;border-radius:999px;padding:4px 10px;white-space:nowrap}
+.pill-divided{color:#1A1300;background:var(--accent)}
+.pill-growing{color:#0E1116;background:var(--good)}
+.pill-mixed,.pill-open,.pill-new{color:var(--ink);background:var(--line2)}
+.pill-settled,.pill-faded{color:var(--muted);border:1px solid var(--line2)}
+.status{display:flex;gap:8px;align-items:center;font-size:13px;font-weight:600;color:var(--accent)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.status-live .dot{background:#FF5A5A} .status-live{color:#FF8A8A}
+.footer{font-size:12px;line-height:1.6;color:var(--faint);padding:8px 4px 0;border-top:1px solid var(--line);margin-top:8px}
+</style>
+<style>
+.hero{display:flex;flex-direction:column;gap:6px}
+.hero h1{margin:0;font-size:48px;line-height:.95}
+.hero .vs{color:var(--faint);font-size:28px}
+.meta{font-size:14px;color:var(--muted)}
+.local{font-size:13px;color:var(--faint)}
+.story{font-size:16px;line-height:1.5}
+.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;background:var(--card);border-radius:14px;padding:4px;position:sticky;top:8px;z-index:5;box-shadow:0 0 0 8px var(--bg)}
+.tabs a{display:flex;align-items:center;justify-content:center;min-height:44px;text-decoration:none;font-size:14px;font-weight:600;color:var(--muted);border-radius:10px}
+.tabs a[aria-current="true"]{color:var(--bg);background:var(--ink);font-weight:700}
+.phase{display:flex;flex-direction:column;gap:14px;scroll-margin-top:72px}
+.js .phase{display:none}
+.js .phase.on{display:flex}
+.phase h2{margin:4px 0 0;font-size:26px;text-transform:uppercase}
+.phase h2 + .src{margin-top:-8px}
+.timeline{display:flex;flex-direction:column;gap:14px;border-left:2px solid var(--line);margin-left:6px;padding-left:16px}
+.rounds{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:6px}
+.rounds div{display:flex;flex-direction:column;align-items:center;gap:6px}
+.rounds i{display:block;width:100%;height:40px;border-radius:8px}
+.rounds span{font-size:12px;color:var(--muted);text-align:center}
+.result-h{margin:0;font-size:30px;line-height:1}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.stat{background:var(--card2);border-radius:12px;padding:12px}
+.stat b{display:block;font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700}
+.stat span{font-size:12px;color:var(--muted);line-height:1.35}
+.tp-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.sidebox{background:var(--card2);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:4px}
+.sidebox .label{font-size:12px}
+.sidebox p{font-size:14px;line-height:1.45;color:var(--ink2)}
+.creators{display:flex;flex-direction:column;gap:12px}
+.creator{display:flex;flex-direction:column;gap:2px}
+.creator b{font-size:14px}
+.creator p{font-size:14px;color:var(--ink2);line-height:1.45}
+.fanbases{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.track{display:flex;flex-direction:column;gap:12px;border-left:2px solid var(--line);margin-left:4px;padding-left:14px}
+.track div{display:flex;flex-direction:column;gap:2px}
+.track .when{font-size:12px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.5px}
+.track .when.next{color:var(--accent)}
+.track .hl{font-size:15px;font-weight:600}
+.track .note{font-size:14px;color:var(--muted);line-height:1.4}
+.updates{font-size:12px;color:var(--faint);line-height:1.6}
+.feed{gap:14px}
+.feed-group{display:flex;flex-direction:column;gap:2px}
+.feed-h{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.feed-note{font-weight:500;color:var(--faint);font-size:12px}
+.feed-row{display:flex;flex-direction:column;gap:2px;padding:8px 0;border-top:1px solid var(--line);text-decoration:none}
+.feed-row:first-of-type{border-top:0}
+.feed-t{font-size:14px;line-height:1.4;color:var(--ink2)}
+.quote .feed-t{font-style:italic}
+.feed-m{font-size:12px;color:var(--faint)}
+.pulse{display:flex;align-items:flex-end;gap:1px;height:80px;margin-top:4px}
+.pulse i{flex:1;background:var(--accent);opacity:.75;border-radius:2px 2px 0 0;min-height:2px}
+.peaks{display:flex;flex-direction:column;gap:8px}
+.peak{display:flex;flex-direction:column;gap:2px;padding-top:8px;border-top:1px solid var(--line)}
+.peak b{font-size:13px;color:var(--accent)}
+.peak span{font-size:14px;color:var(--ink2)}
+.next-btn{display:flex;align-items:center;justify-content:center;min-height:48px;text-decoration:none;font-size:15px;font-weight:700;color:var(--bg);background:var(--accent);border-radius:14px}
+.next-btn:hover{color:var(--bg);filter:brightness(1.08)}
+</style><style>
+.hero{display:flex;flex-direction:column;gap:6px}
+.hero h1{margin:0;font-size:48px;line-height:.95}
+.meta{font-size:14px;color:var(--muted)}
+.story{font-size:16px;line-height:1.5}
+.ev-row{display:flex;flex-direction:column;gap:3px;padding:10px 0;border-top:1px solid var(--line);text-decoration:none;color:var(--ink)}
+.ev-row:first-of-type{border-top:0}
+.ev-row b{font-family:'Barlow Condensed',sans-serif;font-size:22px;letter-spacing:.5px;text-transform:uppercase;line-height:1}
+.ev-row .ev-m{font-size:13px;color:var(--faint)}
+.section-h{margin:4px 0 0;font-size:26px;text-transform:uppercase}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="topbar">
+  <a class="brand" href="../">COMMENTATOR</a>
+  <span class="chip">Football</span>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">Topic keycard</div>
+  <h1 class="display"><span style="color:var(--a)">PREMIER LEAGUE</span></h1>
+  <div class="meta">Ongoing · refreshed every 30 minutes</div>
+</section>
+
+<section class="card">
+  <div class="label">This week in 20 seconds</div>
+    <p class="story">The Premier League returns this weekend after the international break. The big games: Newcastle vs Arsenal on Saturday and Liverpool vs Manchester United at Anfield on Sunday. Arsenal then host Dortmund in the Champions League on Tuesday.</p>
+<div class="src">Updated Tue 17 Nov</div></section>
+
+<section class="card">
+  <div class="label">Event keycards in this topic</div>
+  <div>
+    <a class="ev-row" href="../liverpool-man-utd-2026-11-22/">
+      <span class="status status-upcoming"><span class="dot"></span>Upcoming</span>
+      <b><span style="color:var(--a)">LIVERPOOL</span> <span style="color:var(--faint);font-size:16px">vs</span> <span style="color:var(--b)">MAN UNITED</span></b>
+      <span class="ev-m">Sun 22 Nov · 8:30pm Dubai · Briefing lands Sat 21 Nov</span>
+    </a>
+    <a class="ev-row" href="../arsenal-dortmund-2026-11-24/">
+      <span class="status status-upcoming"><span class="dot"></span>Upcoming</span>
+      <b><span style="color:var(--a)">ARSENAL</span> <span style="color:var(--faint);font-size:16px">vs</span> <span style="color:var(--b)">DORTMUND</span></b>
+      <span class="ev-m">Tue 24 Nov · midnight Dubai · Briefing lands Mon 23 Nov</span>
+    </a>
+  </div>
+</section>
+
+
+<div class="ph"><strong>This week from the sources</strong><br>Headlines, videos and the most-liked comments from the last 7 days land here automatically.</div>
+
+
+
+<details class="card">
+  <summary class="tp-head" style="cursor:pointer;list-style:none;min-height:44px"><span class="label">Sources on this keycard (18)</span><span class="pill pill-new">Default pack · tap to see</span></summary>
+  <div class="feed-group">
+    <div class="feed-row" style="cursor:default">
+      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">Arsenal</b></span>
+      <span class="feed-m">Official · YouTube · good for official · collected automatically</span>
+    </div>
+    <div class="feed-row" style="cursor:default">
+      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">Liverpool FC</b></span>
+      <span class="feed-m">Official · YouTube · good for official · collected automatically</span>
+    </div>
+    <div class="feed-row" style="cursor:default">
+      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">Manchester United</b></span>
+      <span class="feed-m">Official · YouTube · good for official · collected automatically</span>
+    </div>
+    <div class="feed-row" style="cursor:default">
+      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">Premier League</b></span>
+      <span class="feed-m">Official · YouTube · good for official, highlights · collected automatically</span>
+    </div>
+    <div class="feed-row" style="cursor:default">
+      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">NBC Sports Soccer</b></span>
+      <span class="feed-m">Broadcaster · YouTube · good for live watch-along · collected automatically</span>
+    </div>
+    <div class="feed-row" style="cursor:default">
+      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">Sky Sports Football</b></span>
+      <span class="feed-m">Broadcaster · YouTube · good for highlights, live watch-along · collected automatically</span>
+    </div>
+    <div class="feed-row" style="cursor:default">
+      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">AFTV</b></span>
+      <span class="feed-m">Fans · YouTube · good for fan mood, live watch-along · collected automatically</span>
+    </div>
+    <div class="feed-row" style="cursor:default">
+      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">The Anfield Wrap</b></span>
+      <span class="feed-m">Fans · YouTube · good for fan mood, live watch-along · collected automatically</span>
+    </div>
+    <div class="feed-row" style="cursor:default">
+      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">The Redmen TV</b></span>
+      <span class="feed-m">Fans · YouTube · good for fan mood, live watch-along · collected automatically</span>
+    </div>
+    <div class="feed-row" style="cursor:default">
+      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">The United Stand</b></span>
+      <span class="feed-m">Fans · YouTube · good for fan mood, live watch-along · collected automatically</span>
+    </div>
+    <div class="feed-row" style="cursor:default">
+      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">r/soccer</b></span>
+      <span class="feed-m">Fans · Reddit · good for fan mood, debate · added by hand</span>
+    </div>
+    <div class="feed-row" style="cursor:default">
+      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">BBC Sport</b></span>
+      <span class="feed-m">News · Website · good for news · collected automatically</span>
+    </div>
+    <div class="feed-row" style="cursor:default">
+      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">ESPN FC</b></span>
+      <span class="feed-m">News · Website · good for news · collected automatically</span>
+    </div>
+    <div class="feed-row" style="cursor:default">
+      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">Liverpool Echo</b></span>
+      <span class="feed-m">News · Website · good for club news · collected automatically</span>
+    </div>
+    <div class="feed-row" style="cursor:default">
+      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">Manchester Evening News</b></span>
+      <span class="feed-m">News · Website · good for club news · collected automatically</span>
+    </div>
+    <div class="feed-row" style="cursor:default">
+      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">Sky Sports</b></span>
+      <span class="feed-m">News · Website · good for news · collected automatically</span>
+    </div>
+    <div class="feed-row" style="cursor:default">
+      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">The Guardian</b></span>
+      <span class="feed-m">News · Website · good for news, analysis · collected automatically</span>
+    </div>
+    <div class="feed-row" style="cursor:default">
+      <span class="feed-t" style="font-style:normal"><b style="color:var(--ink);font-weight:600">Google News search</b></span>
+      <span class="feed-m">News search · Web · good for wider coverage · collected automatically</span>
+    </div>
+  </div>
+  <div class="src">Coming soon: make this keycard your own. Add or remove sources, then share or compare it with a friend.</div>
+</details>
+
+
+<section class="updates">
+  <div class="label" style="margin-bottom:4px">Keycard updates</div>
+<div>Tue 17 Nov — Topic keycard created.</div></section>
+<footer class="footer">
+  Commentator is a pilot. Sources are named on every card. Unofficial; not affiliated with any league, promotion or company covered here.<br>
+  Built 2026-11-16 20:19 UTC.
+</footer>
+</div>
+<script>
+document.querySelectorAll('time[data-t]').forEach(function (t) {
+  try {
+    var d = new Date(t.dataset.t);
+    if (!isNaN(d)) t.textContent = d.toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+  } catch (err) {}
+});
+</script>
+</body>
+</html>
