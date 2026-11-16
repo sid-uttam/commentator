@@ -117,6 +117,16 @@ a{color:var(--accent)} a:hover{color:#FFC56B}
 .peak span{font-size:14px;color:var(--ink2)}
 .next-btn{display:flex;align-items:center;justify-content:center;min-height:48px;text-decoration:none;font-size:15px;font-weight:700;color:var(--bg);background:var(--accent);border-radius:14px}
 .next-btn:hover{color:var(--bg);filter:brightness(1.08)}
+.brief .bp{display:flex;flex-direction:column;gap:3px;padding:9px 0;border-top:1px solid var(--line)}
+.brief .bp:first-of-type{border-top:0}
+.bt{font-size:15px;line-height:1.45;color:var(--ink2)}
+.bs{font-size:12px;color:var(--faint)}.bs a{color:var(--faint);text-decoration:underline;text-underline-offset:2px}
+.lbl{align-self:flex-start;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;border-radius:6px;padding:2px 7px}
+.lbl-confirmed{color:#0E1116;background:var(--good)}
+.lbl-reported{color:var(--ink);background:var(--line2)}
+.lbl-rumour{color:#1A1300;background:var(--accent)}
+.lbl-opinion{color:var(--a);border:1px solid var(--a-line)}
+.lbl-fan-view{color:var(--b);border:1px solid var(--b-line)}
 </style><style>
 .day{font-size:12px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.5px;margin-top:6px}
 .ol{display:flex;flex-direction:column;gap:2px;padding:10px 0;border-top:1px solid var(--line);text-decoration:none}
@@ -139,8 +149,10 @@ a{color:var(--accent)} a:hover{color:#FFC56B}
 
 <section class="card card-accent">
   <div class="label">How this keycard works</div>
-  <p class="body">Headlines only, from several outlets side by side, so you can see how each one frames the same story. No fan comments, no summary written by us.</p>
+  <p class="body">Headlines from several outlets side by side, so you can see how each one frames the same story. The AI briefing only sums up what these outlets report, says who reported what, and shows where they differ. No fan comments.</p>
 </section>
+
+
 
 <section class="card">
   <div class="label">Same story, different outlets</div>
@@ -202,7 +214,7 @@ a{color:var(--accent)} a:hover{color:#FFC56B}
 
 <footer class="footer">
   Commentator is a pilot. Sources are named on every card. Unofficial; not affiliated with any league, promotion or company covered here.<br>
-  Built 2026-11-16 20:43 UTC.
+  Built 2026-11-16 20:58 UTC.
 </footer>
 </div>
 <script>

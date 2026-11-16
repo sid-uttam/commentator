@@ -7,6 +7,7 @@ name: Collect and rebuild
 # Secrets (Settings > Secrets and variables > Actions):
 #   ENGINE_TOKEN     fine-grained token with Contents: read and write on sid-uttam/commentator-engine
 #   YOUTUBE_API_KEY  YouTube Data API v3 key (optional: without it, news only)
+#   ANTHROPIC_API_KEY  Claude API key for AI briefings (optional: without it, no AI briefings)
 
 on:
   workflow_dispatch: {}
@@ -44,6 +45,7 @@ jobs:
       - name: Collect and build
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           cd engine
           python run.py --out ../docs
