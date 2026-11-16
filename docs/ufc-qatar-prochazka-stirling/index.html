@@ -69,7 +69,7 @@ a{color:var(--accent)} a:hover{color:#FFC56B}
 .tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;background:var(--card);border-radius:14px;padding:4px;position:sticky;top:8px;z-index:5;box-shadow:0 0 0 8px var(--bg)}
 .tabs a{display:flex;align-items:center;justify-content:center;min-height:44px;text-decoration:none;font-size:14px;font-weight:600;color:var(--muted);border-radius:10px}
 .tabs a[aria-current="true"]{color:var(--bg);background:var(--ink);font-weight:700}
-.phase{display:flex;flex-direction:column;gap:14px}
+.phase{display:flex;flex-direction:column;gap:14px;scroll-margin-top:72px}
 .js .phase{display:none}
 .js .phase.on{display:flex}
 .phase h2{margin:4px 0 0;font-size:26px;text-transform:uppercase}
@@ -100,6 +100,21 @@ a{color:var(--accent)} a:hover{color:#FFC56B}
 .track .hl{font-size:15px;font-weight:600}
 .track .note{font-size:14px;color:var(--muted);line-height:1.4}
 .updates{font-size:12px;color:var(--faint);line-height:1.6}
+.feed{gap:14px}
+.feed-group{display:flex;flex-direction:column;gap:2px}
+.feed-h{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.feed-note{font-weight:500;color:var(--faint);font-size:12px}
+.feed-row{display:flex;flex-direction:column;gap:2px;padding:8px 0;border-top:1px solid var(--line);text-decoration:none}
+.feed-row:first-of-type{border-top:0}
+.feed-t{font-size:14px;line-height:1.4;color:var(--ink2)}
+.quote .feed-t{font-style:italic}
+.feed-m{font-size:12px;color:var(--faint)}
+.pulse{display:flex;align-items:flex-end;gap:1px;height:80px;margin-top:4px}
+.pulse i{flex:1;background:var(--accent);opacity:.75;border-radius:2px 2px 0 0;min-height:2px}
+.peaks{display:flex;flex-direction:column;gap:8px}
+.peak{display:flex;flex-direction:column;gap:2px;padding-top:8px;border-top:1px solid var(--line)}
+.peak b{font-size:13px;color:var(--accent)}
+.peak span{font-size:14px;color:var(--ink2)}
 .next-btn{display:flex;align-items:center;justify-content:center;min-height:48px;text-decoration:none;font-size:15px;font-weight:700;color:var(--bg);background:var(--accent);border-radius:14px}
 .next-btn:hover{color:var(--bg);filter:brightness(1.08)}
 </style>
@@ -142,6 +157,8 @@ a{color:var(--accent)} a:hover{color:#FFC56B}
   </article>
 
 
+<div class="ph"><strong>What&#39;s coming in</strong><br>News and creator videos start flowing in here automatically during fight week.</div>
+
   <div class="ph"><strong>Fan mood going in</strong><br>What r/mma fight-week threads expect, added from the fight-week threads.</div>
 
   <a class="next-btn" href="#live" data-tab="live">Next: Fight night →</a>
@@ -151,6 +168,8 @@ a{color:var(--accent)} a:hover{color:#FFC56B}
   <h2 class="display">The big moments</h2>
   <div class="ph"><strong>Filled in after the event</strong><br>The moments that mattered, each with the fan reaction and the backstory behind it.</div>
 
+  <div class="ph"><strong>Live chat pulse</strong><br>Recorded from YouTube watch-along streams while the event is on: how busy the chat gets, and what it&#39;s saying at each spike.</div>
+
 
 
   <a class="next-btn" href="#aftermath" data-tab="aftermath">Next: Aftermath →</a>
@@ -159,6 +178,8 @@ a{color:var(--accent)} a:hover{color:#FFC56B}
 <section class="phase" id="aftermath">
   <h2 class="display">What everyone's arguing about</h2>
   <div class="ph"><strong>Talking points arrive after the event</strong><br>The 3–4 things people are debating, with where opinion sits on each.</div>
+
+<div class="ph"><strong>What&#39;s coming in since</strong><br>Post-event news, creator reactions and their most-liked comments land here automatically.</div>
 
 
   <section class="card">
@@ -181,7 +202,7 @@ a{color:var(--accent)} a:hover{color:#FFC56B}
 <div>Mon 16 Nov — Page created with an early look at the card.</div></section>
 <footer class="footer">
   Commentator is a pilot. Sources are named on every card. Unofficial; not affiliated with the UFC, the Premier League or UEFA.<br>
-  Built 2026-11-16 17:11 UTC.
+  Built 2026-11-16 18:15 UTC.
 </footer>
 </div>
 <script>
@@ -202,6 +223,12 @@ a{color:var(--accent)} a:hover{color:#FFC56B}
   var start = location.hash.replace('#', '');
   show(['buildup', 'live', 'aftermath'].indexOf(start) > -1 ? start : 'buildup', false);
 
+  document.querySelectorAll('time[data-t]').forEach(function (t) {
+    try {
+      var d = new Date(t.dataset.t);
+      if (!isNaN(d)) t.textContent = d.toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+    } catch (err) {}
+  });
   var el = document.querySelector('[data-start]');
   if (el) {
     try {

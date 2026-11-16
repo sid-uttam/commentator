@@ -1,0 +1,70 @@
+name: Collect and rebuild
+
+# Every 30 minutes: fetch the private engine, collect news / YouTube / live chat for active events,
+# rebuild the pages into docs/, and save the collected data back to the engine repo.
+# While an event is live, a round stays on for up to 25 minutes recording live chat.
+#
+# Secrets (Settings > Secrets and variables > Actions):
+#   ENGINE_TOKEN     fine-grained token with Contents: read and write on sid-uttam/commentator-engine
+#   YOUTUBE_API_KEY  YouTube Data API v3 key (optional: without it, news only)
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "*/30 * * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: collect
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: pip install -q jinja2
+
+      - name: Fetch the engine
+        env:
+          ENGINE_TOKEN: ${{ secrets.ENGINE_TOKEN }}
+        run: |
+          if [ -z "$ENGINE_TOKEN" ]; then echo "::error::ENGINE_TOKEN secret is missing"; exit 1; fi
+          git clone -q --depth 20 "https://x-access-token:${ENGINE_TOKEN}@github.com/sid-uttam/commentator-engine.git" engine
+
+      - name: Collect and build
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: |
+          cd engine
+          python run.py --out ../docs
+
+      - name: Save collected data to the engine
+        run: |
+          cd engine
+          git config user.name "commentator-bot"
+          git config user.email "commentator-bot@users.noreply.github.com"
+          git add events state
+          if ! git diff --cached --quiet; then
+            git commit -q -m "Collected data $(date -u +%Y-%m-%dT%H:%MZ)"
+            for i in 1 2 3; do git pull -q --rebase origin main && git push -q origin main && break; sleep 5; done
+          fi
+
+      - name: Publish pages
+        run: |
+          git config user.name "commentator-bot"
+          git config user.email "commentator-bot@users.noreply.github.com"
+          git add docs
+          if ! git diff --cached --quiet; then
+            git commit -q -m "Pages update $(date -u +%Y-%m-%dT%H:%MZ)"
+            for i in 1 2 3; do git pull -q --rebase origin main && git push -q origin main && break; sleep 5; done
+          fi
