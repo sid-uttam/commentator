@@ -38,7 +38,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install
-        run: pip install -q jinja2
+        run: pip install -q jinja2 pillow
 
       - name: Fetch the engine
         env:
