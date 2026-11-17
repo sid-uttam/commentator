@@ -72,7 +72,8 @@ async function show() {
     const acts = document.getElementById('acts');
     const visEl = document.getElementById('vis'); if (visEl) visEl.hidden = !own;   // only the owner needs to know who can see it
     const noun = { picks: 'pick', sources: 'source', playbook: 'step' }[shape] || 'thing';
-    const copyNote = main.length ? `Copy to get all ${main.length} ${noun}${main.length === 1 ? '' : 's'} as your own, credited to ${first}. Change anything; ${first}'s stays as it is.` : '';
+    const what = sections.length > 1 ? 'all of it' : main.length ? `all ${main.length} ${noun}${main.length === 1 ? '' : 's'}` : 'it';
+    const copyNote = `Copy to get ${what} as your own, credited to ${first}. Change anything; ${first}'s stays as it is.`;
     if (!own) { mountActions(acts, k.id, { title: k.title, url: ROOT + 'u/' + docId + '/', copyNote, owner: k.owner,
       followNote: sources.length || (cf && cf.live) ? 'Follow to get its updates.' : `Follow to hear when ${first} changes it.` }); return; }
     acts.innerHTML = `<div class="kc-act-row"><a class="kc-btn kc-btn-main" href="${esc(makeUrl(docId))}">Edit</a>

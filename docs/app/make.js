@@ -1,5 +1,5 @@
 // Make or edit a keycard: /make/ (new) or /make/?id=<doc id> (edit). Never a blank page: start from a shape or a copy.
-import { onUser, signIn, noteStart, loadKeycard, saveKeycard, deleteKeycard, keycardUrl, esc, toast, ROOT, live, SUBJECTS, catOf, aiUrl, askAI } from './app.js';
+import { onUser, signIn, signInSheet, noteStart, loadKeycard, saveKeycard, deleteKeycard, keycardUrl, esc, toast, ROOT, live, SUBJECTS, catOf, aiUrl, askAI } from './app.js';
 
 const box = document.getElementById('ed');
 const params = new URLSearchParams(location.search);
@@ -164,11 +164,11 @@ box.addEventListener('click', e => {
   const answers = [0, 1, 2].map(i => (document.getElementById('fq' + i) || {}).value || '');
   if (act === 'find' && !answers.some(a => a.trim())) { toast('Answer at least one, even briefly'); return; }
   try { sessionStorage.setItem(MAKE_PENDING, JSON.stringify({ act, topic, answers, paste: (document.getElementById('paste0') || {}).value || '' })); } catch (x) {}
-  signIn();
+  signInSheet('Sign in to start', "It's free. Your keycard is saved to your account, and you carry on right where you were.");
 }, true);
 
 box.addEventListener('click', async e => {
-  if (e.target.closest('[data-showpaste]')) { e.preventDefault(); const pb = document.getElementById('paste-box'); pb.hidden = false; pb.querySelector('textarea').focus(); return; }
+  if (e.target.closest('[data-showpaste]')) { e.preventDefault(); const pb = document.getElementById('paste-box'); pb.hidden = false; pb.scrollIntoView({ behavior: 'smooth', block: 'center' }); pb.querySelector('textarea').focus(); return; }
   if (e.target.closest('[data-blank]')) { e.preventDefault(); start('picks'); return; }
   if (e.target.closest('[data-ivquit]')) { e.preventDefault(); iv = null; pick = null; try { sessionStorage.removeItem(IV); } catch (x) {} starters(); return; }
   if (e.target.closest('[data-rsstop]')) { e.preventDefault(); finishReasons(); return; }

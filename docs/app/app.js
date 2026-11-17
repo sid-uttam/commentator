@@ -26,19 +26,36 @@ const watchers = [];
 export function onUser(cb) { watchers.push(cb); if (me !== undefined) cb(me); }
 function setUser(u) { me = u; watchers.forEach(cb => { try { cb(u); } catch (e) { console.error(e); } }); }
 export const user = () => me;
+let myNameCache = '';
+export const myName = () => myNameCache || (me && me.displayName) || 'Someone';
+// Change the name shown on your keycards (and on the ones you've already made).
+export async function setMyName(name) {
+  const f = await ready; name = String(name || '').trim().slice(0, 40); if (!name || !me) return;
+  await f.F.setDoc(f.F.doc(f.db, 'users', me.uid), { name, nameSet: true }, { merge: true });
+  myNameCache = name; try { sessionStorage.setItem('kc-name-' + me.uid, name); } catch (e) {}
+  const mine = await myKeycards().catch(() => []);
+  await Promise.all(mine.map(k => f.F.setDoc(f.F.doc(f.db, 'keycards', k.docId), { ownerName: name }, { merge: true }).catch(() => {})));
+}
 export const isAdmin = () => !!(me && me.email && cfg.adminEmail && me.email === cfg.adminEmail);
 
 ready.then(f => {
   if (!f) return setUser(null);
   f.A.getRedirectResult(f.auth).catch(() => {});
   f.A.onAuthStateChanged(f.auth, async u => {
-    if (u && !sessionStorage.getItem('kc-profile-' + u.uid)) {
-      try {
-        await f.F.setDoc(f.F.doc(f.db, 'users', u.uid),
-          { name: u.displayName || 'Someone', photo: u.photoURL || '', seen: f.F.serverTimestamp(),
-            tz: (Intl.DateTimeFormat().resolvedOptions().timeZone || '') }, { merge: true });
-        sessionStorage.setItem('kc-profile-' + u.uid, '1');
-      } catch (e) { console.warn('profile save failed', e); }
+    if (u) {
+      // The name shown on your keycards: your Google name, unless you've chosen one on Mine (nameSet).
+      try { myNameCache = sessionStorage.getItem('kc-name-' + u.uid) || ''; } catch (e) {}
+      if (!myNameCache || !sessionStorage.getItem('kc-profile-' + u.uid)) {
+        try {
+          const d = await f.F.getDoc(f.F.doc(f.db, 'users', u.uid));
+          const chosen = d.exists() && d.data().nameSet ? d.data().name : '';
+          myNameCache = chosen || u.displayName || 'Someone';
+          await f.F.setDoc(f.F.doc(f.db, 'users', u.uid),
+            { ...(chosen ? {} : { name: myNameCache }), photo: u.photoURL || '', seen: f.F.serverTimestamp(),
+              tz: (Intl.DateTimeFormat().resolvedOptions().timeZone || '') }, { merge: true });
+          sessionStorage.setItem('kc-profile-' + u.uid, '1'); sessionStorage.setItem('kc-name-' + u.uid, myNameCache);
+        } catch (e) { console.warn('profile save failed', e); }
+      }
     }
     setUser(u);
     if (u) runPending(u);
@@ -87,7 +104,7 @@ export async function withUser(name, ...args) {
     : ['Sign in to continue', 'So your keycards are saved and you can share them.'];
   signInSheet(...why);
 }
-function signInSheet(title, body) {
+export function signInSheet(title, body) {
   document.querySelector('.kc-sheet')?.remove();
   const el = document.createElement('div');
   el.className = 'kc-sheet';
@@ -98,7 +115,7 @@ function signInSheet(title, body) {
       <small>Free. We only see your name and photo.</small></div>`;
   const close = () => el.remove();
   el.addEventListener('click', e => {
-    if (e.target === el || e.target.closest('[data-no]')) { sessionStorage.removeItem(PENDING); close(); }
+    if (e.target === el || e.target.closest('[data-no]')) { sessionStorage.removeItem(PENDING); sessionStorage.removeItem('kc-make-pending'); close(); }
     if (e.target.closest('[data-go]')) { close(); signIn(); }
   });
   document.body.appendChild(el);
@@ -144,8 +161,8 @@ export async function copyKeycard(id) {
   const src = await loadKeycard(id);
   const by = src.curator || src.ownerName || 'Keycard';
   const data = {
-    owner: me.uid, ownerName: me.displayName || 'Someone', ownerPhoto: me.photoURL || '',
-    title: `${(me.displayName || 'My').split(' ')[0]}'s ${(src.title || '').replace(/\s+by\s+[^]+$/i, '').trim() || src.title}`, tagline: '', subject: catOf(src.subject || ''),
+    owner: me.uid, ownerName: myName(), ownerPhoto: me.photoURL || '',
+    title: `${myName().split(' ')[0]}'s ${(src.title || '').replace(/\s+by\s+[^]+$/i, '').trim() || src.title}`, tagline: '', subject: catOf(src.subject || ''),
     sections: clean(src.sections), sources: (src.sources || []).map(s => ({ name: s.name || '', why: s.why || '', url: s.url || '', from: true })),
     shape: src.shape || '', tested: src.tested || '',
     instruction: src.instruction || '', visibility: 'unlisted', edited: false,
@@ -160,7 +177,7 @@ registerAction('copy', copyKeycard);
 
 export async function saveKeycard(docId, data) {
   const f = await ready;
-  const body = { ...data, owner: me.uid, ownerName: me.displayName || 'Someone', ownerPhoto: me.photoURL || '',
+  const body = { ...data, owner: me.uid, ownerName: myName(), ownerPhoto: me.photoURL || '',
                  updated: f.F.serverTimestamp(), checked: f.F.serverTimestamp() };
   if (docId) { await f.F.setDoc(f.F.doc(f.db, 'keycards', docId), body, { merge: true }); return docId; }
   body.created = f.F.serverTimestamp();
@@ -364,7 +381,8 @@ const SHARE_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" 
 // ---------- render a keycard someone made (same look as the site's curated keycards) ----------
 export function itemRow(it, mark) {
   const u = safeUrl(it.url);
-  const meta = esc(it.why || it.type || (u ? new URL(u).hostname.replace(/^www\./, '') : ''));
+  // A reason is the owner's words; a Maps category ("Ramen restaurant") is just a label, so it shows as a small tag.
+  const meta = it.why ? esc(it.why) : it.type ? `<span class="kc-tag">${esc(it.type)}</span>` : esc(u ? new URL(u).hostname.replace(/^www\./, '') : '');
   const yours = mark && !it.from ? `<span class="kc-yours">${esc(mark)}</span>` : '';   // mark: e.g. "added by Arjun"
   const t = `<span class="kc-row-t">${esc(it.name || u)}${yours}</span>${meta ? `<span class="kc-row-m">${meta}</span>` : ''}`;
   if (it.copy) {

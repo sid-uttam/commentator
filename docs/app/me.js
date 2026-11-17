@@ -1,5 +1,5 @@
 // Mine: the keycards you made or copied, and the ones you follow.
-import { onUser, signIn, signOut, myKeycards, myFollows, loadKeycard, keycardUrl, tileHTML, catOf, esc, ROOT, live, getWeekly, setWeekly, toast, isAdmin, betaData, ago } from './app.js';
+import { onUser, signIn, signOut, myKeycards, myFollows, loadKeycard, keycardUrl, tileHTML, catOf, esc, ROOT, live, getWeekly, setWeekly, toast, isAdmin, betaData, ago, myName, setMyName } from './app.js';
 
 const box = document.getElementById('me');
 const VIS = { public: 'Everyone', unlisted: 'Link only', private: 'Just me' };
@@ -17,9 +17,14 @@ onUser(async u => {
     <div class="sec-l">Made by you</div><div class="grid" id="mine"><div class="grid-empty">Loading…</div></div>
     <div class="sec-l">Following</div><div class="grid" id="fol"><div class="grid-empty">Loading…</div></div>
     ${isAdmin() ? '<div class="sec-l">Beta results <small style="text-transform:none;letter-spacing:0">only you see this</small></div><div id="beta" class="card"><p class="kc-fine">Loading…</p></div>' : ''}
+    <div class="kc-toggle"><span><b>Your name on keycards</b><small>How friends see you, e.g. "Sid".</small></span>
+      <span style="display:flex;gap:6px;align-items:center"><input id="nm" maxlength="40" style="width:120px;font:500 15px Inter,system-ui,sans-serif;color:var(--ink);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:8px 10px">
+      <button class="kc-btn" type="button" id="nmsave" style="flex:0 0 auto;min-height:38px">Save</button></span></div>
     <label class="kc-toggle"><span><b>Weekly email</b><small>One short note on Sundays: what's coming up and what changed.</small></span>
       <input type="checkbox" id="wk" checked></label>
     <p class="kc-fine" style="text-align:center">Signed in as ${esc(u.displayName || u.email || '')} · <a href="#" id="so" style="color:var(--muted)">Sign out</a></p>`;
+  const nm = document.getElementById('nm'); nm.value = myName();
+  document.getElementById('nmsave').onclick = async () => { await setMyName(nm.value); toast(`Your keycards now say "${myName()}"`); };
   const wk = document.getElementById('wk');
   getWeekly().then(v => { wk.checked = v !== false; });
   wk.onchange = async () => { await setWeekly(wk.checked); toast(wk.checked ? 'Weekly email on' : 'Weekly email off'); };

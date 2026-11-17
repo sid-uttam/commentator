@@ -152,7 +152,7 @@ body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 .kc-tested{font-size:12px;color:var(--faint)}
 .ed-item textarea.copy{min-height:90px;font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink2)}
 /* This week: what's on, one swipe */
-.wk-strip{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px 2px}
+.wk-strip{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px 2px;-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent)}
 .wk-strip::-webkit-scrollbar{display:none}
 .wk{flex:none;width:152px;display:flex;flex-direction:column;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-decoration:none}
 .wk .when{font-size:12px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:6px}
@@ -228,3 +228,4 @@ body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 .kc-by{display:flex;align-items:center;gap:10px;font-size:15px;margin-top:4px}
 .kc-by img,.kc-by .kc-av{width:34px;height:34px;border-radius:50%;object-fit:cover;flex:0 0 34px;background:var(--line2);display:flex;align-items:center;justify-content:center;color:var(--ink);font-weight:700;font-size:15px}
 .kc-asfriend{display:inline-block;margin-top:8px;color:var(--accent)!important;text-decoration:none}
+.kc-tag{display:inline-block;font:600 11px/1 Inter,system-ui,sans-serif;letter-spacing:.3px;color:var(--faint);border:1px solid var(--line2);border-radius:6px;padding:4px 6px;margin-top:2px}
