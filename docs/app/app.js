@@ -26,6 +26,7 @@ const watchers = [];
 export function onUser(cb) { watchers.push(cb); if (me !== undefined) cb(me); }
 function setUser(u) { me = u; watchers.forEach(cb => { try { cb(u); } catch (e) { console.error(e); } }); }
 export const user = () => me;
+export const isAdmin = () => !!(me && me.email && cfg.adminEmail && me.email === cfg.adminEmail);
 
 ready.then(f => {
   if (!f) return setUser(null);
@@ -126,7 +127,7 @@ export async function loadKeycard(id) {
 
 // In a copy, everything starts marked as from the original; what the owner adds later isn't.
 const clean = list => (list || []).map(s => ({
-  title: s.title || '', items: (s.items || []).map(i => ({ name: i.name || '', why: i.why || '', url: i.url || '', copy: i.copy || '', from: true }))
+  title: s.title || '', items: (s.items || []).map(i => ({ name: i.name || '', why: i.why || '', url: i.url || '', copy: i.copy || '', ...(i.type ? { type: i.type } : {}), from: true }))
 }));
 
 // A fingerprint of a keycard's contents, to tell a copier when the original has changed.
@@ -215,6 +216,41 @@ export async function myFollows() {
   const docs = await f.F.getDocs(f.F.query(f.F.collection(f.db, 'follows'), f.F.where('uid', '==', me.uid)));
   return docs.docs.map(d => d.data().keycard);
 }
+// ---------- beta results ----------
+// An open: once a day per browser per keycard, so a refresh doesn't count twice. Owners' own visits don't count.
+export async function recordOpen(id, ownerUid) {
+  const f = await ready; if (!f) return;
+  const day = new Date().toISOString().slice(0, 10), key = 'kc-open-' + id;
+  try { if (localStorage.getItem(key) === day) return; } catch (e) {}
+  const u = await new Promise(res => onUser(res));
+  if (u && ((ownerUid && u.uid === ownerUid) || (id.startsWith('site:') && u.email && u.email === cfg.adminEmail))) return;   // owners don't count
+  try { await f.F.addDoc(f.F.collection(f.db, 'opens'), { keycard: id, uid: u ? u.uid : null, at: f.F.serverTimestamp() }); localStorage.setItem(key, day); } catch (e) {}
+}
+const nameOf = async (f, uid, cache) => {
+  if (!(uid in cache)) { const d = await f.F.getDoc(f.F.doc(f.db, 'users', uid)).catch(() => null); cache[uid] = (d && d.exists() && d.data().name) || 'Someone'; }
+  return cache[uid];
+};
+// Who followed and copied a keycard, by name, plus how many times it's been opened.
+export async function whoFor(id) {
+  const f = await ready; if (!f) return null;
+  const q = (col, field) => f.F.getDocs(f.F.query(f.F.collection(f.db, col), f.F.where(field, '==', id)));
+  try {
+    const [fo, co, op] = await Promise.all([q('follows', 'keycard'), q('copies', 'from'), q('opens', 'keycard')]);
+    const cache = {};
+    const names = async snap => [...new Set(await Promise.all(snap.docs.map(d => nameOf(f, d.data().uid, cache))))];
+    return { followers: await names(fo), copiers: await names(co), opens: op.docs.length,
+             people: new Set(op.docs.map(d => d.data().uid).filter(Boolean)).size };
+  } catch (e) { console.warn(e); return null; }
+}
+// Everything for Sid's beta results page: people, what they did, and how each keycard is doing.
+export async function betaData() {
+  const f = await ready; if (!f) return null;
+  const all = async (col, ...w) => (await f.F.getDocs(f.F.query(f.F.collection(f.db, col), ...w))).docs.map(d => ({ id: d.id, ...d.data() }));
+  const [users, follows, copies, opens, pub, unl] = await Promise.all([all('users'), all('follows'), all('copies'), all('opens'),
+    all('keycards', f.F.where('visibility', '==', 'public')), all('keycards', f.F.where('visibility', '==', 'unlisted'))]);
+  return { users, follows, copies, opens, keycards: [...pub, ...unl] };
+}
+
 export async function counts(id) {
   const f = await ready; if (!f) return null;
   const n = async (col, field) => (await f.F.getCountFromServer(
@@ -310,6 +346,7 @@ export function mountActions(el, id, opts = {}) {
   el.querySelector('[data-a="copy"]').onclick = () => withUser('copy', id).catch(e => { console.error(e); toast("Couldn't copy it. Try again?"); });
   el.querySelector('[data-a="share"]').onclick = () => share(title, opts.url || keycardUrl(id));
   if (opts.own) fBtn.hidden = true;
+  else recordOpen(id, opts.owner);
   onUser(async u => {
     const at = changed;
     const f = u ? await isFollowing(id).catch(() => false) : false;
@@ -323,7 +360,7 @@ const SHARE_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" 
 // ---------- render a keycard someone made (same look as the site's curated keycards) ----------
 export function itemRow(it, mark) {
   const u = safeUrl(it.url);
-  const meta = esc(it.why || (u ? new URL(u).hostname.replace(/^www\./, '') : ''));
+  const meta = esc(it.why || it.type || (u ? new URL(u).hostname.replace(/^www\./, '') : ''));
   const yours = mark && !it.from ? `<span class="kc-yours">${esc(mark)}</span>` : '';   // mark: e.g. "added by Arjun"
   const t = `<span class="kc-row-t">${esc(it.name || u)}${yours}</span>${meta ? `<span class="kc-row-m">${meta}</span>` : ''}`;
   if (it.copy) {

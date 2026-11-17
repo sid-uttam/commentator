@@ -108,7 +108,7 @@ function render() {
   box.innerHTML = `
     <form class="ed" onsubmit="return false">
       <input class="ed-title" data-p="title" value="${esc(k.title)}" placeholder="Name it" maxlength="80" aria-label="Name">
-      <input data-p="tagline" value="${esc(k.tagline)}" placeholder="${k.copiedFrom ? 'What makes your version yours?' : 'In one line: what is it, who is it for?'}" maxlength="160" aria-label="One line">
+      <input data-p="tagline" value="${esc(k.tagline)}" placeholder="${k.copiedFrom ? 'What makes your version yours?' : 'In one line: what should someone get out of it?'}" maxlength="160" aria-label="One line">
       ${(k.sections || []).map((s, i) => listBox(s.title, s.items, `sections.${i}.items`, '', `sections.${i}.title`)).join('')}
       ${showSources ? listBox('Sources I follow', k.sources, 'sources', 'Paste links to YouTube channels or websites and you get a short AI update from them every few hours. Say why each one is good.') : ''}
       <div class="ed-row">
@@ -171,11 +171,19 @@ box.addEventListener('click', async e => {
   if (e.target.closest('[data-showpaste]')) { e.preventDefault(); const pb = document.getElementById('paste-box'); pb.hidden = false; pb.querySelector('textarea').focus(); return; }
   if (e.target.closest('[data-blank]')) { e.preventDefault(); start('picks'); return; }
   if (e.target.closest('[data-ivquit]')) { e.preventDefault(); iv = null; pick = null; try { sessionStorage.removeItem(IV); } catch (x) {} starters(); return; }
+  if (e.target.closest('[data-rsstop]')) { e.preventDefault(); finishReasons(); return; }
   if (e.target.closest('[data-back]')) { e.preventDefault(); pick = null; starters(); scrollTo(0, 0); return; }
   const t = e.target.closest('button'); if (!t) return;
   const d = t.dataset;
   if (d.starter) { start(d.starter); return; }
   if (d.ivchip) { const t = document.getElementById('iv-topic'); t.value = d.ivchip.replace('…', ' '); t.focus(); return; }
+  if (d.rsnext !== undefined || d.rsskip !== undefined) {
+    const v = document.getElementById('rs-why').value.trim();
+    if (d.rsnext !== undefined && v) { setPath(rs.queue[rs.i] + '.why', v); rs.added++; dirty = true; }
+    rs.i++;
+    if (rs.added && rs.added % 5 === 0 && d.rsnext !== undefined && v) saveQuietly();
+    renderReasons(); return;
+  }
   if (d.watchchip) { const t = box.querySelector('[data-p="watch"]'); t.value = (t.value.trim() ? t.value.trim() + ' ' : '') + d.watchchip; setPath('watch', t.value); dirty = true; t.focus(); return; }
   if (d.choice) { pick = d.choice; starters(); scrollTo(0, 0); return; }
   if (d.idea) {
@@ -226,10 +234,9 @@ box.addEventListener('click', async e => {
 function focusLast(path) { const els = box.querySelectorAll(`[data-p^="${path}."][data-p$=".name"]`); if (els.length) els[els.length - 1].focus(); }
 
 let made = null;   // how this keycard was started, and when: { how, t0 }
-async function save(btn) {
-  if (!k.title.trim()) { toast('Give it a name first'); box.querySelector('[data-p="title"]').focus(); return; }
+function payload() {
   const keep = it => (it.name || '').trim() || (it.url || '').trim() || (it.copy || '').trim();
-  const tidy = it => ({ name: (it.name || '').trim(), why: (it.why || '').trim(), url: (it.url || '').trim(), ...(it.copy ? { copy: it.copy.trim() } : {}), ...(it.from ? { from: true } : {}) });
+  const tidy = it => ({ name: (it.name || '').trim(), why: (it.why || '').trim(), url: (it.url || '').trim(), ...(it.type ? { type: it.type } : {}), ...(it.copy ? { copy: it.copy.trim() } : {}), ...(it.from ? { from: true } : {}) });
   const data = {
     title: k.title.trim(), tagline: k.tagline.trim(), subject: k.subject || '',
     sections: k.sections.map(s => ({ title: s.title.trim() || 'Picks', items: s.items.filter(keep).map(tidy) })).filter(s => s.items.length),
@@ -238,12 +245,58 @@ async function save(btn) {
     visibility: k.visibility, copiedFrom: k.copiedFrom || null, edited: !!(k.edited || (k.copiedFrom && dirty) || !k.copiedFrom),
   };
   if (!docId && made) data.made = { how: made.how, secs: Math.round((Date.now() - made.t0) / 1000) };
+  return data;
+}
+async function save(btn) {
+  if (!k.title.trim()) { toast('Give it a name first'); box.querySelector('[data-p="title"]').focus(); return; }
+  const data = payload();
   btn.disabled = true; btn.textContent = 'Saving…';
   try {
     const id = await saveKeycard(docId, data);
     dirty = false;
     location.href = keycardUrl('user:' + id);
   } catch (e) { console.error(e); toast("Couldn't save. Check your connection and try again."); btn.disabled = false; btn.textContent = 'Save'; }
+}
+
+// ---------- Add your reasons: one pick at a time ----------
+// Reasons are what make a list worth borrowing ("best tonkotsu in town" beats "Ramen restaurant"). AI never writes
+// them: the owner does, a line each, skipping any they like. Saved as they go.
+let rs = null;   // { queue: [paths], i, added }
+const missingWhy = () => k.sections.flatMap((sec, si) => sec.items.map((it, ii) => ((it.name || '').trim() && !(it.why || '').trim()) ? `sections.${si}.items.${ii}` : null)).filter(Boolean);
+function startReasons() {
+  rs = { queue: missingWhy(), i: 0, added: 0 };
+  if (!rs.queue.length) { rs = null; toast('Every pick already has a reason'); return render(); }
+  renderReasons();
+}
+function renderReasons() {
+  if (rs.i >= rs.queue.length) return finishReasons();
+  const path = rs.queue[rs.i], it = getPath(path), sec = k.sections[+path.split('.')[1]];
+  box.innerHTML = `<a href="#" class="mk-back" data-rsstop>‹ Done for now</a>
+    <section class="kc-hero"><h1 class="display kc-title">WHY THIS ONE?</h1>
+      <p class="kc-body">A few words on why each pick is on your list. It's what makes it worth borrowing.</p></section>
+    <section class="ed-sec ed-start">
+      <span class="label">${esc(sec.title || 'Picks')} · ${rs.i + 1} of ${rs.queue.length}</span>
+      <p class="iv-q" style="margin:4px 0 2px">${esc(it.name)}</p>
+      ${it.type ? `<small class="kc-fine">${esc(it.type)}</small>` : ''}
+      <input id="rs-why" placeholder="e.g. Best tonkotsu in town. Go at lunch." maxlength="160" autocomplete="off">
+      <div class="ed-row">
+        <button class="kc-btn kc-btn-main" type="button" data-rsnext>Next</button>
+        <button class="kc-btn" type="button" data-rsskip>Skip</button>
+      </div>
+    </section>
+    <p class="kc-fine" style="text-align:center">${rs.added ? `${rs.added} added so far. ` : ''}Saved as you go.</p>`;
+  const inp = document.getElementById('rs-why'); inp.focus();
+  inp.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); box.querySelector('[data-rsnext]').click(); } };
+}
+async function saveQuietly() {
+  if (!docId) return;
+  try { await saveKeycard(docId, payload()); dirty = false; } catch (e) { console.warn('autosave failed', e); }
+}
+async function finishReasons() {
+  const n = rs ? rs.added : 0; rs = null;
+  await saveQuietly();
+  location.href = keycardUrl('user:' + docId);
+  toast(n ? `Added ${n} reason${n === 1 ? '' : 's'}` : 'Saved');
 }
 
 function start(kind) {
@@ -477,6 +530,7 @@ onUser(async u => {
     if (focus === 'title') { const t = box.querySelector('[data-p="title"]'); t.focus(); t.select(); }
     if (focus === 'add') box.querySelector(`[data-p="${k.sections.length ? 'sections.0.items' : 'sources'}.0.name"]`).focus();
     if (focus === 'remove') toast('Tap × on anything you don\'t want, then Save');
+    if (focus === 'reasons') return startReasons();
     if (focus === 'watch') { const w = box.querySelector('[data-p="watch"]'); w.scrollIntoView({ block: 'center' }); w.focus(); }
   } catch (e) { box.innerHTML = `<section class="card"><p class="kc-body">We couldn't find that keycard. <a href="${ROOT}me/">Your keycards</a></p></section>`; }
 });

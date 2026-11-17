@@ -2,7 +2,7 @@
 // One layout for every shape: who made it and how fresh it is, then the most useful thing first.
 //   Picks: the list first, "what's new" after it.  Sources: "right now" first.  Playbook: numbered steps + copy boxes.
 import { loadKeycard, mountActions, onUser, esc, itemRow, fold, briefingCard, keycardUrl, makeUrl, share, kcHash,
-         markChecked, ago, toast, ROOT, live, SHAPE_LABEL } from './app.js';
+         markChecked, ago, toast, ROOT, live, SHAPE_LABEL, whoFor } from './app.js';
 
 const box = document.getElementById('kc');
 const params = new URLSearchParams(location.search);
@@ -26,6 +26,14 @@ async function show() {
   const shape = k.shape || (sources.length && !sections.length ? 'sources' : 'picks');
   const vis = { private: 'Only you can see this', unlisted: 'Only people you send the link to can see this' }[k.visibility];
   const all = [...sections.flatMap(s => s.items), ...sources];
+  // What came from the original: compare with the original itself, by name. (Older copies lost their markers
+  // when saved, so the marker alone can't be trusted.) Falls back to the marker if the original can't be loaded.
+  if (cf) {
+    const norm = x => String(x || '').trim().toLowerCase();
+    let names = null;
+    try { const o = await loadKeycard(cf.id); names = new Set([...(o.sections || []).flatMap(x => x.items || []), ...(o.sources || [])].map(i => norm(i.name))); } catch (e) {}
+    if (names && names.size) all.forEach(i => { i.from = names.has(norm(i.name)); });
+  }
   const main = sections.length ? sections.flatMap(s => s.items) : sources;   // what people count: the picks or steps, else the sources
   const added = cf ? main.filter(i => !i.from).length : 0, inherited = cf ? main.length - added : 0;
 
@@ -62,10 +70,18 @@ async function show() {
     const visEl = document.getElementById('vis'); if (visEl) visEl.hidden = !own;   // only the owner needs to know who can see it
     const noun = { picks: 'pick', sources: 'source', playbook: 'step' }[shape] || 'thing';
     const copyNote = main.length ? `Copy to get all ${main.length} ${noun}${main.length === 1 ? '' : 's'} as your own, credited to ${first}. Change anything; ${first}'s stays as it is.` : '';
-    if (!own) { mountActions(acts, k.id, { title: k.title, url: ROOT + 'u/' + docId + '/', copyNote }); return; }
+    if (!own) { mountActions(acts, k.id, { title: k.title, url: ROOT + 'u/' + docId + '/', copyNote, owner: k.owner }); return; }
     acts.innerHTML = `<div class="kc-act-row"><a class="kc-btn kc-btn-main" href="${esc(makeUrl(docId))}">Edit</a>
       <button class="kc-btn" type="button" id="sh">Share</button></div>`;
     document.getElementById('sh').onclick = () => share(k.title, ROOT + 'u/' + docId + '/');
+    // Results, for the owner: seeing your knowledge travel is the reward.
+    acts.insertAdjacentHTML('beforeend', '<div class="kc-results" id="res"></div>');
+    whoFor(k.id).then(r => {
+      const el = document.getElementById('res'); if (!el || !r) return;
+      const list = (names, verb) => names.length ? `<div><b>${names.length}</b> ${verb} <span>${esc(names.slice(0, 4).join(', '))}${names.length > 4 ? ` and ${names.length - 4} more` : ''}</span></div>` : '';
+      const lines = [r.opens ? `<div><b>${r.opens}</b> open${r.opens === 1 ? '' : 's'}</div>` : '', list(r.copiers, r.copiers.length === 1 ? 'copy by' : 'copies by'), list(r.followers, 'following:')].filter(Boolean);
+      el.innerHTML = lines.length ? lines.join('') : `<div class="kc-fine">No one's opened it yet. Share it with a friend and you'll see who follows and copies it here.</div>`;
+    });
     const mine = document.getElementById('mine');
 
     // The moment after copying: this is yours now, here's what you got, three ways to make it yours.
@@ -96,11 +112,19 @@ async function show() {
         const f = box.querySelector('.kc-fresh, .kc-stale'); if (f) { f.className = 'kc-fresh'; f.textContent = `Checked by ${first} just now`; }
       };
     };
-    if (!(cf && cf.hash)) return stillAccurate();
+    // Picks without a reason: the most useful thing an owner can add. Comes before "still accurate?".
+    const noWhy = sections.flatMap(x => x.items).filter(i => !(i.why || '').trim() && !i.copy).length;
+    const nextMessage = () => {
+      if (shape !== 'picks' || noWhy < 3) return stillAccurate();
+      mine.innerHTML = `<section class="kc-mine"><b>${noWhy} picks have no reason yet.</b>
+        <p>A few words on why each one is on your list is what makes it worth borrowing. One at a time, skip any you like.</p>
+        <div class="kc-act-row"><a class="kc-btn kc-btn-main" href="${esc(makeUrl(docId, '&focus=reasons'))}">Add reasons</a></div></section>`;
+    };
+    if (!(cf && cf.hash)) return nextMessage();
     loadKeycard(cf.id).then(orig => {
       const seenKey = 'kc-seen-' + docId + '-' + kcHash(orig);
       let seen = false; try { seen = !!localStorage.getItem(seenKey); } catch (e) {}
-      if (kcHash(orig) === cf.hash || seen) return stillAccurate();
+      if (kcHash(orig) === cf.hash || seen) return nextMessage();
       mine.innerHTML = `<div class="kc-banner"><b>${esc(cf.by)} has updated the original</b> since you copied it. <a href="${esc(keycardUrl(cf.id))}" style="color:var(--accent)">See what's new</a>, then add anything you like to yours.</div>`;
       mine.querySelector('a').onclick = () => { try { localStorage.setItem(seenKey, '1'); } catch (e) {} };
     }).catch(stillAccurate);

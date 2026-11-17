@@ -219,3 +219,8 @@ body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 .kc-sheet-box b{font-size:20px;color:var(--ink)}
 .kc-sheet-box p{margin:0 0 6px;color:var(--ink2);font-size:15px;line-height:1.45}
 .kc-sheet-box small{color:var(--faint);text-align:center;font-size:12px}
+/* Results for the owner */
+.kc-results{display:flex;flex-direction:column;gap:4px;margin-top:12px;padding:12px 14px;border:1px solid var(--line2);border-radius:14px;font:500 14px/1.4 Inter,system-ui,sans-serif;color:var(--ink2)}
+.kc-results b{color:var(--accent);font-size:17px;font-weight:800;margin-right:4px}
+.kc-results span{color:var(--muted)}
+.kc-results:empty{display:none}
