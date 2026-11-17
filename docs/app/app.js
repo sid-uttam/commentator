@@ -107,7 +107,7 @@ export async function copyKeycard(id) {
   const by = src.curator || src.ownerName || 'Commentator';
   const data = {
     owner: me.uid, ownerName: me.displayName || 'Someone', ownerPhoto: me.photoURL || '',
-    title: (src.title || '').replace(/\s+by\s+[^]+$/i, '').trim() || src.title, tagline: src.tagline || '', subject: src.subject || '',
+    title: (src.title || '').replace(/\s+by\s+[^]+$/i, '').trim() || src.title, tagline: '', subject: catOf(src.subject || ''),
     sections: clean(src.sections), sources: (src.sources || []).map(s => ({ name: s.name || '', why: s.why || '', url: s.url || '' })),
     instruction: src.instruction || '', visibility: 'unlisted', edited: false,
     copiedFrom: { id, title: src.title, by, live: src.copiedFrom && src.copiedFrom.live || (id.startsWith('site:') ? id : null) },
@@ -115,7 +115,7 @@ export async function copyKeycard(id) {
   };
   const ref = await f.F.addDoc(f.F.collection(f.db, 'keycards'), data);
   await f.F.addDoc(f.F.collection(f.db, 'copies'), { from: id, to: 'user:' + ref.id, uid: me.uid, at: f.F.serverTimestamp() }).catch(() => {});
-  location.href = makeUrl(ref.id, '&copied=1');
+  location.href = keycardUrl('user:' + ref.id) + '&new=1';
 }
 registerAction('copy', copyKeycard);
 
@@ -182,20 +182,28 @@ export async function share(title, url) {
   try { await navigator.clipboard.writeText(url); toast('Link copied'); } catch (e) { prompt('Copy this link', url); }
 }
 
-// The account button in the top bar of every page.
-function mountAccount() {
-  document.querySelectorAll('[data-account]').forEach(el => {
+// Your photo on the Mine tab once you're signed in.
+function mountMine() {
+  document.querySelectorAll('[data-mine]').forEach(el => {
+    const icon = el.querySelector('svg, img, .av-i');
     onUser(u => {
-      if (u) {
-        const initial = esc((u.displayName || '?').trim()[0] || '?');
-        el.innerHTML = `<a class="kc-acct" href="${ROOT}me/" aria-label="My keycards">${u.photoURL
-          ? `<img src="${esc(u.photoURL)}" alt="" referrerpolicy="no-referrer">` : `<span>${initial}</span>`}<b>My keycards</b></a>`;
-      } else {
-        el.innerHTML = `<button class="kc-signin" type="button">Sign in</button>`;
-        el.querySelector('button').onclick = () => signIn();
-      }
+      const cur = el.querySelector('svg, img, .av-i');
+      if (!u) { if (cur !== icon) cur.replaceWith(icon); return; }
+      const n = u.photoURL ? Object.assign(document.createElement('img'), { className: 'av', src: u.photoURL, alt: '', referrerPolicy: 'no-referrer' })
+        : Object.assign(document.createElement('span'), { className: 'av-i', textContent: (u.displayName || '?').trim()[0] || '?' });
+      cur.replaceWith(n);
     });
   });
+}
+
+// The plain categories people filter by. Older subjects map onto them.
+const CATS = { Football: 'Sport', FPL: 'Sport', UFC: 'Sport', Markets: 'Money & tech', Tech: 'Money & tech', Gaming: 'Games' };
+export const SUBJECTS = ['Food', 'Travel', 'Sport', 'Fitness', 'Money & tech', 'Games', 'Learning', 'Other'];
+export const catOf = s => CATS[s] || (SUBJECTS.includes(s) || s === 'News' ? s : 'Other');
+
+export function tileHTML({ url, cat, title, by, line, mine }) {
+  return `<a class="tile${mine ? ' mine' : ''}" href="${esc(url)}" data-cat="${esc(cat)}"><span class="c">${esc(cat)}</span>
+    <b>${esc(title)}</b>${line ? `<span class="s">${esc(line)}</span>` : ''}<span class="by">${esc(by)}</span></a>`;
 }
 
 // Follow / copy / share buttons, plus follower and copy counts.
@@ -203,17 +211,17 @@ export function mountActions(el, id, opts = {}) {
   const title = opts.title || document.title;
   el.innerHTML = `<div class="kc-act-row">
       <button class="kc-btn kc-btn-main" data-a="follow" type="button">Follow</button>
-      <button class="kc-btn" data-a="copy" type="button">${opts.own ? 'Copy' : 'Copy &amp; make it yours'}</button>
+      <button class="kc-btn" data-a="copy" type="button">Copy</button>
       <button class="kc-btn kc-btn-icon" data-a="share" type="button" aria-label="Share">${SHARE_ICON}</button>
     </div><div class="kc-fine kc-counts" aria-live="polite"></div>`;
   const fBtn = el.querySelector('[data-a="follow"]');
   let following = false, changed = 0;     // changed: ignore a slow 'am I following?' answer once they've tapped
   const paint = () => { fBtn.textContent = following ? 'Following ✓' : 'Follow'; fBtn.classList.toggle('on', following); };
   const showCounts = async () => {
-    const c = await counts(id); const out = el.querySelector('.kc-counts');
-    if (!c || (!c.followers && !c.copies)) { out.textContent = opts.hint || ''; return; }
-    out.textContent = [c.followers ? plural(c.followers, 'follower') : '', c.copies ? plural(c.copies, 'copy', 'copies') : '']
-      .filter(Boolean).join(' · ');
+    const out = el.querySelector('.kc-counts'); const c = await counts(id);
+    const help = 'Follow for its updates. Copy to make your own version.';
+    const n = c ? [c.followers ? plural(c.followers, 'follower') : '', c.copies ? plural(c.copies, 'copy', 'copies') : ''].filter(Boolean) : [];
+    out.textContent = n.length ? `${n.join(' · ')}. ${help}` : help;
   };
   registerAction('follow:' + id, async () => { changed++; await follow(id); following = true; paint(); toast("Following. You'll get its updates."); showCounts(); });
   fBtn.onclick = async () => {
@@ -260,5 +268,5 @@ export function briefingCard(b, title, note) {
     <div class="kc-fine">${esc(note)}</div></section>`;
 }
 
-mountAccount();
-document.querySelectorAll('[data-keycard]').forEach(el => mountActions(el, el.dataset.keycard, { title: el.dataset.title, hint: el.dataset.hint }));
+mountMine();
+document.querySelectorAll('[data-keycard]').forEach(el => mountActions(el, el.dataset.keycard, { title: el.dataset.title }));

@@ -200,7 +200,7 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
 </head>
 <body>
 <div class="wrap">
-<header class="topbar"><a class="brand" href="../../">COMMENTATOR</a><span data-account></span></header>
+<header class="topbar"><a class="brand" href="../../">COMMENTATOR</a></header>
 <section class="kc-hero">
   <div class="eyebrow">16–22 Nov</div>
   <h1 class="display kc-title">Sid's week</h1>
@@ -231,9 +231,14 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
 
 <footer class="footer">
   Commentator is in beta. Sources are named on every keycard; AI updates only use a keycard's own sources. Unofficial; not affiliated with any league, promotion or company covered here.<br>
-  Built 2026-11-17 11:41 UTC.
+  Built 2026-11-17 12:10 UTC.
 </footer>
 </div>
+<nav class="tabbar" aria-label="Main">
+  <a href="../../" class="on" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>Discover</a>
+  <a href="../../make/" class="tab-make"><span class="plus"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span>Make</a>
+  <a href="../../me/" data-mine><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Mine</a>
+</nav>
 <script>
 (function () {
   var fmt = { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' };

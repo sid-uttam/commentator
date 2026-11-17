@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Commentator · borrow the setups of people who know</title>
-<meta name="description" content="Find someone who already knows, and make their knowledge your own. Follow and copy keycards made by people whose taste you trust.">
-<meta property="og:title" content="Commentator · borrow the setups of people who know">
-<meta property="og:description" content="Find someone who already knows, and make their knowledge your own. Follow and copy keycards made by people whose taste you trust.">
+<title>Commentator · borrow what someone else knows</title>
+<meta name="description" content="Find someone who knows. Borrow what they know. Follow people's keycards for updates, or copy one and make it yours.">
+<meta property="og:title" content="Commentator · borrow what someone else knows">
+<meta property="og:description" content="Find someone who knows. Borrow what they know. Follow people&#39;s keycards for updates, or copy one and make it yours.">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Commentator">
 <meta property="og:url" content="https://sid-uttam.github.io/commentator/">
@@ -185,95 +185,60 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
 .kc-li:first-child{border-top:0}
 .kc-li b{font-weight:600;color:var(--ink)}.kc-li i{font-style:normal;font-size:12px;color:var(--faint);grid-column:1}
 .kc-li em{font-style:normal;grid-row:1/3;grid-column:2;align-self:center;font-weight:700;font-size:13px;text-align:right}
-</style><style>
-.intro h1{margin:0;font-size:44px;line-height:.92}
-.intro p{margin:10px 0 0;color:var(--ink2);font-size:16px;line-height:1.45}
-.intro .chip{display:inline-block;margin-bottom:10px;border-color:var(--accent-line);color:var(--accent)}
-.cta{display:flex;gap:8px}
-</style>
-</head>
+</style></head>
 <body>
 <div class="wrap">
-<header class="topbar"><span class="brand">COMMENTATOR</span><span data-account></span></header>
-<section class="intro">
-  <span class="chip">Beta</span>
-  <h1 class="display">FIND SOMEONE WHO<br>ALREADY KNOWS.</h1>
-  <p>A <b>keycard</b> is someone's setup for a subject they know: the sources they trust, their best picks, and why. Follow one to stay up to date, or copy it and make it your own.</p>
-</section>
-
-<section class="card">
-  <div class="steps">
-    <div class="step"><div><b>Find a keycard</b><span>From someone whose taste you trust, like Manav's Dubai eats.</span></div></div>
-    <div class="step"><div><b>Follow it, or copy it</b><span>Follow for short, sourced updates. Copy it to keep what you like and add your own. They keep the credit.</span></div></div>
-    <div class="step"><div><b>Make your own</b><span>Share what you know in a couple of minutes, and see who copies it.</span></div></div>
-  </div>
-  <div class="cta"><a class="kc-btn kc-btn-main" href="make/">Make a keycard</a><a class="kc-btn" href="#people">Browse</a></div>
-</section>
-
-<section class="card" id="people">
-  <div class="kc-h"><span class="label">Keycards by people</span></div>
-  <a class="kc-tile" href="guide-dubai-eats-manav/">
+<header class="topbar"><span class="brand">COMMENTATOR</span><span class="chip">Beta</span></header>
+<div class="hello" id="hello">
+  <b>Borrow what someone else knows.</b>
+  <p>People share <b class="k">keycards</b>: their go-to sources, picks and tips on something they know well. <b class="k">Follow</b> one for updates, or <b class="k">copy</b> it and make it yours. AI keeps it current.</p>
+  <div class="eg">Try: <a href="guide-dubai-eats-manav/">Manav's Dubai eats</a> · <a href="topic-fpl/">an FPL setup</a> · <a href="topic-ai-tech-stocks/">AI &amp; tech stocks</a></div>
+  <button type="button" aria-label="Got it" id="hello-x">×</button>
+</div>
+<section class="disc-h"><h1 class="display">DISCOVER</h1></section>
+<div class="chips" id="chips" role="tablist" aria-label="Filter keycards"></div>
+<div class="grid" id="grid">
+  <a class="tile" href="guide-dubai-eats-manav/" data-cat="Food">
+    <span class="c">Food</span>
     <b>Dubai eats by Manav</b>
-<span class="h">94 places worth eating at in Dubai, from someone who&#39;s been finding them for 10+ years.</span>    <span class="m">Food · by Manav Daryanani · 94 picks · curated</span>
+<span class="s">94 picks</span>    <span class="by">by Manav Daryanani</span>
   </a>
-  <a class="kc-tile" href="guide-thai-food/">
+  <a class="tile" href="guide-thai-food/" data-cat="Food">
+    <span class="c">Food</span>
     <b>Thai food</b>
-<span class="h">Cook it, understand it, and know where to eat it.</span>    <span class="m">Food · by Sid · 13 picks · curated</span>
+<span class="s">13 picks</span>    <span class="by">by Sid</span>
   </a>
-  <div id="people-live"></div>
-</section>
-
-<section class="card">
-  <div class="kc-h"><span class="label">Live keycards</span><span class="kc-fine">updated every 30 minutes</span></div>
-  <a class="kc-tile" href="topic-ai-tech-stocks/">
+  <a class="tile" href="topic-ai-tech-stocks/" data-cat="Money &amp; tech">
+    <span class="c">Money &amp; tech</span>
     <b>AI &amp; Tech Stocks</b>
-<span class="s">Next: Nvidia Q3 FY2027 earnings · in <span data-countdown="2026-11-18T01:20:00+04:00" data-done="now">…</span></span><span class="h">Nvidia faces its biggest earnings test yet after CEO Jensen Huang&#39;s resignation, while new US chip curbs hit AI and chip stocks a…</span>    <span class="m">Markets · Tech</span>
+<span class="s">Next: Nvidia Q3 FY2027 earnings · in <span data-countdown="2026-11-18T01:20:00+04:00" data-done="now">…</span></span>    <span class="by">Live · updated all day</span>
   </a>
-  <a class="kc-tile" href="topic-fpl/">
+  <a class="tile" href="topic-fpl/" data-cat="Sport">
+    <span class="c">Sport</span>
     <b>FPL</b>
-<span class="s">Gameweek 11 deadline <time data-t="2026-11-21T11:00:00Z">Sat 21 Nov</time> · in <span data-countdown="2026-11-21T11:00:00Z" data-done="passed">…</span></span><span class="h">Gameweek 11 deadline is Saturday 21 November at 11:00 UTC, and many managers are moving N. Jackson, Barry and Evanilson in while …</span>    <span class="m">Fantasy football</span>
+<span class="s">Gameweek 11 deadline <time data-t="2026-11-21T11:00:00Z">Sat 21 Nov</time> · in <span data-countdown="2026-11-21T11:00:00Z" data-done="passed">…</span></span>    <span class="by">Live · updated all day</span>
   </a>
-  <a class="kc-tile" href="topic-premier-league/">
+  <a class="tile" href="topic-premier-league/" data-cat="Sport">
+    <span class="c">Sport</span>
     <b>Premier League</b>
-<span class="s">Next: Liverpool vs Manchester United · in <span data-countdown="2026-11-22T20:30:00+04:00" data-done="now">…</span></span><span class="h">Mauricio Pochettino starts as Manchester United head coach on Wednesday, and Declan Rice reportedly agrees a new Arsenal deal.</span>    <span class="m">Football</span>
+<span class="s">Next: Liverpool vs Manchester United · in <span data-countdown="2026-11-22T20:30:00+04:00" data-done="now">…</span></span>    <span class="by">Live · updated all day</span>
   </a>
-  <a class="kc-tile" href="topic-ufc/">
+  <a class="tile" href="topic-ufc/" data-cat="Sport">
+    <span class="c">Sport</span>
     <b>UFC</b>
-<span class="s">Next: UFC Fight Night Qatar: Procházka vs Stirling · in <span data-countdown="2026-11-21T22:00:00+04:00" data-done="now">…</span></span><span class="h">UFC 334 in New York closed on Sunday with Ciryl Gane keeping the heavyweight title, and Amanda Nunes&#39; rematch with Kayla Harrison…</span>    <span class="m">UFC · MMA</span>
+<span class="s">Next: UFC Fight Night Qatar: Procházka vs Stirling · in <span data-countdown="2026-11-21T22:00:00+04:00" data-done="now">…</span></span>    <span class="by">Live · updated all day</span>
   </a>
-</section>
-
-<section class="card">
-  <div class="kc-h"><span class="label">Coming up</span></div>
-  <a class="kc-tile" href="nvidia-q3-fy2027-earnings/">
-    <b>Nvidia Q3 FY2027 earnings</b>
-<span class="s">Tue 17 Nov (US) · results ~1:20am, call 2am Wed Dubai · in <span data-countdown="2026-11-18T01:20:00+04:00" data-done="now">…</span></span><span class="m">In AI &amp; Tech Stocks</span>  </a>
-  <a class="kc-tile" href="gta-6-launch/">
-    <b>GTA VI</b>
-<span class="s">Thu 19 Nov · unlocks midnight Dubai time</span>  </a>
-  <a class="kc-tile" href="ufc-qatar-prochazka-stirling/">
-    <b>UFC Fight Night Qatar: Procházka vs Stirling</b>
-<span class="s">Sat 21 Nov · main card 10pm Dubai · in <span data-countdown="2026-11-21T22:00:00+04:00" data-done="now">…</span></span><span class="m">In UFC</span>  </a>
-  <a class="kc-tile" href="liverpool-man-utd-2026-11-22/">
-    <b>Liverpool vs Manchester United</b>
-<span class="s">Sun 22 Nov · 8:30pm Dubai · in <span data-countdown="2026-11-22T20:30:00+04:00" data-done="now">…</span></span><span class="m">In Premier League</span>  </a>
-  <a class="kc-tile" href="arsenal-dortmund-2026-11-24/">
-    <b>Arsenal vs Borussia Dortmund</b>
-<span class="s">Tue 24 Nov · midnight Dubai · in <span data-countdown="2026-11-25T00:00:00+04:00" data-done="now">…</span></span><span class="m">In Premier League</span>  </a>
-  <a class="kc-tile" href="ufc-335-oliveira-lopes/">
-    <b>UFC 335: Oliveira vs Lopes</b>
-<span class="s">Sat 12 Dec (US) · early Sun 13 Dec in Dubai</span><span class="m">In UFC</span>  </a>
-<details class="kc-more" style="margin-top:6px"><summary>Recent (1)</summary><a class="kc-row" href="ufc-334-gane-hokit/"><span class="kc-row-t">UFC 334: Gane vs Hokit</span><span class="kc-row-m">Sat 14 Nov</span></a></details></section>
-
-<a class="card" href="week/sid/" style="text-decoration:none">
-  <div class="kc-h"><span class="label">Sid's week · 16–22 Nov</span><span class="kc-fine">6 keycards</span></div>
-  <div class="kc-body">UFC · Iran–USA · Premier League · FPL · GTA VI · AI &amp; Tech Stocks</div>
-</a>
+</div>
 <footer class="footer">
   Commentator is in beta. Sources are named on every keycard; AI updates only use a keycard's own sources. Unofficial; not affiliated with any league, promotion or company covered here.<br>
-  Built 2026-11-17 11:41 UTC.
+  Built 2026-11-17 12:10 UTC.
 </footer>
 </div>
+<nav class="tabbar" aria-label="Main">
+  <a href="" class="on" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>Discover</a>
+  <a href="make/" class="tab-make"><span class="plus"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span>Make</a>
+  <a href="me/" data-mine><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Mine</a>
+</nav>
 <script>
 (function () {
   var fmt = { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' };
@@ -298,12 +263,31 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
   tick(); setInterval(tick, 30000);
 })();
 </script><script type="module">
-import { publicKeycards, esc } from './app/app.js';
-const box = document.getElementById('people-live');
+import { publicKeycards, tileHTML, catOf, user, onUser } from './app/app.js';
+const grid = document.getElementById('grid'), chips = document.getElementById('chips');
+const hello = document.getElementById('hello');
+try { if (localStorage.getItem('kc-hello')) hello.hidden = true; } catch (e) {}
+document.getElementById('hello-x').onclick = () => { hello.hidden = true; try { localStorage.setItem('kc-hello', '1'); } catch (e) {} };
+
+let current = 'All';
+function paintChips() {
+  const cats = ['All', ...new Set([...grid.querySelectorAll('.tile')].map(t => t.dataset.cat).filter(Boolean))];
+  chips.innerHTML = cats.map(c => `<button type="button" role="tab" aria-selected="${c === current}" class="${c === current ? 'on' : ''}" data-c="${c}">${c}</button>`).join('');
+}
+function filter() {
+  grid.querySelectorAll('.tile').forEach(t => { t.hidden = current !== 'All' && t.dataset.cat !== current; });
+}
+chips.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; current = b.dataset.c; paintChips(); filter(); });
+paintChips();
+
+// Keycards friends made (public ones), first in the grid.
 publicKeycards().then(list => {
   list = list.filter(k => !k.copiedFrom || k.edited);
-  box.innerHTML = list.map(k => `<a class="kc-tile" href="k/?id=${encodeURIComponent(k.docId)}"><b>${esc(k.title)}</b>
-    ${k.tagline ? `<span class="h">${esc(k.tagline)}</span>` : ''}<span class="m">${esc([k.subject, 'by ' + (k.ownerName || 'someone')].filter(Boolean).join(' · '))}</span></a>`).join('');
+  if (!list.length) return;
+  grid.insertAdjacentHTML('afterbegin', list.map(k => tileHTML({
+    url: `k/?id=${encodeURIComponent(k.docId)}`, cat: catOf(k.subject), title: k.title,
+    by: 'by ' + (k.ownerName || 'someone'), line: k.tagline })).join(''));
+  paintChips(); filter();
 }).catch(e => console.warn(e));
 </script>
 <script type="module" src="app/app.js"></script>

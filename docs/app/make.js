@@ -1,10 +1,9 @@
 // Make or edit a keycard: /make/ (new) or /make/?id=<doc id> (edit). Never a blank page: start from a shape or a copy.
-import { onUser, signIn, loadKeycard, saveKeycard, deleteKeycard, keycardUrl, esc, toast, ROOT, live } from './app.js';
+import { onUser, signIn, loadKeycard, saveKeycard, deleteKeycard, keycardUrl, esc, toast, ROOT, live, SUBJECTS, catOf } from './app.js';
 
 const box = document.getElementById('ed');
 const params = new URLSearchParams(location.search);
 const docId = params.get('id');
-const SUBJECTS = ['Food', 'Travel', 'Fitness', 'Football', 'FPL', 'UFC', 'Markets', 'Tech', 'Gaming', 'Learning', 'Other'];
 
 const STARTERS = {
   picks: {
@@ -47,11 +46,14 @@ function parseLines(text) {
   });
 }
 
+const linkOpen = new Set();
 function itemHTML(it, path) {
+  const showLink = it.url || linkOpen.has(path);
   return `<div class="ed-item"><div class="ed-item-f">
       <input data-p="${path}.name" value="${esc(it.name)}" placeholder="Name" aria-label="Name">
-      <input class="why" data-p="${path}.why" value="${esc(it.why)}" placeholder="Why it's here (the part people are borrowing)" aria-label="Why">
-      <input class="url url" data-p="${path}.url" value="${esc(it.url)}" placeholder="Link (optional)" inputmode="url" aria-label="Link">
+      <input class="why" data-p="${path}.why" value="${esc(it.why)}" placeholder="Why? (one line)" aria-label="Why">
+      ${showLink ? `<input class="url" data-p="${path}.url" value="${esc(it.url)}" placeholder="Paste a link" inputmode="url" aria-label="Link">`
+        : `<button class="ed-link" type="button" data-link="${path}">+ link</button>`}
     </div><button class="ed-x" type="button" data-rm="${path}" aria-label="Remove">×</button></div>`;
 }
 
@@ -79,29 +81,34 @@ function listBox(title, items, path, hint, titlePath) {
   </section>`;
 }
 
+let moreOpen = false;
 function render() {
-  const cf = k.copiedFrom;
+  const wasOpen = box.querySelector('.ed-more'); if (wasOpen) moreOpen = wasOpen.open;
+  const showSources = k.sources.length || k.kind === 'sources';
   box.innerHTML = `
-    ${params.get('copied') && cf ? `<div class="kc-banner"><b>This is your copy</b> of ${esc(cf.title)}. Give it your own name, keep what you like, drop what you don't and add your own. ${esc(cf.by)} keeps the credit.</div>` : ''}
     <form class="ed" onsubmit="return false">
-      <label class="ed-field"><span>Name</span>
-        <input class="ed-title" data-p="title" value="${esc(k.title)}" placeholder="e.g. Dubai brunches" maxlength="80" required></label>
-      <label class="ed-field"><span>In one line</span>
-        <input data-p="tagline" value="${esc(k.tagline)}" placeholder="What is it, and who's it for?" maxlength="160"></label>
-      <div class="ed-field"><span>Subject</span>
-        <div class="ed-chips">${SUBJECTS.map(s => `<button type="button" class="ed-chip${k.subject === s ? ' on' : ''}" data-subject="${s}">${s}</button>`).join('')}</div></div>
+      <input class="ed-title" data-p="title" value="${esc(k.title)}" placeholder="Name it, e.g. Dubai brunches" maxlength="80" aria-label="Name">
+      <input data-p="tagline" value="${esc(k.tagline)}" placeholder="${k.copiedFrom ? 'What makes your version yours?' : 'In one line: what is it, who is it for?'}" maxlength="160" aria-label="One line">
       ${(k.sections || []).map((s, i) => listBox(s.title, s.items, `sections.${i}.items`, '', `sections.${i}.title`)).join('')}
-      <div class="ed-row"><button class="kc-btn kc-btn-quiet" type="button" data-addsec>+ Add a section</button></div>
-      ${listBox('Sources I follow', k.sources || [], 'sources', 'Websites, YouTube channels, podcasts, people. Say why each is good: that’s the knowledge others are borrowing.')}
-      <label class="ed-field"><span>What should it keep an eye on?</span>
-        <textarea data-p="instruction" placeholder="e.g. New openings that suit this list, and anything that has closed.">${esc(k.instruction)}</textarea>
-        <small>Used for the short AI updates. They only ever use the sources on this keycard.</small></label>
-      <div class="ed-field"><span>Who can see it</span>
-        <div class="ed-vis">
-          ${[['public', 'Everyone', 'Shows on the home page'], ['unlisted', 'Link only', 'Anyone you send it to'], ['private', 'Just me', 'Only you']]
-            .map(([v, t, s]) => `<label><input type="radio" name="vis" value="${v}"${k.visibility === v ? ' checked' : ''}>${t}<small>${s}</small></label>`).join('')}
-        </div></div>
-      ${docId ? `<div class="ed-row"><button class="kc-btn kc-btn-danger" type="button" data-delete>Delete this keycard</button></div>` : ''}
+      ${showSources ? listBox('Sources I follow', k.sources, 'sources', 'Channels, sites, podcasts, people. Say why each one is good.') : ''}
+      <div class="ed-row">
+        <button class="kc-btn kc-btn-quiet" type="button" data-addsec>+ Section</button>
+        ${showSources ? '' : '<button class="kc-btn kc-btn-quiet" type="button" data-addsrc>+ Sources you follow</button>'}
+      </div>
+      <details class="ed-more"${moreOpen ? ' open' : ''}>
+        <summary>More options</summary>
+        <div class="ed-field"><span>Subject</span>
+          <div class="ed-chips">${SUBJECTS.map(x => `<button type="button" class="ed-chip${catOf(k.subject) === x && k.subject ? ' on' : ''}" data-subject="${x}">${x}</button>`).join('')}</div></div>
+        <label class="ed-field"><span>What should it keep an eye on?</span>
+          <textarea data-p="instruction" placeholder="e.g. New openings that suit this list, and anything that has closed.">${esc(k.instruction)}</textarea>
+          <small>For the short AI updates. They only use the sources on this keycard.</small></label>
+        <div class="ed-field"><span>Who can see it</span>
+          <div class="ed-vis">
+            ${[['public', 'Everyone', 'On Discover'], ['unlisted', 'Link only', 'People you send it to'], ['private', 'Just me', 'Only you']]
+              .map(([v, t, x]) => `<label><input type="radio" name="vis" value="${v}"${k.visibility === v ? ' checked' : ''}>${t}<small>${x}</small></label>`).join('')}
+          </div></div>
+        ${docId ? `<button class="kc-btn kc-btn-danger" type="button" data-delete>Delete this keycard</button>` : ''}
+      </details>
       <div class="ed-bar">
         <a class="kc-btn" href="${docId ? esc(keycardUrl('user:' + docId)) : ROOT}">Cancel</a>
         <button class="kc-btn kc-btn-main" type="button" data-save>Save</button>
@@ -122,8 +129,10 @@ box.addEventListener('click', async e => {
   const t = e.target.closest('button'); if (!t) return;
   const d = t.dataset;
   if (d.starter) { start(d.starter); return; }
+  if (d.link) { linkOpen.add(d.link); render(); box.querySelector(`[data-p="${d.link}.url"]`).focus(); return; }
+  if (d.addsrc) { k.kind = 'sources'; k.sources.push(blankItem()); dirty = true; render(); focusLast('sources'); return; }
   if (d.tog) { shut.has(d.tog) ? shut.delete(d.tog) : shut.add(d.tog); render(); return; }
-  if (d.subject) { k.subject = k.subject === d.subject ? '' : d.subject; dirty = true; render(); return; }
+  if (d.subject) { k.subject = catOf(k.subject) === d.subject && k.subject ? '' : d.subject; dirty = true; render(); return; }
   if (d.add) { getPath(d.add).push(blankItem()); dirty = true; render(); focusLast(d.add); return; }
   if (d.rm) { const ps = d.rm.split('.'); const i = +ps.pop(); getPath(ps.join('.')).splice(i, 1); dirty = true; render(); return; }
   if (d.rmsec) { if (!confirm('Remove this section and everything in it?')) return; shut.clear(); k.sections.splice(+d.rmsec, 1); dirty = true; render(); return; }
@@ -165,7 +174,7 @@ async function save(btn) {
 
 function start(kind) {
   const s = STARTERS[kind];
-  k = { title: '', tagline: '', subject: '', visibility: 'public', copiedFrom: null, ...JSON.parse(JSON.stringify(s.k)) };
+  k = { title: '', tagline: '', subject: '', visibility: 'public', copiedFrom: null, kind, ...JSON.parse(JSON.stringify(s.k)) };
   k.sections.forEach(sec => { if (!sec.items.length) sec.items.push(blankItem()); });
   if (kind === 'sources') k.sources.push(blankItem());
   render();
@@ -175,10 +184,10 @@ function start(kind) {
 function starters() {
   box.innerHTML = `<section class="kc-hero"><div class="eyebrow">New keycard</div>
       <h1 class="display kc-title">MAKE A KEYCARD</h1>
-      <p class="kc-body">Share something you know: the sources you trust, your best picks, or a routine you've figured out. Pick a shape to start.</p></section>
+      <p class="kc-body">Share something you know. Pick a shape to start.</p></section>
     <div class="starters">${Object.entries(STARTERS).map(([key, s]) =>
       `<button class="starter" type="button" data-starter="${key}"><b>${s.name}</b><span>${s.blurb}</span><i>${s.eg}</i></button>`).join('')}</div>
-    <p class="kc-fine" style="text-align:center">Or start faster: <a href="${ROOT}">copy someone's keycard</a> and make it yours.</p>`;
+    <p class="kc-fine" style="text-align:center">Or find one on <a href="${ROOT}">Discover</a>, tap Copy and make it yours.</p>`;
 }
 
 function signInFirst() {
