@@ -233,6 +233,33 @@ export async function myFollows() {
   const docs = await f.F.getDocs(f.F.query(f.F.collection(f.db, 'follows'), f.F.where('uid', '==', me.uid)));
   return docs.docs.map(d => d.data().keycard);
 }
+// ---------- search: the site's keycards plus friends' public ones ----------
+let siteIdx = null;
+const words = t => String(t || '').toLowerCase().replace(/[^a-z0-9\u00c0-\u024f-]+/g, ' ').split(' ').filter(w => w.length > 2 && !['the', 'and', 'for', 'with', 'how', 'my', 'your'].includes(w));
+const stem = w => w.replace(/(ies|es|s)$/, '');
+export async function searchKeycards(q) {
+  const want = [...new Set(words(q).map(stem))]; if (!want.length) return [];
+  if (!siteIdx) { try { siteIdx = await (await fetch(ROOT + 'keycards.json', { cache: 'no-cache' })).json(); } catch (e) { siteIdx = []; } }
+  const friends = await publicKeycards(80).catch(() => []);
+  const all = [...siteIdx.map(k => ({ ...k, url: ROOT + k.url })),
+               ...friends.filter(k => !k.copiedFrom || k.edited).map(k => ({ id: k.id, url: keycardUrl(k.id), title: k.title, tagline: k.tagline || '',
+                 subject: catOf(k.subject), type: SHAPE_LABEL[k.shape] || '', by: k.ownerName || '',
+                 words: [k.title, k.tagline, k.subject, ...(k.sections || []).flatMap(x => [x.title, ...(x.items || []).map(i => i.name)])].join(' ') }))];
+  return all.map(k => { const have = new Set(words(k.words + ' ' + k.title).map(stem)); return { k, n: want.filter(w => have.has(w)).length }; })
+    .filter(x => x.n > 0).sort((a, b) => b.n - a.n).slice(0, 6).map(x => x.k);
+}
+
+// ---------- asks: "nobody's made one yet, I'd like one" (kept on your own profile; no new database rules) ----------
+export async function saveAsk(topic) {
+  const f = await ready; if (!f || !me) return;
+  topic = String(topic || '').trim().slice(0, 80); if (!topic) return;
+  const ref = f.F.doc(f.db, 'users', me.uid);
+  const d = await f.F.getDoc(ref).catch(() => null);
+  const asks = ((d && d.exists() && d.data().asks) || []).filter(a => a.topic.toLowerCase() !== topic.toLowerCase());
+  asks.push({ topic, at: new Date().toISOString() });
+  await f.F.setDoc(ref, { asks: asks.slice(-20) }, { merge: true });
+}
+
 // ---------- beta results ----------
 // An open: once a day per browser per keycard, so a refresh doesn't count twice. Owners' own visits don't count.
 export async function recordOpen(id, ownerUid) {

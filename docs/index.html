@@ -234,6 +234,8 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
     <span class="in">Champions League</span>
   </a>
 </div>
+<div class="disc-search"><input id="q" type="search" placeholder="Search keycards: food, FPL, routines…" aria-label="Search keycards" enterkeyhint="search"></div>
+<div class="disc-empty" id="qempty" hidden></div>
 <div class="chips" id="chips" role="tablist" aria-label="Filter keycards"></div>
 <div class="grid" id="grid">
   <a class="tile" href="guide-dubai-eats-manav/" data-cat="Food">
@@ -357,9 +359,26 @@ function paintChips() {
   const cats = ['All', ...new Set([...grid.querySelectorAll('.tile')].map(t => t.dataset.cat).filter(Boolean))];
   chips.innerHTML = cats.map(c => `<button type="button" role="tab" aria-selected="${c === current}" class="${c === current ? 'on' : ''}" data-c="${c}">${c}</button>`).join('');
 }
+// Search: filter tiles by what they say; nothing found → make the first one, or ask for one.
+const q = document.getElementById('q'), qempty = document.getElementById('qempty');
+const norm = t => t.toLowerCase().replace(/[^a-z0-9\u00c0-\u024f]+/g, ' ');
 function filter() {
-  grid.querySelectorAll('.tile').forEach(t => { t.hidden = current !== 'All' && t.dataset.cat !== current; });
+  const words = norm(q.value).split(' ').filter(w => w.length > 1);
+  let shown = 0;
+  grid.querySelectorAll('.tile').forEach(t => {
+    const text = norm(t.textContent);
+    const ok = (current === 'All' || t.dataset.cat === current) && words.every(w => text.includes(w.replace(/s$/, '')));
+    t.hidden = !ok; if (ok) shown++;
+  });
+  const term = q.value.trim();
+  qempty.hidden = !(term && !shown);
+  if (!qempty.hidden) {
+    const into = encodeURIComponent(term), safe = term.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    qempty.innerHTML = `<p>No one's made a keycard on <b>“${safe}”</b> yet.</p>
+      <div class="kc-act-row"><a class="kc-btn kc-btn-main" href="make/?into=${into}">Make the first one</a><a class="kc-btn" href="make/?into=${into}">Ask for one</a></div>`;
+  }
 }
+q.addEventListener('input', filter);
 chips.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; current = b.dataset.c; paintChips(); filter(); });
 paintChips();
 

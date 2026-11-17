@@ -1,5 +1,5 @@
 // Make or edit a keycard: /make/ (new) or /make/?id=<doc id> (edit). Never a blank page: start from a shape or a copy.
-import { onUser, signIn, signInSheet, noteStart, loadKeycard, saveKeycard, deleteKeycard, keycardUrl, esc, toast, ROOT, live, SUBJECTS, catOf, aiUrl, askAI } from './app.js';
+import { onUser, signIn, signInSheet, noteStart, searchKeycards, saveAsk, loadKeycard, saveKeycard, deleteKeycard, keycardUrl, esc, toast, ROOT, live, SUBJECTS, catOf, aiUrl, askAI } from './app.js';
 
 const box = document.getElementById('ed');
 const params = new URLSearchParams(location.search);
@@ -155,14 +155,17 @@ box.addEventListener('change', e => { if (e.target.name === 'vis') k.visibility 
 const MAKE_PENDING = 'kc-make-pending';
 box.addEventListener('click', e => {
   if (owner) return;
-  const b = e.target.closest('[data-ivstart],[data-frompaste],[data-blank],[data-idea],[data-findideas]'); if (!b) return;
+  const b = e.target.closest('[data-ivstart],[data-frompaste],[data-blank],[data-idea],[data-findideas],[data-intoideas],[data-ask]'); if (!b) return;
   if (b.matches('[data-idea]') && b.dataset.idea.includes('…')) return;   // just fills the box; no need to sign in yet
   e.preventDefault(); e.stopImmediatePropagation();
-  const act = b.matches('[data-ivstart],[data-idea]') ? 'ivstart' : b.matches('[data-findideas]') ? 'find' : b.matches('[data-frompaste]') ? 'frompaste' : 'blank';
+  const act = b.matches('[data-ivstart],[data-idea]') ? 'ivstart' : b.matches('[data-findideas]') ? 'find' : b.matches('[data-intoideas]') ? 'into'
+    : b.matches('[data-ask]') ? 'ask' : b.matches('[data-frompaste]') ? 'frompaste' : 'blank';
   const topic = b.matches('[data-idea]') ? b.dataset.idea : ((document.getElementById('iv-topic') || {}).value || '').trim();
   if (act === 'ivstart' && !topic) { toast('What would you like to share?'); return; }
   const answers = [0, 1, 2].map(i => (document.getElementById('fq' + i) || {}).value || '');
   if (act === 'find' && !answers.some(a => a.trim())) { toast('Answer at least one, even briefly'); return; }
+  if (act === 'into' || act === 'ask') { try { sessionStorage.setItem(MAKE_PENDING, JSON.stringify({ act, topic: into.topic })); } catch (x) {}
+    signInSheet(act === 'ask' ? 'Sign in to ask' : 'Sign in to see ideas', act === 'ask' ? "It's free. We'll email you when someone makes one." : "It's free, and you carry on right where you were."); return; }
   try { sessionStorage.setItem(MAKE_PENDING, JSON.stringify({ act, topic, answers, paste: (document.getElementById('paste0') || {}).value || '' })); } catch (x) {}
   signInSheet('Sign in to start', "It's free. Your keycard is saved to your account, and you carry on right where you were.");
 }, true);
@@ -172,7 +175,7 @@ box.addEventListener('click', async e => {
   if (e.target.closest('[data-blank]')) { e.preventDefault(); start('picks'); return; }
   if (e.target.closest('[data-ivquit]')) { e.preventDefault(); iv = null; pick = null; try { sessionStorage.removeItem(IV); } catch (x) {} starters(); return; }
   if (e.target.closest('[data-rsstop]')) { e.preventDefault(); finishReasons(); return; }
-  if (e.target.closest('[data-back]')) { e.preventDefault(); pick = null; starters(); scrollTo(0, 0); return; }
+  if (e.target.closest('[data-back]')) { e.preventDefault(); pick = null; into = null; starters(); scrollTo(0, 0); return; }
   const t = e.target.closest('button'); if (!t) return;
   const d = t.dataset;
   if (d.starter) { start(d.starter); return; }
@@ -185,6 +188,9 @@ box.addEventListener('click', async e => {
     renderReasons(); return;
   }
   if (d.watchchip) { const t = box.querySelector('[data-p="watch"]'); t.value = (t.value.trim() ? t.value.trim() + ' ' : '') + d.watchchip; setPath('watch', t.value); dirty = true; t.focus(); return; }
+  if (d.into !== undefined) { startInto(document.getElementById('into').value); return; }
+  if (d.intoideas !== undefined) { if (owner) loadIntoIdeas(into.topic); return; }
+  if (d.ask !== undefined) { await saveAsk(into.topic).catch(() => {}); into.asked = true; renderInto(); toast("Asked. We'll let you know."); return; }
   if (d.choice) { pick = d.choice; starters(); scrollTo(0, 0); return; }
   if (d.idea) {
     if (d.idea.includes('…')) {                       // "My 5 favourite restaurants in …": they finish the sentence
@@ -419,9 +425,65 @@ const WATCH = {
 const watchFor = k => WATCH[k.shape] || (k.copiedFrom && k.copiedFrom.live && !/^site:guide-/.test(k.copiedFrom.live) ? WATCH.sources : WATCH.picks);
 const FIND_QS = ['What do friends or colleagues usually come to you for?', "What's something you've spent ages learning or figuring out?", 'What do you love recommending or explaining?'];
 let pick = null, found = null;   // which choice is open; ideas the AI suggested
+let into = null;                 // "What are you into?": { topic, matches, ideas, asked, state }
+const TYPE_LABEL = { playbook: 'Playbook', picks: 'Picks', sources: 'Sources' };
+
+async function startInto(topic) {
+  topic = String(topic || '').trim();
+  if (!topic) { toast("What are you into? A few words is fine"); return; }
+  into = { topic, matches: null, ideas: null, asked: false, state: 'loading' };
+  pick = 'into'; renderInto(); scrollTo(0, 0);
+  searchKeycards(topic).then(m => { if (into && into.topic === topic) { into.matches = m; renderInto(); } });
+  if (owner) loadIntoIdeas(topic);
+}
+async function loadIntoIdeas(topic) {
+  into.state = 'loading'; renderInto();
+  try {
+    let d;
+    try { d = await askAI('into', topic, []); }
+    catch (e) {   // the worker hasn't been updated yet: use "Help me find an idea" with this as the answer
+      if (!/unknown action/i.test(e.message)) throw e;
+      d = await askAI('ideas', 'Help me find an idea', [{ q: 'What are you into, or what have you figured out?', a: topic }]);
+    }
+    if (into && into.topic === topic) { into.ideas = d.ideas || []; into.state = ''; renderInto(); }
+  } catch (e) { if (into) { into.state = 'error:' + e.message; renderInto(); } }
+}
+function renderInto() {
+  const t = into.topic;
+  const matches = into.matches === null ? '<p class="kc-fine">Looking…</p>'
+    : into.matches.length ? into.matches.map(k => `<a class="kc-row" href="${esc(k.url)}"><span class="kc-row-t">${esc(k.title)}</span><span class="kc-row-m">${esc([k.type, k.subject, k.by ? 'by ' + k.by : ''].filter(Boolean).join(' · '))}</span></a>`).join('')
+    : `<p class="kc-body" style="font-size:15px">No one's made a keycard on “${esc(t)}” yet. You could be the first.</p>`;
+  const ideas = !owner ? `<p class="kc-body" style="font-size:15px">Get ideas for keycards you could make from your own experience.</p>
+        <button class="kc-btn kc-btn-main" type="button" data-intoideas>Show me ideas</button>`
+    : into.state === 'loading' ? '<div class="iv-dots"><i></i><i></i><i></i></div>'
+    : into.state.startsWith('error:') ? `<div class="kc-banner">${esc(into.state.slice(6))} <button class="kc-btn kc-btn-quiet" type="button" data-intoideas>Try again</button></div>`
+    : `<div class="mk-ideas">${(into.ideas || []).map(i => `<button type="button" class="mk-idea mk-idea-typed" data-idea="${esc(i.start || i.title)}">
+          ${TYPE_LABEL[i.type] ? `<span class="mk-type">${TYPE_LABEL[i.type]}</span>` : ''}<b>${esc(i.title)}</b>${i.blurb ? `<span>${esc(i.blurb)}</span>` : ''}</button>`).join('')}
+        <button type="button" class="mk-idea mk-idea-typed" data-idea="${esc(t)}"><b>Or just: ${esc(t)}</b><span>Start the interview with your own words</span></button></div>`;
+  box.innerHTML = `<a href="#" class="mk-back" data-back>‹ Back</a>
+    <section class="ed-sec ed-start mk-into">
+      <span class="label">What are you into?</span>
+      <div class="mk-into-row"><input id="into" value="${esc(t)}" maxlength="80" enterkeyhint="go">
+      <button class="kc-btn kc-btn-main" type="button" data-into>Go</button></div>
+    </section>
+    <span class="label" style="display:block;margin:18px 4px 6px">Already on Keycard</span>
+    <section class="card">${matches}</section>
+    <span class="label" style="display:block;margin:18px 4px 6px">You could make</span>
+    ${ideas}
+    <section class="ed-sec ed-start" style="margin-top:18px">
+      <span class="label">Not your thing to write?</span>
+      ${into.asked ? `<p class="kc-body" style="font-size:15px">Asked. We'll tell you in your Sunday email when someone makes one.</p>`
+        : `<p class="kc-body" style="font-size:15px">Ask for a keycard on “${esc(t)}”, and we'll tell you when someone makes one.</p>
+           <button class="kc-btn" type="button" data-ask>Ask for one</button>`}
+    </section>`;
+  const inp = document.getElementById('into');
+  if (inp) inp.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); startInto(inp.value); } };
+}
+
 
 function starters() {
   if (pick === 'find') return renderFind();
+  if (pick === 'into') return renderInto();
   const c = CHOICES.find(x => x.key === pick);
   if (c) return renderChoice(c);
   const paste = `<section class="ed-sec ed-start" id="paste-box"${aiUrl ? ' hidden' : ''}>
@@ -431,8 +493,15 @@ function starters() {
     </section>`;
   box.innerHTML = `<section class="kc-hero">
       <h1 class="display kc-title">EVERYONE KNOWS SOMETHING.</h1>
-      <p class="kc-body">Turn something you've figured out into a keycard someone else can borrow. What would you like to share?</p></section>
-    ${aiUrl ? `<div class="mk-choices">
+      <p class="kc-body">Turn something you've figured out into a keycard someone else can borrow.</p></section>
+    ${aiUrl ? `<section class="ed-sec ed-start mk-into">
+      <span class="label">What are you into?</span>
+      <div class="mk-into-row"><input id="into" placeholder="e.g. 7-a-side tactics, Bali" maxlength="80" enterkeyhint="go">
+      <button class="kc-btn kc-btn-main" type="button" data-into>Go</button></div>
+      <small class="kc-fine">See what's already here, and keycards you could make from your own experience.</small>
+    </section>
+    <span class="label" style="display:block;margin:14px 4px 8px">Or pick what you'd like to share</span>
+    <div class="mk-choices">
       ${CHOICES.map(x => `<button type="button" class="mk-choice" data-choice="${x.key}"><b>${esc(x.label)}</b><span>${esc(x.sub)}</span></button>`).join('')}
       <button type="button" class="mk-choice mk-find" data-choice="find"><b>Help me find an idea</b><span>Three quick questions, then a few ideas to pick from</span></button>
     </div>` : ''}
@@ -440,6 +509,8 @@ function starters() {
     <p class="kc-fine" style="text-align:center">${aiUrl ? '<a href="#" data-showpaste>Already have a list? Paste it</a> · ' : ''}<a href="#" data-blank>Start blank</a> · <a href="${ROOT}">Copy one from Discover</a></p>
     ${owner ? '' : '<p class="kc-fine" style="text-align:center">Free. You\'ll sign in with Google when you start, so it\'s saved.</p>'}`;
 }
+
+document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'into' && pick !== 'into') { e.preventDefault(); startInto(e.target.value); } });
 
 function renderChoice(c) {
   box.innerHTML = `<a href="#" class="mk-back" data-back>‹ Back</a>
@@ -491,7 +562,7 @@ window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); 
 let started = false;
 onUser(async u => {
   if (!live()) { box.innerHTML = `<section class="card"><p class="kc-body">Making keycards opens very soon.</p></section>`; return; }
-  if (!u) { owner = null; return starters(); }
+  if (!u) { owner = null; if (params.get('into') && aiUrl && !into) return startInto(params.get('into')); return into ? renderInto() : starters(); }
   if (started && owner === u.uid) return;
   started = true; owner = u.uid;
   const tpl = TEMPLATES[params.get('template')];
@@ -507,10 +578,13 @@ onUser(async u => {
       if (pend.act === 'blank') return start('picks');
       if (pend.act === 'frompaste') return startFromPaste(pend.paste);
       if (pend.act === 'ivstart' && aiUrl) return startInterview(pend.topic);
+      if (pend.act === 'into' && aiUrl) return startInto(pend.topic);
+      if (pend.act === 'ask') { await startInto(pend.topic); await saveAsk(pend.topic).catch(() => {}); into.asked = true; return renderInto(); }
       if (pend.act === 'find' && aiUrl) { pick = 'find'; found = { answers: pend.answers || [] }; starters(); return findIdeas(pend.answers || []); }
     }
     try { iv = JSON.parse(sessionStorage.getItem(IV) || 'null'); } catch (e) { iv = null; }
     if (iv && iv.q && aiUrl) return renderIv();
+    if (params.get('into') && aiUrl) return startInto(params.get('into'));
     return starters();
   }
   try {

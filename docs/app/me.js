@@ -86,6 +86,15 @@ async function betaResults() {
     ${row('Follows', `${sum(d.follows, 'keycard', live)} live · ${sum(d.follows, 'keycard', x => !live(x))} personal`)}
     ${row('Copies', `${sum(d.copies, 'from', live)} live · ${sum(d.copies, 'from', x => !live(x))} personal`)}`;
 
+  // What people asked for that nobody's made yet: the seeding list.
+  const asks = d.users.flatMap(u => (u.asks || []).map(a => ({ ...a, who: u.name || 'Someone' })));
+  if (asks.length) {
+    const byTopic = {};
+    asks.forEach(a => { const t = a.topic.trim().toLowerCase(); (byTopic[t] = byTopic[t] || { topic: a.topic, who: [] }).who.push(a.who); });
+    html += `<div class="kc-fine" style="padding:12px 0 4px">Asked for (make these, or ask a friend who knows)</div>` +
+      Object.values(byTopic).sort((a, b) => b.who.length - a.who.length).map(x => row(esc(x.topic), `${x.who.length} · ${esc([...new Set(x.who)].slice(0, 3).join(', '))}`)).join('');
+  }
+
   // Each keycard
   const ids = [...new Set([...d.opens.map(o => o.keycard), ...d.follows.map(f => f.keycard), ...d.copies.map(c => c.from)])];
   const kcTitle = {}; d.keycards.forEach(k => { kcTitle['user:' + k.id] = k.title; });
