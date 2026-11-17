@@ -24,7 +24,7 @@ async function show() {
   const sections = (k.sections || []).map(s => ({ ...s, items: (s.items || []).filter(i => i.name || i.url || i.copy) })).filter(s => s.items.length);
   const sources = (k.sources || []).filter(s => s.name || s.url);
   const shape = k.shape || (sources.length && !sections.length ? 'sources' : 'picks');
-  const vis = { private: 'Only you can see this', unlisted: 'Only people with the link' }[k.visibility];
+  const vis = { private: 'Only you can see this', unlisted: 'Only people you send the link to can see this' }[k.visibility];
   const all = [...sections.flatMap(s => s.items), ...sources];
   const main = sections.length ? sections.flatMap(s => s.items) : sources;   // what people count: the picks or steps, else the sources
   const added = cf ? main.filter(i => !i.from).length : 0, inherited = cf ? main.length - added : 0;
@@ -47,9 +47,9 @@ async function show() {
       <h1 class="display kc-title">${esc(k.title)}</h1>
       <div class="kc-cur">By <b>${esc(by)}</b>${cf ? ` · based on <a href="${esc(keycardUrl(cf.id))}" style="color:inherit">${esc(cf.by)}'s</a>` : ''}</div>
       ${stale ? `<div class="kc-stale">Not checked for ${Math.round(days / 30)} months, so some of this may be out of date</div>` : fresh ? `<div class="kc-fresh">${fresh}</div>` : ''}
-      ${cf && main.length ? `<div class="kc-fine">${inherited} from ${esc(cf.by)}${added ? ` · <span style="color:var(--good)">${added} added by ${esc(first)}</span>` : ''}</div>` : ''}
+      ${cf && added ? `<div class="kc-fine">${inherited} from ${esc(cf.by)}${added ? ` · <span style="color:var(--good)">${added} added by ${esc(first)}</span>` : ''}</div>` : ''}
       ${k.tested ? `<div class="kc-tested">Tested with ${esc(k.tested)}</div>` : ''}
-      ${vis ? `<div class="kc-fine">${esc(vis)}</div>` : ''}
+      ${vis ? `<div class="kc-fine" id="vis" hidden>${esc(vis)}</div>` : ''}
     </section>
     ${k.tagline ? `<p class="kc-body" style="margin-top:-6px">${esc(k.tagline)}</p>` : ''}
     <div class="kc-actions" id="acts"></div>
@@ -59,6 +59,7 @@ async function show() {
   onUser(u => {
     const own = u && u.uid === k.owner;
     const acts = document.getElementById('acts');
+    const visEl = document.getElementById('vis'); if (visEl) visEl.hidden = !own;   // only the owner needs to know who can see it
     if (!own) { mountActions(acts, k.id, { title: k.title, url: ROOT + 'u/' + docId + '/' }); return; }
     acts.innerHTML = `<div class="kc-act-row"><a class="kc-btn kc-btn-main" href="${esc(makeUrl(docId))}">Edit</a>
       <button class="kc-btn" type="button" id="sh">Share</button></div>`;
@@ -71,7 +72,7 @@ async function show() {
       const n = main.length, noun = shape === 'sources' ? 'source' : shape === 'playbook' ? 'step' : 'pick';
       mine.innerHTML = `<section class="kc-mine">
         <b>${params.get('new') ? 'This is yours now.' : 'Make it yours.'}</b>
-        <p>You got ${n} ${noun}${n === 1 ? '' : 's'}${groups}${cf.live ? ', plus live updates' : ''} from ${esc(cf.by)}. Change anything you like: ${esc(cf.by)}'s original stays as it is, and you'll hear if they update it.</p>
+        <p>You got ${n} ${noun}${n === 1 ? '' : 's'}${groups}${cf.live ? ', plus live updates' : ''} from ${esc(cf.by.split(' ')[0])}. Change anything you like. ${esc(cf.by.split(' ')[0])}'s original stays as it is, and you'll hear if they update it.</p>
         <div class="kc-act-row">
           <a class="kc-btn" href="${esc(makeUrl(docId, '&focus=title'))}">Rename</a>
           <a class="kc-btn" href="${esc(makeUrl(docId, '&focus=add'))}">Add your own</a>
@@ -105,7 +106,7 @@ async function show() {
   // Living: the keycard's own AI update from its links; otherwise a copy of a live keycard shows the original's.
   let mineB = null;
   try { const r = await fetch(ROOT + 'u/' + docId + '/briefing.json', { cache: 'no-cache' }); if (r.ok) mineB = await r.json(); } catch (e) {}
-  const title = shape === 'picks' ? "What's new" : 'Right now';
+  const title = "What's new";
   if (mineB && mineB.points && mineB.points.length) {
     document.getElementById('live').innerHTML = briefingCard(mineB, `${title} · ${ago(mineB.updated)}`,
       'AI summary of the links on this keycard only. Labels show how solid each point is.');

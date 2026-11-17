@@ -46,7 +46,7 @@
 .ed input:focus,.ed textarea:focus{border-color:var(--accent-line);box-shadow:0 0 0 3px rgba(242,169,59,.15)}
 .ed input::placeholder,.ed textarea::placeholder{color:#6B7380}
 .ed textarea{min-height:76px;resize:vertical}
-.ed .ed-title{font:700 30px/1.05 'Barlow Condensed',sans-serif;letter-spacing:.4px;text-transform:uppercase;padding:10px 12px}
+.ed .ed-title{font:700 28px/1.1 'Inter',system-ui,sans-serif;letter-spacing:-.3px;padding:10px 12px}
 .ed-chips{display:flex;flex-wrap:wrap;gap:6px}
 .ed-chip{font:600 13px Inter,system-ui,sans-serif;color:var(--muted);background:transparent;border:1px solid var(--line2);border-radius:999px;padding:7px 12px;cursor:pointer}
 .ed-chip.on{color:#1A1300;background:var(--accent);border-color:var(--accent)}

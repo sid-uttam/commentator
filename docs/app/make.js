@@ -85,7 +85,7 @@ function listBox(title, items, path, hint, titlePath) {
     <div class="ed-sec-h">${titlePath
       ? `<input data-p="${titlePath}" value="${esc(title)}" placeholder="Section name" aria-label="Section name">`
       : `<span class="label" style="padding:6px 4px">${esc(title)}</span>`}
-      <button class="ed-tog" type="button" data-tog="${path}" aria-expanded="${!isShut}">${items.length} ${isShut ? '▸' : '▾'}</button>
+      ${items.length > 6 || isShut ? `<button class="ed-tog" type="button" data-tog="${path}" aria-expanded="${!isShut}">${isShut ? `Show ${items.length}` : 'Hide'}</button>` : ''}
       ${titlePath ? `<button class="ed-x" type="button" data-rmsec="${titlePath.split('.')[1]}" aria-label="Remove section">×</button>` : ''}</div>
     <div class="ed-sec-body">
     ${hint ? `<small class="kc-fine">${esc(hint)}</small>` : ''}
@@ -107,13 +107,13 @@ function render() {
   const showSources = k.sources.length || k.kind === 'sources';
   box.innerHTML = `
     <form class="ed" onsubmit="return false">
-      <input class="ed-title" data-p="title" value="${esc(k.title)}" placeholder="Name it, e.g. Dubai brunches" maxlength="80" aria-label="Name">
+      <input class="ed-title" data-p="title" value="${esc(k.title)}" placeholder="Name it" maxlength="80" aria-label="Name">
       <input data-p="tagline" value="${esc(k.tagline)}" placeholder="${k.copiedFrom ? 'What makes your version yours?' : 'In one line: what is it, who is it for?'}" maxlength="160" aria-label="One line">
       ${(k.sections || []).map((s, i) => listBox(s.title, s.items, `sections.${i}.items`, '', `sections.${i}.title`)).join('')}
       ${showSources ? listBox('Sources I follow', k.sources, 'sources', 'Paste links to YouTube channels or websites and you get a short AI update from them every few hours. Say why each one is good.') : ''}
       <div class="ed-row">
         <button class="kc-btn kc-btn-quiet" type="button" data-addsec>+ Section</button>
-        ${showSources ? '' : '<button class="kc-btn kc-btn-quiet" type="button" data-addsrc>+ Sources you follow</button>'}
+        ${showSources ? '' : '<button class="kc-btn kc-btn-quiet" type="button" data-addsrc>+ Sources for updates</button>'}
       </div>
       <details class="ed-more"${moreOpen ? ' open' : ''}>
         <summary>More options</summary>
@@ -147,6 +147,20 @@ box.addEventListener('input', e => {
   if (e.target.name === 'vis') { k.visibility = e.target.value; dirty = true; }
 });
 box.addEventListener('change', e => { if (e.target.name === 'vis') k.visibility = e.target.value; });
+// Signed out: let people see how making works, and only ask them to sign in when they start.
+// What they'd typed is kept, and the step carries on straight after sign-in.
+const MAKE_PENDING = 'kc-make-pending';
+box.addEventListener('click', e => {
+  if (owner) return;
+  const b = e.target.closest('[data-ivstart],[data-frompaste],[data-blank]'); if (!b) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  const act = b.matches('[data-ivstart]') ? 'ivstart' : b.matches('[data-frompaste]') ? 'frompaste' : 'blank';
+  const topic = ((document.getElementById('iv-topic') || {}).value || '').trim();
+  if (act === 'ivstart' && !topic) { toast('What should the interview be about?'); return; }
+  try { sessionStorage.setItem(MAKE_PENDING, JSON.stringify({ act, topic, paste: (document.getElementById('paste0') || {}).value || '' })); } catch (x) {}
+  signIn();
+}, true);
+
 box.addEventListener('click', async e => {
   if (e.target.closest('[data-showpaste]')) { e.preventDefault(); const pb = document.getElementById('paste-box'); pb.hidden = false; pb.querySelector('textarea').focus(); return; }
   if (e.target.closest('[data-blank]')) { e.preventDefault(); start('picks'); return; }
@@ -310,9 +324,9 @@ function starters() {
       <textarea id="paste0" placeholder="A list, a note, your Maps list copied out… One thing per line. Headings become sections.&#10;&#10;Japanese:&#10;Kinoya – best ramen in town&#10;Kokoro – hand rolls"></textarea>
       <button class="kc-btn kc-btn-main" type="button" data-frompaste>Turn it into a keycard</button>
     </section>`;
-  box.innerHTML = `<section class="kc-hero"><div class="eyebrow">New keycard</div>
+  box.innerHTML = `<section class="kc-hero">
       <h1 class="display kc-title">WHAT DO PEOPLE ASK YOU ABOUT?</h1>
-      <p class="kc-body">Share what you've already figured out. Even if nobody copies it, it's all in one place.</p></section>
+      <p class="kc-body">Turn what you know into a keycard friends can follow and copy. It takes about three minutes.</p></section>
     ${aiUrl ? `<section class="ed-sec ed-start">
       <span class="label">Interview me</span>
       <p class="kc-body" style="font-size:14px">Answer a few questions and it becomes a keycard, in your words.</p>
@@ -321,14 +335,8 @@ function starters() {
       <button class="kc-btn kc-btn-main" type="button" data-ivstart>Start the interview</button>
     </section>` : ''}
     ${paste}
-    <p class="kc-fine" style="text-align:center">${aiUrl ? '<a href="#" data-showpaste>Already have a list? Paste it</a> · ' : ''}<a href="#" data-blank>Start blank</a> · <a href="${ROOT}">Copy one from Discover</a></p>`;
-}
-
-function signInFirst() {
-  box.innerHTML = `<section class="kc-hero"><div class="eyebrow">New keycard</div><h1 class="display kc-title">MAKE A KEYCARD</h1></section>
-    <section class="card"><p class="kc-body">Sign in so your keycard is saved and you can share it.</p>
-    <button class="kc-btn kc-btn-main" type="button" id="si">Sign in with Google</button></section>`;
-  document.getElementById('si').onclick = () => signIn();
+    <p class="kc-fine" style="text-align:center">${aiUrl ? '<a href="#" data-showpaste>Already have a list? Paste it</a> · ' : ''}<a href="#" data-blank>Start blank</a> · <a href="${ROOT}">Copy one from Discover</a></p>
+    ${owner ? '' : '<p class="kc-fine" style="text-align:center">Free. You\'ll sign in with Google when you start, so it\'s saved.</p>'}`;
 }
 
 window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
@@ -336,7 +344,7 @@ window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); 
 let started = false;
 onUser(async u => {
   if (!live()) { box.innerHTML = `<section class="card"><p class="kc-body">Making keycards opens very soon.</p></section>`; return; }
-  if (!u) { owner = null; return signInFirst(); }
+  if (!u) { owner = null; return starters(); }
   if (started && owner === u.uid) return;
   started = true; owner = u.uid;
   const tpl = TEMPLATES[params.get('template')];
@@ -345,6 +353,14 @@ onUser(async u => {
     return render();
   }
   if (!docId) {
+    let pend = null;
+    try { pend = JSON.parse(sessionStorage.getItem(MAKE_PENDING) || 'null'); sessionStorage.removeItem(MAKE_PENDING); } catch (e) {}
+    if (pend) {
+      starters();
+      if (pend.act === 'blank') return start('picks');
+      if (pend.act === 'frompaste') return startFromPaste(pend.paste);
+      if (pend.act === 'ivstart' && aiUrl) { iv = { topic: pend.topic, turns: [], q: '' }; return ivAsk(); }
+    }
     try { iv = JSON.parse(sessionStorage.getItem(IV) || 'null'); } catch (e) { iv = null; }
     if (iv && iv.q && aiUrl) return renderIv();
     return starters();

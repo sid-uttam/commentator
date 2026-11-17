@@ -195,7 +195,7 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
   <div class="eg">Try: <a href="guide-dubai-eats-manav/">Manav's Dubai eats</a> · <a href="topic-fpl/">an FPL setup</a> · <a href="topic-ai-tech-stocks/">AI &amp; tech stocks</a></div>
   <button type="button" aria-label="Got it" id="hello-x">×</button>
 </div>
-<section class="disc-h"><h1 class="display">DISCOVER</h1></section>
+
 <div class="sec-l">This week</div>
 <div class="wk-strip">
   <a class="wk" href="nvidia-q3-fy2027-earnings/">
@@ -239,47 +239,46 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
   <a class="tile" href="topic-ai-tech-stocks/" data-cat="Money &amp; tech">
     <span class="c">Money &amp; tech</span>
     <b>AI &amp; Tech Stocks</b>
-<span class="s">Next: Nvidia Q3 FY2027 earnings · in <span data-countdown="2026-11-18T01:20:00+04:00" data-done="now">…</span></span>    <span class="by">by Sid · live</span>
+<span class="s">Next: Nvidia Q3 FY2027 earnings</span>    <span class="by">by Sid · live</span>
   </a>
   <a class="tile" href="topic-champions-league/" data-cat="Sport">
     <span class="c">Sport</span>
     <b>Champions League</b>
-<span class="s">Next: Arsenal vs Borussia Dortmund · in <span data-countdown="2026-11-25T00:00:00+04:00" data-done="now">…</span></span>    <span class="by">Live · updated all day</span>
+<span class="s">Next: Arsenal vs Dortmund</span>    <span class="by">by Sid · live</span>
   </a>
   <a class="tile" href="topic-fpl/" data-cat="Sport">
     <span class="c">Sport</span>
     <b>FPL</b>
-<span class="s">Gameweek 11 deadline <time data-t="2026-11-21T11:00:00Z">Sat 21 Nov</time> · in <span data-countdown="2026-11-21T11:00:00Z" data-done="passed">…</span></span>    <span class="by">by Sid · live</span>
+<span class="s">Gameweek 11 deadline: <time data-t="2026-11-21T11:00:00Z">Sat 21 Nov</time></span>    <span class="by">by Sid · live</span>
   </a>
   <a class="tile" href="topic-gaming/" data-cat="Pop culture">
     <span class="c">Pop culture</span>
     <b>Gaming</b>
-<span class="s">Next: GTA VI · in <span data-countdown="2026-11-19T00:00:00" data-done="now">…</span></span>    <span class="by">Live · updated all day</span>
+<span class="s">Next: GTA VI</span>    <span class="by">by Sid · live</span>
   </a>
   <a class="tile" href="topic-movies/" data-cat="Pop culture">
     <span class="c">Pop culture</span>
     <b>Movies</b>
-<span class="s">Next: Avengers: Doomsday · in <span data-countdown="2026-12-18T00:00:00" data-done="now">…</span></span>    <span class="by">Live · updated all day</span>
+<span class="s">Next: Avengers: Doomsday</span>    <span class="by">by Sid · live</span>
   </a>
   <a class="tile" href="topic-music/" data-cat="Pop culture">
     <span class="c">Pop culture</span>
     <b>Music</b>
-<span class="s">Ongoing · last 7 days</span>    <span class="by">Live · updated all day</span>
+<span class="s">Awards season, the big drops and the end-of-year lists.</span>    <span class="by">by Sid · live</span>
   </a>
   <a class="tile" href="topic-premier-league/" data-cat="Sport">
     <span class="c">Sport</span>
     <b>Premier League</b>
-<span class="s">Next: Liverpool vs Manchester United · in <span data-countdown="2026-11-22T20:30:00+04:00" data-done="now">…</span></span>    <span class="by">by Sid · live</span>
+<span class="s">Next: Liverpool vs Man United</span>    <span class="by">by Sid · live</span>
   </a>
   <a class="tile" href="topic-ufc/" data-cat="Sport">
     <span class="c">Sport</span>
     <b>UFC</b>
-<span class="s">Next: UFC Fight Night Qatar: Procházka vs Stirling · in <span data-countdown="2026-11-21T22:00:00+04:00" data-done="now">…</span></span>    <span class="by">by Sid · live</span>
+<span class="s">Next: Procházka vs Stirling</span>    <span class="by">by Sid · live</span>
   </a>
 </div>
 <footer class="footer">
-  Keycard is in beta. Sources are named on every keycard; AI updates only use a keycard's own sources. Unofficial; not affiliated with any league, promotion or company covered here.<br>
-  Built 2026-11-17 18:22 UTC.
+  Keycard is in beta. AI updates only use each keycard's listed sources. Not affiliated with anyone it covers.
 </footer>
 </div>
 <nav class="tabbar" aria-label="Main">
@@ -320,6 +319,8 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
       if (isNaN(ms)) return;
       if (ms <= 0) { el.textContent = el.dataset.done || 'Now'; return; }
       var m = Math.floor(ms / 60000), d = Math.floor(m / 1440), h = Math.floor((m % 1440) / 60), mm = m % 60;
+      // The big countdown card is exact; everywhere else reads like a person would say it.
+      if (!el.classList.contains('count') && d >= 2) { el.textContent = d + ' days'; return; }
       el.textContent = (d ? d + 'd ' : '') + (d || h ? h + 'h ' : '') + mm + 'm';
     });
   }
