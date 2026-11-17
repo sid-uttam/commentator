@@ -161,3 +161,19 @@ body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 @keyframes pulse{50%{opacity:.3}}
 .wk b{font:700 17px/1.05 'Barlow Condensed',sans-serif;letter-spacing:.3px;text-transform:uppercase;color:var(--ink)}
 .wk .in{font-size:11px;color:var(--faint);margin-top:auto}
+/* freshness, the copy moment, playbook steps */
+.kc-fresh{font-size:12px;color:var(--faint)}
+.kc-stale{font-size:12px;font-weight:600;color:var(--accent)}
+.kc-mine{background:var(--accent-bg);border:1px solid var(--accent-line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.kc-mine b{font:700 22px/1 'Barlow Condensed',sans-serif;letter-spacing:.4px;text-transform:uppercase;color:var(--accent)}
+.kc-mine p{margin:0;font-size:14px;line-height:1.45;color:var(--accent-ink)}
+.kc-mine .kc-act-row .kc-btn{flex:1 1 0;min-height:40px;font-size:13px;background:transparent;border-color:var(--accent-line);color:var(--accent-ink)}
+.kc-mine .kc-x{align-self:flex-end;margin-top:-6px;font-size:12px;color:var(--accent-ink);opacity:.7;background:none;border:0;cursor:pointer}
+.kc-check{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:14px;color:var(--ink2)}
+.kc-check .kc-act-row{flex:none}.kc-check .kc-btn{min-height:36px;font-size:13px;padding:0 12px}
+.kc-steps{counter-reset:step}
+.kc-steps .kc-row{position:relative;padding-left:34px}
+.kc-steps .kc-row::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:9px;width:22px;height:22px;border-radius:50%;background:var(--line2);color:var(--ink);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.ed-start textarea{width:100%;min-height:130px;font:400 15px/1.45 Inter,system-ui,sans-serif;color:var(--ink);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;outline:none;resize:vertical}
+.ed-start textarea:focus{border-color:var(--accent-line)}
+.ed-start textarea::placeholder{color:#6B7380}

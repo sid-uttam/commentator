@@ -116,7 +116,7 @@ export async function copyKeycard(id) {
   const by = src.curator || src.ownerName || 'Commentator';
   const data = {
     owner: me.uid, ownerName: me.displayName || 'Someone', ownerPhoto: me.photoURL || '',
-    title: (src.title || '').replace(/\s+by\s+[^]+$/i, '').trim() || src.title, tagline: '', subject: catOf(src.subject || ''),
+    title: `${(me.displayName || 'My').split(' ')[0]}'s ${(src.title || '').replace(/\s+by\s+[^]+$/i, '').trim() || src.title}`, tagline: '', subject: catOf(src.subject || ''),
     sections: clean(src.sections), sources: (src.sources || []).map(s => ({ name: s.name || '', why: s.why || '', url: s.url || '', from: true })),
     shape: src.shape || '', tested: src.tested || '',
     instruction: src.instruction || '', visibility: 'unlisted', edited: false,
@@ -132,11 +132,19 @@ registerAction('copy', copyKeycard);
 export async function saveKeycard(docId, data) {
   const f = await ready;
   const body = { ...data, owner: me.uid, ownerName: me.displayName || 'Someone', ownerPhoto: me.photoURL || '',
-                 updated: f.F.serverTimestamp() };
+                 updated: f.F.serverTimestamp(), checked: f.F.serverTimestamp() };
   if (docId) { await f.F.setDoc(f.F.doc(f.db, 'keycards', docId), body, { merge: true }); return docId; }
   body.created = f.F.serverTimestamp();
   return (await f.F.addDoc(f.F.collection(f.db, 'keycards'), body)).id;
 }
+export async function markChecked(docId) { const f = await ready; await f.F.setDoc(f.F.doc(f.db, 'keycards', docId), { checked: f.F.serverTimestamp() }, { merge: true }); }
+export const ago = t => {
+  const ms = t && t.toMillis ? t.toMillis() : Date.parse(t);
+  if (!ms) return '';
+  const m = Math.round((Date.now() - ms) / 60000), d = Math.round(m / 1440);
+  return m < 60 ? 'just now' : m < 1440 ? Math.round(m / 60) + 'h ago' : d === 1 ? 'yesterday' : d < 30 ? d + ' days ago' : d < 60 ? 'a month ago' : Math.round(d / 30) + ' months ago';
+};
+export const ageDays = t => { const ms = t && t.toMillis ? t.toMillis() : Date.parse(t); return ms ? (Date.now() - ms) / 864e5 : 0; };
 export async function deleteKeycard(docId) { const f = await ready; await f.F.deleteDoc(f.F.doc(f.db, 'keycards', docId)); }
 
 async function list(q) { const f = await ready; return (await f.F.getDocs(q)).docs.map(d => ({ ...d.data(), docId: d.id, id: 'user:' + d.id })); }
@@ -277,13 +285,14 @@ export function itemRow(it, mark) {
   }
   return u ? `<a class="kc-row" href="${esc(u)}" target="_blank" rel="noopener">${t}</a>` : `<div class="kc-row">${t}</div>`;
 }
-export function fold(title, rows, open) {
-  return `<details class="kc-fold"${open ? ' open' : ''}><summary><span>${esc(title)}</span><span class="kc-count">${rows.length}</span></summary><div class="kc-fold-body">${rows.join('')}</div></details>`;
+export function fold(title, rows, open, steps) {
+  return `<details class="kc-fold"${open ? ' open' : ''}><summary><span>${esc(title)}</span><span class="kc-count">${rows.length}</span></summary><div class="kc-fold-body${steps ? ' kc-steps' : ''}">${rows.join('')}</div></details>`;
 }
 export function briefingCard(b, title, note) {
   if (!b || !b.points || !b.points.length) return '';
   const pt = p => `<li class="kc-pt"><span class="kc-lbl kc-lbl-${esc((p.label || 'reported').replace(/ /g, '-'))}">${esc(p.label || 'reported')}</span> ${esc(p.text)} ${
-    (p.sources || []).slice(0, 2).map(s => safeUrl(s.url) ? `<a class="kc-src" href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)}</a>` : `<span class="kc-src">${esc(s.name)}</span>`).join(' · ')}</li>`;
+    (p.sources || []).slice(0, 2).map(s => (safeUrl(s.url) ? `<a class="kc-src" href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)}</a>` : `<span class="kc-src">${esc(s.name)}</span>`)
+      + (s.date ? `<span class="kc-src"> · ${esc(ago(s.date))}</span>` : '')).join(' · ')}</li>`;
   return `<section class="card kc-now"><div class="kc-h"><span class="label">${esc(title)}</span></div>
     ${b.headline ? `<p class="kc-head">${esc(b.headline)}</p>` : ''}<ul class="kc-pts">${b.points.slice(0, 3).map(pt).join('')}</ul>
     ${b.points.length > 3 ? `<details class="kc-more"><summary>${b.points.length - 3} more points</summary><ul class="kc-pts">${b.points.slice(3).map(pt).join('')}</ul></details>` : ''}

@@ -110,7 +110,7 @@ function render() {
       <input class="ed-title" data-p="title" value="${esc(k.title)}" placeholder="Name it, e.g. Dubai brunches" maxlength="80" aria-label="Name">
       <input data-p="tagline" value="${esc(k.tagline)}" placeholder="${k.copiedFrom ? 'What makes your version yours?' : 'In one line: what is it, who is it for?'}" maxlength="160" aria-label="One line">
       ${(k.sections || []).map((s, i) => listBox(s.title, s.items, `sections.${i}.items`, '', `sections.${i}.title`)).join('')}
-      ${showSources ? listBox('Sources I follow', k.sources, 'sources', 'Channels, sites, podcasts, people. Say why each one is good.') : ''}
+      ${showSources ? listBox('Sources I follow', k.sources, 'sources', 'Paste links to YouTube channels or websites and you get a short AI update from them every few hours. Say why each one is good.') : ''}
       <div class="ed-row">
         <button class="kc-btn kc-btn-quiet" type="button" data-addsec>+ Section</button>
         ${showSources ? '' : '<button class="kc-btn kc-btn-quiet" type="button" data-addsrc>+ Sources you follow</button>'}
@@ -151,6 +151,7 @@ box.addEventListener('click', async e => {
   const t = e.target.closest('button'); if (!t) return;
   const d = t.dataset;
   if (d.starter) { start(d.starter); return; }
+  if (d.frompaste !== undefined) { startFromPaste(document.getElementById('paste0').value); return; }
   if (d.copyopen) { copyOpen.add(d.copyopen); const it = getPath(d.copyopen); if (it.copy === undefined) it.copy = ''; render(); box.querySelector(`[data-p="${d.copyopen}.copy"]`).focus(); return; }
   if (d.link) { linkOpen.add(d.link); render(); box.querySelector(`[data-p="${d.link}.url"]`).focus(); return; }
   if (d.addsrc) { k.kind = 'sources'; k.sources.push(blankItem()); dirty = true; render(); focusLast('sources'); return; }
@@ -206,10 +207,43 @@ function start(kind) {
   box.querySelector('[data-p="title"]').focus();
 }
 
+// Turn a pasted note or list into sections and items. Headings ("## Thai", "THAI:", "Thai:") start a section.
+function fromPaste(text) {
+  const sections = []; let cur = null;
+  for (const raw of text.split('\n')) {
+    const line = raw.trim(); if (!line) continue;
+    const h = line.match(/^#{1,4}\s*(.+)$/) || (!/https?:\/\//.test(line) && line.match(/^([^-*•\d].{1,50}):$/))
+      || (line.length < 40 && line === line.toUpperCase() && /[A-Z]/.test(line) && !/https?:/.test(line) ? [line, line] : null);
+    if (h) { cur = { title: h[1].replace(/:$/, '').trim(), items: [] }; sections.push(cur); continue; }
+    if (!cur) { cur = { title: 'My picks', items: [] }; sections.push(cur); }
+    cur.items.push(...parseLines(line));
+  }
+  return sections.filter(s => s.items.length);
+}
+
+function startFromPaste(text) {
+  const sections = fromPaste(text);
+  if (!sections.length) return toast('Paste a few lines first');
+  const links = sections.flatMap(s => s.items).filter(i => /youtu|\/feed|rss/.test(i.url || '')).length;
+  const kind = links > sections.flatMap(s => s.items).length / 2 ? 'sources' : 'picks';
+  k = { title: '', tagline: '', subject: '', visibility: 'public', copiedFrom: null, kind, shape: kind, tested: '',
+        sections, sources: [], instruction: STARTERS[kind].k.instruction };
+  if (sections.length > 3) sections.forEach((sec, i) => shut.add(`sections.${i}.items`));
+  dirty = true; render();
+  toast(`Made ${sections.flatMap(s => s.items).length} items in ${sections.length} section${sections.length === 1 ? '' : 's'}. Give it a name.`);
+  box.querySelector('[data-p="title"]').focus();
+}
+
 function starters() {
   box.innerHTML = `<section class="kc-hero"><div class="eyebrow">New keycard</div>
-      <h1 class="display kc-title">MAKE A KEYCARD</h1>
-      <p class="kc-body">Share something you know. Pick a shape to start.</p></section>
+      <h1 class="display kc-title">WHAT DO PEOPLE ASK YOU ABOUT?</h1>
+      <p class="kc-body">Where to eat, who to follow, how you do something. Share what you've already figured out. Even if nobody copies it, you'll have it all in one place.</p></section>
+    <section class="ed-sec ed-start">
+      <span class="label">Paste what you already have</span>
+      <textarea id="paste0" placeholder="A list, a note, your Maps list copied out… One thing per line. Headings become sections.&#10;&#10;Japanese:&#10;Kinoya – best ramen in town&#10;Kokoro – hand rolls"></textarea>
+      <button class="kc-btn kc-btn-main" type="button" data-frompaste>Turn it into a keycard</button>
+    </section>
+    <div class="sec-l">Or start from a shape</div>
     <div class="starters">${Object.entries(STARTERS).map(([key, s]) =>
       `<button class="starter" type="button" data-starter="${key}"><b>${s.name}</b><span>${s.blurb}</span><i>${s.eg}</i></button>`).join('')}</div>
     <p class="kc-fine" style="text-align:center">Or find one on <a href="${ROOT}">Discover</a>, tap Copy and make it yours.</p>`;
@@ -243,6 +277,15 @@ onUser(async u => {
     if (!k.shape && (k.sections || []).some(sec => sec.items.some(it => it.copy))) k.shape = 'playbook';
     if (k.sections.length > 3) k.sections.forEach((sec, i) => shut.add(`sections.${i}.items`));
     if (k.sources.length > 6) shut.add('sources');
+    const focus = params.get('focus');
+    if (focus === 'remove') shut.clear();                       // open everything so they can tap × on what they don't want
+    if (focus === 'add') {                                     // a blank line at the top of the first list, ready to type
+      const list = k.sections.length ? k.sections[0].items : k.sources;
+      list.unshift(blankItem()); shut.delete(k.sections.length ? 'sections.0.items' : 'sources'); dirty = true;
+    }
     render();
+    if (focus === 'title') { const t = box.querySelector('[data-p="title"]'); t.focus(); t.select(); }
+    if (focus === 'add') box.querySelector(`[data-p="${k.sections.length ? 'sections.0.items' : 'sources'}.0.name"]`).focus();
+    if (focus === 'remove') toast('Tap × on anything you don\'t want, then Save');
   } catch (e) { box.innerHTML = `<section class="card"><p class="kc-body">We couldn't find that keycard. <a href="${ROOT}me/">Your keycards</a></p></section>`; }
 });
