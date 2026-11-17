@@ -224,3 +224,7 @@ body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 .kc-results b{color:var(--accent);font-size:17px;font-weight:800;margin-right:4px}
 .kc-results span{color:var(--muted)}
 .kc-results:empty{display:none}
+/* Creator, with photo, on a friend's keycard */
+.kc-by{display:flex;align-items:center;gap:10px;font-size:15px;margin-top:4px}
+.kc-by img,.kc-by .kc-av{width:34px;height:34px;border-radius:50%;object-fit:cover;flex:0 0 34px;background:var(--line2);display:flex;align-items:center;justify-content:center;color:var(--ink);font-weight:700;font-size:15px}
+.kc-asfriend{display:inline-block;margin-top:8px;color:var(--accent)!important;text-decoration:none}

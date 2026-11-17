@@ -40,7 +40,7 @@ async function show() {
   // Freshness: when the owner last edited or confirmed it. Picks and playbooks rot silently, so say so.
   const touched = [k.checked, k.updated].map(t => t && t.toMillis ? t.toMillis() : 0).reduce((a, b) => Math.max(a, b), 0);
   const days = touched ? (Date.now() - touched) / 864e5 : 0;
-  const fresh = touched && !(cf && !k.edited) ? `Checked by ${esc(first)} ${esc(ago(new Date(touched).toISOString()))}` : '';
+  const fresh = touched && !(cf && !k.edited) ? `Updated by ${esc(first)} ${esc(ago(new Date(touched).toISOString()))}` : '';
   const stale = touched && days > 90 && shape !== 'sources';
 
   const folds = sections.length || sources.length ? `<section class="kc-folds">
@@ -53,7 +53,7 @@ async function show() {
     <section class="kc-hero">
       <div class="eyebrow">${esc([SHAPE_LABEL[shape], k.subject].filter(Boolean).join(' · ') || 'Keycard')}</div>
       <h1 class="display kc-title">${esc(k.title)}</h1>
-      <div class="kc-cur">By <b>${esc(by)}</b>${cf ? ` · based on <a href="${esc(keycardUrl(cf.id))}" style="color:inherit">${esc(cf.by)}'s</a>` : ''}</div>
+      <div class="kc-cur kc-by">${k.ownerPhoto ? `<img src="${esc(k.ownerPhoto)}" alt="" referrerpolicy="no-referrer">` : `<span class="kc-av">${esc(first.slice(0, 1))}</span>`}<span>By <b>${esc(by)}</b>${cf ? ` · based on <a href="${esc(keycardUrl(cf.id))}" style="color:inherit">${esc(cf.by)}'s</a>` : ''}</span></div>
       ${stale ? `<div class="kc-stale">Not checked for ${Math.round(days / 30)} months, so some of this may be out of date</div>` : fresh ? `<div class="kc-fresh">${fresh}</div>` : ''}
       ${cf && added ? `<div class="kc-fine">${inherited} from ${esc(cf.by)}${added ? ` · <span style="color:var(--good)">${added} added by ${esc(first)}</span>` : ''}</div>` : ''}
       ${k.tested ? `<div class="kc-tested">Tested with ${esc(k.tested)}</div>` : ''}
@@ -65,12 +65,16 @@ async function show() {
     ${shape === 'picks' && !k.watch ? folds + '<div id="live"></div>' : '<div id="live"></div>' + folds}`;
 
   onUser(u => {
-    const own = u && u.uid === k.owner;
+    const preview = params.get('as') === 'friend';     // the owner, seeing it exactly as a friend would
+    const own = u && u.uid === k.owner && !preview;
+    if (preview && u && u.uid === k.owner && !document.querySelector('.kc-previewing'))
+      box.insertAdjacentHTML('afterbegin', `<div class="kc-banner kc-previewing">This is what friends see. <a href="?id=${encodeURIComponent(docId)}" style="color:var(--accent)">Back to yours</a></div>`);
     const acts = document.getElementById('acts');
     const visEl = document.getElementById('vis'); if (visEl) visEl.hidden = !own;   // only the owner needs to know who can see it
     const noun = { picks: 'pick', sources: 'source', playbook: 'step' }[shape] || 'thing';
     const copyNote = main.length ? `Copy to get all ${main.length} ${noun}${main.length === 1 ? '' : 's'} as your own, credited to ${first}. Change anything; ${first}'s stays as it is.` : '';
-    if (!own) { mountActions(acts, k.id, { title: k.title, url: ROOT + 'u/' + docId + '/', copyNote, owner: k.owner }); return; }
+    if (!own) { mountActions(acts, k.id, { title: k.title, url: ROOT + 'u/' + docId + '/', copyNote, owner: k.owner,
+      followNote: sources.length || (cf && cf.live) ? 'Follow to get its updates.' : `Follow to hear when ${first} changes it.` }); return; }
     acts.innerHTML = `<div class="kc-act-row"><a class="kc-btn kc-btn-main" href="${esc(makeUrl(docId))}">Edit</a>
       <button class="kc-btn" type="button" id="sh">Share</button></div>`;
     document.getElementById('sh').onclick = () => share(k.title, ROOT + 'u/' + docId + '/');
@@ -80,7 +84,8 @@ async function show() {
       const el = document.getElementById('res'); if (!el || !r) return;
       const list = (names, verb) => names.length ? `<div><b>${names.length}</b> ${verb} <span>${esc(names.slice(0, 4).join(', '))}${names.length > 4 ? ` and ${names.length - 4} more` : ''}</span></div>` : '';
       const lines = [r.opens ? `<div><b>${r.opens}</b> open${r.opens === 1 ? '' : 's'}</div>` : '', list(r.copiers, r.copiers.length === 1 ? 'copy by' : 'copies by'), list(r.followers, 'following:')].filter(Boolean);
-      el.innerHTML = lines.length ? lines.join('') : `<div class="kc-fine">No one's opened it yet. Share it with a friend and you'll see who follows and copies it here.</div>`;
+      el.insertAdjacentHTML('afterend', `<a class="kc-fine kc-asfriend" href="?id=${encodeURIComponent(docId)}&as=friend">See it as a friend would ›</a>`);
+      el.innerHTML = lines.length ? lines.join('') : `<div class="kc-fine">Your keycard is ready to travel. Share it with someone who'd find it useful, and you'll see here when people open, follow or make their own version.</div>`;
     });
     const mine = document.getElementById('mine');
 
@@ -109,7 +114,7 @@ async function show() {
         <a class="kc-btn" href="${esc(makeUrl(docId))}">Edit</a></div></div>`;
       document.getElementById('ok').onclick = async () => {
         await markChecked(docId); mine.innerHTML = ''; toast('Thanks. Marked as checked today.');
-        const f = box.querySelector('.kc-fresh, .kc-stale'); if (f) { f.className = 'kc-fresh'; f.textContent = `Checked by ${first} just now`; }
+        const f = box.querySelector('.kc-fresh, .kc-stale'); if (f) { f.className = 'kc-fresh'; f.textContent = `Updated by ${first} just now`; }
       };
     };
     // Picks without a reason: the most useful thing an owner can add. Comes before "still accurate?".
