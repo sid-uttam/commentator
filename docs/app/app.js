@@ -34,7 +34,8 @@ ready.then(f => {
     if (u && !sessionStorage.getItem('kc-profile-' + u.uid)) {
       try {
         await f.F.setDoc(f.F.doc(f.db, 'users', u.uid),
-          { name: u.displayName || 'Someone', photo: u.photoURL || '', seen: f.F.serverTimestamp() }, { merge: true });
+          { name: u.displayName || 'Someone', photo: u.photoURL || '', seen: f.F.serverTimestamp(),
+            tz: (Intl.DateTimeFormat().resolvedOptions().timeZone || '') }, { merge: true });
         sessionStorage.setItem('kc-profile-' + u.uid, '1');
       } catch (e) { console.warn('profile save failed', e); }
     }
@@ -235,8 +236,8 @@ function mountMine() {
 }
 
 // The plain categories people filter by. Older subjects map onto them.
-const CATS = { Football: 'Sport', FPL: 'Sport', UFC: 'Sport', Markets: 'Money & tech', Tech: 'Money & tech', Gaming: 'Games' };
-export const SUBJECTS = ['Food', 'Travel', 'Sport', 'Fitness', 'Money & tech', 'Games', 'Learning', 'Other'];
+const CATS = { Football: 'Sport', FPL: 'Sport', UFC: 'Sport', Markets: 'Money & tech', Tech: 'Money & tech', Gaming: 'Pop culture', Games: 'Pop culture', Film: 'Pop culture', Music: 'Pop culture' };
+export const SUBJECTS = ['Food', 'Travel', 'Sport', 'Fitness', 'Money & tech', 'Pop culture', 'Learning', 'Other'];
 export const catOf = s => CATS[s] || (SUBJECTS.includes(s) || s === 'News' ? s : 'Other');
 
 export function tileHTML({ url, cat, title, by, line, mine }) {

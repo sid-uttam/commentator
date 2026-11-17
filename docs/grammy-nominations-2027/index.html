@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grammy nominations · Keycard</title>
+<meta name="description" content="Grammy nominations: countdown, launch day and first verdicts.">
+<meta property="og:title" content="Grammy nominations · Keycard">
+<meta property="og:description" content="Mon 16 Nov · The Recording Academy announced 2027 Grammy nominees on Monday, with 100 categories, the largest field since 2011.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Keycard">
+<meta property="og:url" content="https://sid-uttam.github.io/commentator/grammy-nominations-2027/">
+<meta property="og:image" content="https://sid-uttam.github.io/commentator/grammy-nominations-2027/card.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image"><meta name="theme-color" content="#0E1116">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E1116; --card:#161A21; --card2:#1C222B; --line:#262C36; --line2:#3A424E;
+  --ink:#EEF0F2; --ink2:#D6DADF; --muted:#A3ACB8; --faint:#8A93A0;
+  --a:#6FB6FF; --a-line:#2B4A6B; --b:#F07A3A; --b-line:#6B3A20;
+  --accent:#F2A93B; --accent-bg:#221C12; --accent-ink:#F5D9A8; --accent-line:#3A3020;
+  --good:#7FD3A8;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,-apple-system,sans-serif}
+a{color:var(--accent)} a:hover{color:#FFC56B}
+.wrap{max-width:560px;margin:0 auto;padding:20px 16px 48px;display:flex;flex-direction:column;gap:16px}
+.display{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.5px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;letter-spacing:3px;color:var(--ink);text-decoration:none}
+.chip{font-size:12px;font-weight:600;color:var(--muted);border:1px solid #2A313C;border-radius:999px;padding:6px 12px;white-space:nowrap}
+.eyebrow{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.label{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.card h3{margin:0;font-size:18px;font-weight:700;line-height:1.3}
+.card p{margin:0}
+.body{font-size:15px;line-height:1.5;color:var(--ink2)}
+.src{font-size:12px;color:var(--faint)}
+.src a{color:var(--faint);text-decoration:underline;text-underline-offset:2px}
+.src a:hover{color:var(--ink2)}
+.tag{align-self:flex-start;font-size:12px;font-weight:700;border-radius:6px;padding:4px 8px;letter-spacing:.3px;text-transform:uppercase}
+.tag-accent{color:#1A1300;background:var(--accent)}
+.tag-a{color:var(--a);border:1px solid var(--a-line)}
+.tag-b{color:var(--b);border:1px solid var(--b-line)}
+.tag-neutral{color:var(--muted);border:1px solid #2A313C}
+.card-accent{border-color:var(--accent-line)}
+.card-hl{border:1.5px solid var(--accent)}
+.why{background:var(--accent-bg);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px;font-size:14px;line-height:1.45;color:var(--accent-ink)}
+.why .label{color:var(--accent)}
+.ph{border:1.5px dashed var(--line2);border-radius:14px;padding:12px 14px;font-size:13px;line-height:1.45;color:var(--faint)}
+.ph strong{color:var(--muted);font-weight:600}
+.pill{font-size:12px;font-weight:700;border-radius:999px;padding:4px 10px;white-space:nowrap}
+.pill-divided{color:#1A1300;background:var(--accent)}
+.pill-growing{color:#0E1116;background:var(--good)}
+.pill-mixed,.pill-open,.pill-new{color:var(--ink);background:var(--line2)}
+.pill-settled,.pill-faded{color:var(--muted);border:1px solid var(--line2)}
+.status{display:flex;gap:8px;align-items:center;font-size:13px;font-weight:600;color:var(--accent)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.status-live .dot{background:#FF5A5A} .status-live{color:#FF8A8A}
+.footer{font-size:12px;line-height:1.6;color:var(--faint);padding:8px 4px 0;border-top:1px solid var(--line);margin-top:8px}
+</style>
+<link rel="stylesheet" href="../app/app.css">
+<style>
+.hero{display:flex;flex-direction:column;gap:6px}
+.hero h1{margin:0;font-size:48px;line-height:.95}
+.hero .vs{color:var(--faint);font-size:28px}
+.meta{font-size:14px;color:var(--muted)}
+.local{font-size:13px;color:var(--faint)}
+.story{font-size:16px;line-height:1.5}
+.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;background:var(--card);border-radius:14px;padding:4px;position:sticky;top:8px;z-index:5;box-shadow:0 0 0 8px var(--bg)}
+.tabs a{display:flex;align-items:center;justify-content:center;min-height:44px;text-decoration:none;font-size:14px;font-weight:600;color:var(--muted);border-radius:10px}
+.tabs a[aria-current="true"]{color:var(--bg);background:var(--ink);font-weight:700}
+.phase{display:flex;flex-direction:column;gap:14px;scroll-margin-top:72px}
+.js .phase{display:none}
+.js .phase.on{display:flex}
+.phase h2{margin:2px 0 0;font-size:20px;text-transform:uppercase;color:var(--muted)}
+.phase h2 + .src{margin-top:-8px}
+.timeline{display:flex;flex-direction:column;gap:14px;border-left:2px solid var(--line);margin-left:6px;padding-left:16px}
+.rounds{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:6px}
+.rounds div{display:flex;flex-direction:column;align-items:center;gap:6px}
+.rounds i{display:block;width:100%;height:40px;border-radius:8px}
+.rounds span{font-size:12px;color:var(--muted);text-align:center}
+.result-h{margin:0;font-size:30px;line-height:1}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.stat{background:var(--card2);border-radius:12px;padding:12px}
+.stat b{display:block;font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700}
+.stat span{font-size:12px;color:var(--muted);line-height:1.35}
+.tp-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.sidebox{background:var(--card2);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:4px}
+.sidebox .label{font-size:12px}
+.sidebox p{font-size:14px;line-height:1.45;color:var(--ink2)}
+.creators{display:flex;flex-direction:column;gap:12px}
+.creator{display:flex;flex-direction:column;gap:2px}
+.creator b{font-size:14px}
+.creator p{font-size:14px;color:var(--ink2);line-height:1.45}
+.fanbases{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.track{display:flex;flex-direction:column;gap:12px;border-left:2px solid var(--line);margin-left:4px;padding-left:14px}
+.track div{display:flex;flex-direction:column;gap:2px}
+.track .when{font-size:12px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.5px}
+.track .when.next{color:var(--accent)}
+.track .hl{font-size:15px;font-weight:600}
+.track .note{font-size:14px;color:var(--muted);line-height:1.4}
+.updates{font-size:12px;color:var(--faint);line-height:1.6}
+.feed{gap:14px}
+.feed-group{display:flex;flex-direction:column;gap:2px}
+.feed-h{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.feed-note{font-weight:500;color:var(--faint);font-size:12px}
+.feed-row{display:flex;flex-direction:column;gap:2px;padding:8px 0;border-top:1px solid var(--line);text-decoration:none}
+.feed-row:first-of-type{border-top:0}
+.feed-t{font-size:14px;line-height:1.4;color:var(--ink2)}
+.quote .feed-t{font-style:italic}
+.feed-m{font-size:12px;color:var(--faint)}
+.pulse{display:flex;align-items:flex-end;gap:1px;height:80px;margin-top:4px}
+.pulse i{flex:1;background:var(--accent);opacity:.75;border-radius:2px 2px 0 0;min-height:2px}
+.peaks{display:flex;flex-direction:column;gap:8px}
+.peak{display:flex;flex-direction:column;gap:2px;padding-top:8px;border-top:1px solid var(--line)}
+.peak b{font-size:13px;color:var(--accent)}
+.peak span{font-size:14px;color:var(--ink2)}
+.next-btn{display:flex;align-items:center;justify-content:center;min-height:48px;text-decoration:none;font-size:15px;font-weight:700;color:var(--bg);background:var(--accent);border-radius:14px}
+.next-btn:hover{color:var(--bg);filter:brightness(1.08)}
+.brief .bp{display:flex;flex-direction:column;gap:3px;padding:9px 0;border-top:1px solid var(--line)}
+.brief .bp:first-of-type{border-top:0}
+.bt{font-size:15px;line-height:1.45;color:var(--ink2)}
+.bs{font-size:12px;color:var(--faint)}.bs a{color:var(--faint);text-decoration:underline;text-underline-offset:2px}
+.lbl{align-self:flex-start;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;border-radius:6px;padding:2px 7px}
+.lbl-confirmed{color:#0E1116;background:var(--good)}
+.lbl-reported{color:var(--ink);background:var(--line2)}
+.lbl-rumour{color:#1A1300;background:var(--accent)}
+.lbl-opinion{color:var(--a);border:1px solid var(--a-line)}
+.lbl-ai-interpretation{color:var(--muted);border:1px dashed var(--line2)}
+.lbl-fan-view{color:var(--b);border:1px solid var(--b-line)}
+/* ---- compact keycard ---- */
+.kc-hero{display:flex;flex-direction:column;gap:6px}
+.kc-title{margin:0;font-size:40px;line-height:.95;color:var(--ink)}
+.kc-cur{font-size:13px;color:var(--muted)}.kc-cur b{color:var(--ink)}
+.kc-status{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:var(--accent);margin-top:2px}
+.kc-status .dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
+.kc-status-live{color:#FF6B6B}.kc-status-finished,.kc-status-ongoing{color:var(--good)}
+.kc-status b,.kc-status time{color:inherit}
+.kc-fine{font-size:12px;color:var(--faint);line-height:1.4}
+.kc-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.kc-head{margin:0;font-size:18px;line-height:1.35;font-weight:700;color:var(--ink)}
+.kc-body{margin:0;font-size:15px;line-height:1.5;color:var(--ink2)}
+.kc-pts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.kc-pt{font-size:15px;line-height:1.45;color:var(--ink2)}
+.kc-lbl{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;border-radius:5px;padding:1px 6px;margin-right:2px;vertical-align:2px}
+.kc-lbl-confirmed{color:#0E1116;background:var(--good)}
+.kc-lbl-reported{color:var(--ink);background:var(--line2)}
+.kc-lbl-rumour{color:#1A1300;background:var(--accent)}
+.kc-lbl-opinion{color:var(--a);border:1px solid var(--a-line)}
+.kc-lbl-fan-view{color:var(--b);border:1px solid var(--b-line)}
+.kc-lbl-ai-interpretation,.kc-lbl-differ{color:var(--muted);border:1px dashed var(--line2)}
+.kc-src{font-size:12px;color:var(--faint);white-space:normal}
+.kc-src a{color:var(--faint);text-decoration:underline;text-underline-offset:2px}
+.kc-more summary,.kc-fold summary{cursor:pointer;list-style:none}
+.kc-more summary::-webkit-details-marker,.kc-fold summary::-webkit-details-marker{display:none}
+.kc-more summary{font-size:14px;font-weight:600;color:var(--accent);min-height:36px;display:flex;align-items:center}
+.kc-more[open] summary{margin-bottom:8px}
+.kc-you-row{display:flex;flex-direction:column;gap:6px;padding-top:10px;border-top:1px solid var(--line)}
+.kc-you-row:first-of-type{border-top:0;padding-top:0}
+.kc-you-k{font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.4px;text-transform:uppercase}
+.kc-you-k span{color:var(--muted);text-transform:none;font-weight:600;letter-spacing:0}
+.kc-link{font-size:13px;color:var(--ink2);text-decoration:none;border-left:2px solid var(--accent);padding-left:8px}
+.kc-folds{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.kc-fold{border-top:1px solid var(--line)}.kc-fold:first-child{border-top:0}
+.kc-fold summary{display:flex;justify-content:space-between;align-items:center;min-height:52px;padding:0 16px;font-size:15px;font-weight:600;color:var(--ink)}
+.kc-fold summary::after{content:"›";color:var(--faint);font-size:20px;margin-left:8px;transition:transform .15s}
+.kc-fold[open] summary::after{transform:rotate(90deg)}
+.kc-count{margin-left:auto;font-size:13px;color:var(--faint);font-weight:500}
+.kc-fold-body{padding:0 16px 10px}
+.kc-row{display:flex;flex-direction:column;gap:2px;padding:9px 0;border-top:1px solid var(--line);text-decoration:none}
+.kc-row:first-child{border-top:0}
+.kc-row-t{font-size:14px;line-height:1.4;color:var(--ink2)}
+.kc-row-m{font-size:12px;color:var(--faint)}
+a.kc-row:hover .kc-row-t{color:var(--ink)}
+.kc-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.kc-fact{background:var(--card2);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.kc-fact b{font-size:15px;color:var(--ink)}.kc-fact span{font-size:12px;color:var(--muted);line-height:1.35}
+.kc-list{display:flex;flex-direction:column}
+.kc-li{display:grid;grid-template-columns:1fr auto;gap:0 10px;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.kc-li:first-child{border-top:0}
+.kc-li b{font-weight:600;color:var(--ink)}.kc-li i{font-style:normal;font-size:12px;color:var(--faint);grid-column:1}
+.kc-li em{font-style:normal;grid-row:1/3;grid-column:2;align-self:center;font-weight:700;font-size:13px;text-align:right}
+</style><style>.count{font-family:'Barlow Condensed',sans-serif;font-size:44px;font-weight:700;line-height:1;color:var(--accent)}</style></head>
+<body>
+<div class="wrap">
+<header class="topbar">
+  <a class="brand" href="../">KEYCARD</a>
+<a class="chip" href="../topic-music/" style="text-decoration:none">Music ›</a></header>
+<section class="kc-hero">
+  <div class="eyebrow">Music · 2027 Grammy Awards</div>
+  <h1 class="display kc-title">Grammy nominations</h1>
+<div class="kc-status kc-status-finished"><span class="dot"></span><span>Finished · <time data-day="2026-11-16">Mon 16 Nov</time></span></div></section>
+
+<section class="card kc-now">
+  <div class="kc-h"><span class="label">Right now</span><span class="kc-fine"><time data-ago="2026-11-17T18:22:40Z">updated</time></span></div>
+<p class="kc-head">The Recording Academy announced 2027 Grammy nominees on Monday, with 100 categories, the largest field since 2011.</p>  <ul class="kc-pts"><li class="kc-pt"><span class="kc-lbl kc-lbl-reported">reported</span> The Recording Academy revealed nominees for the 2027 Grammy Awards in 100 categories, the largest field since 2011. <span class="kc-src"><a href="https://news.google.com/rss/articles/CBMi0wFBVV95cUxQTW0xTUNvemJQVzdhNXBmcUY4azEyN3N3YWh1NlVtd2RNaHU2Wm5scTBXTmhpLTFrU1Y2alRtTU1SSHZFX0NtYjlFYUFIN3QtT0txRGd1R2NVR3NFdHFlWWlWbDhHQ1pDNnl1ZjdESV9fTmFYajNGVURGRUwwUmxtNEp4Ukh2aGM3djBNMVcwMmNaYnJiLXR0QV9iS2N2dXhOb3dYeXN5NXpLSWxEb3BoQVViVnRjc1ZfUWxKZEdiXzN6bUwzMW1pNERjRzBzS21KdXBz?oc=5" target="_blank" rel="noopener">Facebook</a> · <time data-ago="2026-11-17T17:42:01Z">2026-11-17</time></span></li><li class="kc-pt"><span class="kc-lbl kc-lbl-reported">reported</span> RAYE leads the nominations with 11, followed by Rosalía with nine. <span class="kc-src"><a href="https://www.youtube.com/watch?v=5eqUxxTqHhU" target="_blank" rel="noopener">Entertainment Tonight</a> · <time data-ago="2026-11-16T23:00:25Z">2026-11-16</time></span></li><li class="kc-pt"><span class="kc-lbl kc-lbl-reported">reported</span> Ariana Grande, Doechii, Brandi Carlile and Foo Fighters are among the nominees, based on local news coverage. <span class="kc-src"><a href="https://news.google.com/rss/articles/CBMifEFVX3lxTE5tRDU2MUVyYjZfYmFyaTU5MTRNZkNGY2Z5dEFIUWd5akJOY0x2YmhhMEFyTTNzN2R1OGJGV09jN2VRaWhxNERMMUV4Qy1yeG8yY0hmY1dSN0JUejdnamJLTUhOVzFFZnJNVmx5dGxZb0VZUHVyaXd4MGFwdDQ?oc=5" target="_blank" rel="noopener">MyNorthwest.com</a> · <time data-ago="2026-11-17T17:41:31Z">2026-11-17</time> · <a href="https://news.google.com/rss/articles/CBMi_wFBVV95cUxPdXRuZVBOejhfYzVjSDZsbl9BdjRuSGVLS0F3N0hCUGpxcFd6UHFQN0k5TExYN3h3aFZ0dmptcTZ2OHZNY2ZXX0EzLV91dmxhdFRJRVhQenhvOGVhSjhYZXhqX2ExcFpqUHJnYnQ1MS03QkowajBOckQ2b1hFQk8yUFNuREx4LUw4RXdCa3dvV0IwMG9ILXZoTVdWWVFRVGMzVElkTGgwRDVjcTF6aEdBQ1V3UVB3TWlpN2hSTUJYdVlvXzFMeWh5T1dsOThmVG12bXJQeDFFRWdtOUdqOWx3TkxyQmxzWjFQTHRuSWhoVDJ0NldJOGNOTXVKX2Z1UjA?oc=5" target="_blank" rel="noopener">The Palm Beach Post</a> · <time data-ago="2026-11-17T16:51:00Z">2026-11-17</time></span></li></ul>
+  <details class="kc-more"><summary>Where sources differ + 2 more</summary>
+    <ul class="kc-pts"><li class="kc-pt"><span class="kc-lbl kc-lbl-reported">reported</span> Dolly Parton received multiple posthumous nominations, according to People. <span class="kc-src"><a href="https://news.google.com/rss/articles/CBMikgFBVV95cUxPRVdjcUp2WFl0NDNrNnBfaXFDWUQ5MlJ5REJ5d0xpdDlpZEZWeTlKY0FuN255WDJVbnJJRFgydHlxbjlfWnNBVGJ4bFk2YUtEd3p1REhtMkUtcUFNdDdxVDVRc0UzcVZ2bU5QQU5DYlRMQ3hRN3JCSGVDWHM2S1dmM1g1Ny1uUExYZ09oN2diNFF5Zw?oc=5" target="_blank" rel="noopener">People.com</a> · <time data-ago="2026-11-17T05:25:15Z">2026-11-17</time></span></li><li class="kc-pt"><span class="kc-lbl kc-lbl-fan-view">fan view</span> Fans are split on the nominations, with many saying Taylor Swift&#39;s Life of a Showgirl should not be Album of the Year. <span class="kc-src"><a href="https://www.youtube.com/watch?v=BmPI0SCXS5U" target="_blank" rel="noopener">comment on Spill Sesh</a></span></li><li class="kc-pt"><span class="kc-lbl kc-lbl-differ">differ</span> Some fans say Harry Styles and Noah Kahan were snubbed, while others say Olivia Rodrigo and Raye deserved their nods. <span class="kc-src"><a href="https://www.youtube.com/watch?v=BmPI0SCXS5U" target="_blank" rel="noopener">Spill Sesh</a> · <time data-ago="2026-11-16T20:37:29Z">2026-11-16</time> · <a href="https://www.youtube.com/watch?v=Mb7rJVOsgms" target="_blank" rel="noopener">E! News</a> · <time data-ago="2026-11-16T20:04:03Z">2026-11-16</time> · <a href="https://www.youtube.com/watch?v=WIX59wGHinQ" target="_blank" rel="noopener">comment on YouTube</a></span></li><li class="kc-pt"><span class="kc-lbl kc-lbl-differ">differ</span> Critics and creators disagree on whether Audrey Hobert was snubbed, and reactions to the dance categories vary. <span class="kc-src"><a href="https://news.google.com/rss/articles/CBMi0wFBVV95cUxQTW0xTUNvemJQVzdhNXBmcUY4azEyN3N3YWh1NlVtd2RNaHU2Wm5scTBXTmhpLTFrU1Y2alRtTU1SSHZFX0NtYjlFYUFIN3QtT0txRGd1R2NVR3NFdHFlWWlWbDhHQ1pDNnl1ZjdESV9fTmFYajNGVURGRUwwUmxtNEp4Ukh2aGM3djBNMVcwMmNaYnJiLXR0QV9iS2N2dXhOb3dYeXN5NXpLSWxEb3BoQVViVnRjc1ZfUWxKZEdiXzN6bUwzMW1pNERjRzBzS21KdXBz?oc=5" target="_blank" rel="noopener">Facebook</a> · <time data-ago="2026-11-17T17:42:01Z">2026-11-17</time> · <a href="https://news.google.com/rss/articles/CBMiigFBVV95cUxQcmg4eFMwdWNTamxVV0psM1FRTEc5akhwTk1fQzZMekFHNjc0WXo2NU5CTXFiemt5UkVQV1J6YnpJTVYwakc1UXZUZXhFdTBYUXk4OGhCVTVHVUZ3Y0k2dWRPR19GU3dlQ3dPWWhiSVRUSXY2T1lRWjNiZG13Mm1zbEdQTExVZG03NkE?oc=5" target="_blank" rel="noopener">Billboard</a> · <time data-ago="2026-11-17T01:28:01Z">2026-11-17</time> · <a href="https://www.youtube.com/watch?v=02inkjSYV6o" target="_blank" rel="noopener">Andrew Ramdat</a> · <time data-ago="2026-11-16T17:33:17Z">2026-11-16</time></span></li></ul>
+  </details>
+  <div class="kc-fine">AI summary of this keycard's sources only. Labels show how solid each point is.</div>
+</section>
+
+
+<section class="card">
+  <div class="kc-h"><span class="label">First verdicts</span></div>
+<a class="kc-row" href="https://news.google.com/rss/articles/CBMi_wFBVV95cUxPdXRuZVBOejhfYzVjSDZsbl9BdjRuSGVLS0F3N0hCUGpxcFd6UHFQN0k5TExYN3h3aFZ0dmptcTZ2OHZNY2ZXX0EzLV91dmxhdFRJRVhQenhvOGVhSjhYZXhqX2ExcFpqUHJnYnQ1MS03QkowajBOckQ2b1hFQk8yUFNuREx4LUw4RXdCa3dvV0IwMG9ILXZoTVdWWVFRVGMzVElkTGgwRDVjcTF6aEdBQ1V3UVB3TWlpN2hSTUJYdVlvXzFMeWh5T1dsOThmVG12bXJQeDFFRWdtOUdqOWx3TkxyQmxzWjFQTHRuSWhoVDJ0NldJOGNOTXVKX2Z1UjA?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">Floridians Ariana Grande, Doechii score Grammys 2027 nominations</span><span class="kc-row-m">The Palm Beach Post · Tue 17 Nov</span></a><a class="kc-row" href="https://news.google.com/rss/articles/CBMie0FVX3lxTE9KTzFsRV9uRGJoUEdpT0htSFZHdXVsMUtlLWthbmFYdGFUUWYyUGhacnY4bWk2RkV3dU9iUGZQSDBLZGRlU2dSMUhoRWMxN0VRendSckRsMDM0X2tJLXBvcHk5ME95b29oTjhwTWQzNjFSNFJFenpqSTJpWQ?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">2027 Grammy nominations: Raye leads with 11, Angine de Poitrine score 4 — including best new artist</span><span class="kc-row-m">CBC · Mon 16 Nov</span></a><a class="kc-row" href="https://news.google.com/rss/articles/CBMivwFBVV95cUxQQ055bFNrbjFwOHlva01EQ2hfYnlacWxQWkUzR1FpYUppM2h5OThjQmxGdm5qVDBBNFZPdzN4WDFMR0hTQ2NvMk1xMFpKR2I1Mk5YZE5MMTY3S2hsdzE4bTlQS0g5Z3NoaF92SVg2SWFHVGR2RjRvS3pMenNFT2dKc21QVmd1aUo5YThwcjVJZ3AtWVpZODh0LWk2Q1lDYW40QnBTakF3S3dfWlhkR3J4MmU1QllQeFM5aHZCYklFVQ?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">2027 Grammys: Nominations In Album Cover, Music Film, Video Games Score, Visual Media Score &amp; More</span><span class="kc-row-m">Grammy · Mon 16 Nov</span></a><a class="kc-row" href="https://news.google.com/rss/articles/CBMioAFBVV95cUxNVEViTTExSWczSjNxREU2LUxEZGE2X3JDWFF3QmMtSlM1bFpCZndsdnNvZ3BfdzJrVHVhU01ubzd4aHp1Y2h4RFp0WUtHbDhaRW5QeEYyeUFnNVE1dENta0pyaDUtZFBodnh0d0tuRGZjT1B1VDRhUGRwbWs1cEVkcGg5S1h3SmluTk5DT0hyMzRqM1ktSjZDajJyYzlYWHBZ?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">Taylor Swift Scores Five Grammy Nominations, Including Album and Record of the Year Nods</span><span class="kc-row-m">The Hollywood Reporter · Mon 16 Nov</span></a></section>
+<section class="kc-folds">
+<details class="kc-fold"><summary><span>Latest headlines</span><span class="kc-count">12</span></summary><div class="kc-fold-body"><a class="kc-row" href="https://news.google.com/rss/articles/CBMirgFBVV95cUxQcWNNWDN2YjZqOUE0aWxzOGRDMl8wdXdxMExBUTRCQkcwT1llWWxGMlhFMF9EN1ZldGRCUTBLeDdWN0tGVHJEYzFFR2lNR2dWRW5ORURIcUp2bjlDZnR2Tlg0ZTdSd0s0WFBCdU9RTGkwNThleVVhUG5fYkpaX0FZZDY0dC1zVjk1Q1N1SEJpRURmUkNWZUZZMGdMY25iRU5lNXctOTdHY181dzN3UHc?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">2027 Grammys: Indian American artists earn two nominations; Tamil song makes history</span><span class="kc-row-m">The American Bazaar · Tue 17 Nov</span></a><a class="kc-row" href="https://news.google.com/rss/articles/CBMi0wFBVV95cUxQTW0xTUNvemJQVzdhNXBmcUY4azEyN3N3YWh1NlVtd2RNaHU2Wm5scTBXTmhpLTFrU1Y2alRtTU1SSHZFX0NtYjlFYUFIN3QtT0txRGd1R2NVR3NFdHFlWWlWbDhHQ1pDNnl1ZjdESV9fTmFYajNGVURGRUwwUmxtNEp4Ukh2aGM3djBNMVcwMmNaYnJiLXR0QV9iS2N2dXhOb3dYeXN5NXpLSWxEb3BoQVViVnRjc1ZfUWxKZEdiXzN6bUwzMW1pNERjRzBzS21KdXBz?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">Our Popcast music critics think Audrey Hobert was snubbed by the Recording Academy, which revealed nominees for the 2027 Grammy Awards in 100 categories, the largest field since 2011.</span><span class="kc-row-m">Facebook · Tue 17 Nov</span></a><a class="kc-row" href="https://news.google.com/rss/articles/CBMifEFVX3lxTE5tRDU2MUVyYjZfYmFyaTU5MTRNZkNGY2Z5dEFIUWd5akJOY0x2YmhhMEFyTTNzN2R1OGJGV09jN2VRaWhxNERMMUV4Qy1yeG8yY0hmY1dSN0JUejdnamJLTUhOVzFFZnJNVmx5dGxZb0VZUHVyaXd4MGFwdDQ?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">Brandi Carlile, Foo Fighters among Washington’s 2027 Grammy nominees</span><span class="kc-row-m">MyNorthwest.com · Tue 17 Nov</span></a><a class="kc-row" href="https://news.google.com/rss/articles/CBMiiwFBVV95cUxQRmw0WWdCSjM5WTdDakpIbFo0blpNeE9YY2ZsUUE1Nnp0SmE3U0hZOGoxSHc1enFBNkk3bHh3SGtFZHZRWVNvMW45VVhSOERNU0dZN1ZnVThWTEU2TGViay12V3dpWmlVblEyTk1BdXBDQ0dVY0pVWEk1RFdsbHpLQjJCeWozVVZVczhZ?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">Congratulations to Yale School of Music’s 2027 GRAMMY nominees!</span><span class="kc-row-m">Yale School of Music · Tue 17 Nov</span></a><a class="kc-row" href="https://news.google.com/rss/articles/CBMi_wFBVV95cUxPdXRuZVBOejhfYzVjSDZsbl9BdjRuSGVLS0F3N0hCUGpxcFd6UHFQN0k5TExYN3h3aFZ0dmptcTZ2OHZNY2ZXX0EzLV91dmxhdFRJRVhQenhvOGVhSjhYZXhqX2ExcFpqUHJnYnQ1MS03QkowajBOckQ2b1hFQk8yUFNuREx4LUw4RXdCa3dvV0IwMG9ILXZoTVdWWVFRVGMzVElkTGgwRDVjcTF6aEdBQ1V3UVB3TWlpN2hSTUJYdVlvXzFMeWh5T1dsOThmVG12bXJQeDFFRWdtOUdqOWx3TkxyQmxzWjFQTHRuSWhoVDJ0NldJOGNOTXVKX2Z1UjA?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">Floridians Ariana Grande, Doechii score Grammys 2027 nominations</span><span class="kc-row-m">The Palm Beach Post · Tue 17 Nov</span></a><a class="kc-row" href="https://news.google.com/rss/articles/CBMi0wFBVV95cUxPZWs4Tng4TllSRGlXQzI4dko2RnhsdG1fWVkyWUdQMzdNQnU5MVphRHRNY09KV0V4UFVVUFlkZEpuUU1IdVFZLTdSUUVnbU5GT19XZDJNRGMwYU14YWFMeGk0bktoOWh1ZWt1X3FzTmNCRjlCcmRoNGgxR2VDNFlLN21uc3Z3dldhNDFfTmF3ZkltWjR5SWtTWnpHVjIwcmFtVmVvZHNOMzZkUU1CLWdDYnRfdUJHVkIxcV9pVWs3X0pTMTJ2bGZpTlpXaElCY1dRQUlv?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">The Recording Academy revealed nominees for the 2027 Grammy Awards in 100 categories, the largest field since 2011. Our Popcast critics react to the Best Rap Album nominees, which include music by Ye, formerly known as Kanye West, Cardi B, Don Toliv</span><span class="kc-row-m">Facebook · Tue 17 Nov</span></a><a class="kc-row" href="https://news.google.com/rss/articles/CBMinAFBVV95cUxQV2NBb2VkS3pQZXhwUm5xdzgxZEd6amh6TnFZZ3hmXzlzSmJrR1UwanJNakt4bmFMRXVUVjE0bTlIMktfSFM4WGo0SXh1T1hlRnBVZmxXUjA2ZmRpSmlfUVlxRXV6ZERILXVUTDBoenlZcng3U0FvOUJobi1HM3B3WTJvVEY1QXFaTzF2QXBnbXZHdWVneEFIbGRwc2g?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">2027 Grammy nominations: All the snubs (Harry Styles, Noah Kahan, Stella Lefty) and surprises (Björk, Black Francis, Tim Curry)</span><span class="kc-row-m">Gold Derby · Mon 16 Nov</span></a><a class="kc-row" href="https://news.google.com/rss/articles/CBMifkFVX3lxTE9INDhhSFdrbUM5VlpmQjJTdmw0QWM5eHRsRjVVYzN0bHdna01ucUh4M3NlUFFGSjM2RjhtTHNhQVhTbHFSRHJoU2N2Y1RPbnlWOGdJcllhMEdaLVVkYURiQmRjTzRrZ3c2UjVzX19pLWFKM3FSWmJ4c2lSeGl1Zw?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">7 Takeaways From the 2027 Grammy Nominations</span><span class="kc-row-m">Pitchfork · Mon 16 Nov</span></a><a class="kc-row" href="https://news.google.com/rss/articles/CBMitgFBVV95cUxQUm04bWdtMnA3Rmh1VlQxb1J4NUdVc0JFYjJUNkNLa0FPX3lJd1FWOXFkME4yd2p0djdlMENFM1pnS21aTlJEOTAzZVNFY3pYd3pwQjdvOTZaLXpjZU5UcmxNTGc0WTRhNzhKaWJpOTBqc0pHUkUwN09zNUNQWkpoVEJ0QWs0VEFWTzhlWV9UR1RkY2hleVJaY3hzWWdVdUZYcUlublF3MER5TkM3RENaSmpGOXpVQQ?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">Grammys 2027: Snubs &amp; Surprises for Harry Styles, Noah Kahan, More</span><span class="kc-row-m">The Hollywood Reporter · Mon 16 Nov</span></a><a class="kc-row" href="https://news.google.com/rss/articles/CBMiugFBVV95cUxNN2l2MTlHWmV3YzBPcUp0dFBIX1VkZXp2MG9hXy1TMG5Hd1hhMF9qdjVNVV9KREFVOTlXMnZqbU41cHBtaUxrTXhzVUJ2d1dLWmI5dDk0RzdrWFpIRzNqMFhUS0NKc1JYR1huNy01SVRULVAzb0t4cmJLNFN0S3RlLTR4eFJKMDcxbHczMk93bnI3cE9aZmpWQmxzRXlkS2JYME01RXBvVzZONzhPanl5Z2VmNllxRnN4R0E?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">WA folk-rock hero gets 4 nominations for 2027 Grammys</span><span class="kc-row-m">The Seattle Times · Mon 16 Nov</span></a><a class="kc-row" href="https://news.google.com/rss/articles/CBMiogFBVV95cUxQNUVVbkZtN1NjUjJDN0tuR2U3NldpTFJ6QlZfdWZBbmM1Z0RSWlZFclV4eUFlVGNqZl9qT2VJUnktYkN1Mi1sbFQ3NTRfLTlWR3VQQkttUG9aWmdtd3kwNlJkc1NoRi1PNU1hOWhuMmpwNThJbnVpbFVwZXRoZGxObmI1MG5tc1ctUzV6eXlIbF8yOXN4TDI4ZXVYQWM0LTE4SVE?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">RAYE Tearfully Reacts to Scoring 11 2027 Grammy Nods, More Than Any Other Artist: ‘WHAT IS HAPPENING’</span><span class="kc-row-m">Billboard · Mon 16 Nov</span></a><a class="kc-row" href="https://news.google.com/rss/articles/CBMingFBVV95cUxNVHdLS0pSRmQ0bHVubFRTeU5OeWloZEFKUThuUjJpYzdDbUM5cWwzMjJORXA4NXBqUGFRdDktd3lUOG1MQV9uLTA2ZFh3UXFoYkFxU2V4ekIxZVh6U0pudENjdEpFYUhLd1ZhSGJuR083VXMyQk5sanU3NWQtdjdpdW5rQjJ2eThINUdiYUVMVWJlN1lmTU53Z3VST0lmQQ?oc=5" target="_blank" rel="noopener"><span class="kc-row-t">The Biggest Snubs and Surprises From the 2027 Grammy Nominations</span><span class="kc-row-m">Vulture · Mon 16 Nov</span></a></div></details><details class="kc-fold"><summary><span>Videos</span><span class="kc-count">8</span></summary><div class="kc-fold-body"><a class="kc-row" href="https://www.youtube.com/watch?v=LrvOuWzvbVU" target="_blank" rel="noopener"><span class="kc-row-t">2027 Grammys: Full Nominations List (Rewatch Nominations Special Presentation)</span><span class="kc-row-m">GRAMMYS · 890,570 views</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=WIX59wGHinQ" target="_blank" rel="noopener"><span class="kc-row-t">2027 Grammys: Nominations In Album Of The Year, Song Of The Year, Best New Artist &amp; More</span><span class="kc-row-m">GRAMMYS · 262,182 views</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=RFlWRpRrK5E" target="_blank" rel="noopener"><span class="kc-row-t">2027 GRAMMY Nominations Livestream | Monday, Nov 16, 7:45am ET / 4:45am PT</span><span class="kc-row-m">GRAMMYS · 23,179 views</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=jEBWBCRJNeg" target="_blank" rel="noopener"><span class="kc-row-t">2027 Grammy Nominations: Watch The Replay</span><span class="kc-row-m">GRAMMYS · 15,963 views</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=w0Rauoomx9k" target="_blank" rel="noopener"><span class="kc-row-t">2027 GRAMMY Nominees React To Their Nominations! 🥹✨</span><span class="kc-row-m">GRAMMYS · 14,861 views</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=BmPI0SCXS5U" target="_blank" rel="noopener"><span class="kc-row-t">GRAMMYS DRAMA IS A MESS (2027 nominations revealed)</span><span class="kc-row-m">Spill Sesh · 127,674 views</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=JeEkdzv4C0c" target="_blank" rel="noopener"><span class="kc-row-t">2027 GRAMMY NOMINATIONS!</span><span class="kc-row-m">angelina · 49,280 views</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=5eqUxxTqHhU" target="_blank" rel="noopener"><span class="kc-row-t">2027 GRAMMY Nominations: Snubs, Surprises and History Makers</span><span class="kc-row-m">Entertainment Tonight · 17,455 views</span></a></div></details><details class="kc-fold"><summary><span>What fans are saying</span><span class="kc-count">10</span></summary><div class="kc-fold-body"><div class="kc-fine" style="padding:6px 0">Most-liked comments. Likes show engagement, not who's right.</div><a class="kc-row" href="https://www.youtube.com/watch?v=WIX59wGHinQ&amp;lc=UgwXIFN8a9PP-T-S0jN4AaABAg" target="_blank" rel="noopener"><span class="kc-row-t">“Just a reminder, no artist needs a Grammy to be huge, but the Grammy needs these artists to run its business.”</span><span class="kc-row-m">860 likes · GRAMMYS</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=WIX59wGHinQ&amp;lc=UgwASdi08gIjX9F10254AaABAg" target="_blank" rel="noopener"><span class="kc-row-t">“Oliva Rodrgo deserves it 💜💟”</span><span class="kc-row-m">830 likes · GRAMMYS</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=WIX59wGHinQ&amp;lc=UgzbwCWyBlpb5fuILcB4AaABAg" target="_blank" rel="noopener"><span class="kc-row-t">“Raye is leading with 11 nominations Olivia Rodrigo 7”</span><span class="kc-row-m">743 likes · GRAMMYS</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=LrvOuWzvbVU&amp;lc=Ugy6iy2PDCy-adr7qlZ4AaABAg" target="_blank" rel="noopener"><span class="kc-row-t">“album of the year: you seem pretty sad for a girl so in love🤞🏻🤞🏻🤞🏻”</span><span class="kc-row-m">560 likes · GRAMMYS</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=02inkjSYV6o&amp;lc=UgzkYbryI9doh9o7IOh4AaABAg" target="_blank" rel="noopener"><span class="kc-row-t">“Lmao there is no way katseye fans expected hotti frutti to be Grammy nominated 😭”</span><span class="kc-row-m">456 likes · Andrew Ramdat</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=BmPI0SCXS5U&amp;lc=UgzU5WCnA71rHfGT5I54AaABAg" target="_blank" rel="noopener"><span class="kc-row-t">“The Life Of A Showgirl being nominated for album of the year....I am actually speechless.”</span><span class="kc-row-m">751 likes · Spill Sesh</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=BmPI0SCXS5U&amp;lc=Ugw6URxGxhpHX6qZ6lR4AaABAg" target="_blank" rel="noopener"><span class="kc-row-t">“The fact that they feel obligated to nominate any and everything Swift is enraging, tbh. I actually can get behind the Ophelia nomination, but the Toy Story song and Life Of A Snoozefest? Fkn miss me…”</span><span class="kc-row-m">410 likes · Spill Sesh</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=BmPI0SCXS5U&amp;lc=UgzOIUXD-qvB-wuonqx4AaABAg" target="_blank" rel="noopener"><span class="kc-row-t">“Raye 11 nominations without a label backing her is impressive asf”</span><span class="kc-row-m">366 likes · Spill Sesh</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=BmPI0SCXS5U&amp;lc=UgyFXSyaY74kut6L06d4AaABAg" target="_blank" rel="noopener"><span class="kc-row-t">“i am a HUGE swiftie but i agree, the life of a showgirl is not album of the year imo. so many other artists should have got nominated”</span><span class="kc-row-m">249 likes · Spill Sesh</span></a><a class="kc-row" href="https://www.youtube.com/watch?v=BmPI0SCXS5U&amp;lc=UgyLkl3ISk08J_7jR8t4AaABAg" target="_blank" rel="noopener"><span class="kc-row-t">“There’s no way Taylor needed that many nominations”</span><span class="kc-row-m">247 likes · Spill Sesh</span></a></div></details>  
+<details class="kc-fold"><summary><span>Sources on this keycard</span><span class="kc-count">7</span></summary><div class="kc-fold-body"><div class="kc-row"><span class="kc-row-t">Recording Academy / GRAMMYs</span><span class="kc-row-m">Official · YouTube · good for official news</span></div><div class="kc-row"><span class="kc-row-t">Billboard</span><span class="kc-row-m">Broadcaster · YouTube · good for charts, interviews</span></div><div class="kc-row"><span class="kc-row-t">Billboard</span><span class="kc-row-m">News · Website · good for news, charts</span></div><div class="kc-row"><span class="kc-row-t">Pitchfork</span><span class="kc-row-m">News · Website · good for news, reviews</span></div><div class="kc-row"><span class="kc-row-t">Rolling Stone Music</span><span class="kc-row-m">News · Website · good for news, features</span></div><div class="kc-row"><span class="kc-row-t">Variety</span><span class="kc-row-m">News · Website · good for news, box office</span></div><div class="kc-row"><span class="kc-row-t">Google News search</span><span class="kc-row-m">News search · Web · good for wider coverage</span></div></div></details><details class="kc-fold"><summary><span>Keycard updates</span><span class="kc-count">1</span></summary><div class="kc-fold-body"><div class="kc-row"><span class="kc-row-t">Moment set up.</span><span class="kc-row-m">Tue 17 Nov</span></div></div></details></section><footer class="footer">
+  Keycard is in beta. Sources are named on every keycard; AI updates only use a keycard's own sources. Unofficial; not affiliated with any league, promotion or company covered here.<br>
+  Built 2026-11-17 18:22 UTC.
+</footer>
+</div>
+<nav class="tabbar" aria-label="Main">
+  <a href="../" class="on" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>Discover</a>
+  <a href="../make/" class="tab-make"><span class="plus"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span>Make</a>
+  <a href="../me/" data-mine><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Mine</a>
+</nav>
+<script>
+(function () {
+  // Every time on the site is shown in the viewer's own time zone.
+  var W = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  var M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  function day(d) { return W[d.getDay()] + ' ' + d.getDate() + ' ' + M[d.getMonth()]; }
+  // "Sun 22 Nov · 8:30pm". Midnight belongs to the evening before: "Tue 24 Nov · midnight".
+  function local(d) {
+    var h = d.getHours(), m = d.getMinutes();
+    if (h === 0 && m === 0) return day(new Date(d - 60000)) + ' · midnight';
+    return day(d) + ' · ' + (h % 12 || 12) + (m ? ':' + String(m).padStart(2, '0') : '') + (h < 12 ? 'am' : 'pm');
+  }
+  document.querySelectorAll('time[data-local], time[data-t]').forEach(function (t) {
+    var d = new Date(t.dataset.local || t.dataset.t);
+    if (!isNaN(d)) { t.textContent = local(d); t.title = 'Your time'; }
+  });
+  // Release days: the date as written, no time zone shift (a film opens on the 18th everywhere).
+  document.querySelectorAll('time[data-day]').forEach(function (t) {
+    var d = new Date(t.dataset.day + 'T12:00:00');
+    if (!isNaN(d)) t.textContent = day(d);
+  });
+  document.querySelectorAll('time[data-ago]').forEach(function (t) {
+    var m = Math.round((new Date() - new Date(t.dataset.ago)) / 60000);
+    if (isNaN(m)) return;
+    t.textContent = m < 1 ? 'just now' : m < 60 ? m + 'm ago' : m < 1440 ? Math.round(m / 60) + 'h ago' : Math.round(m / 1440) + 'd ago';
+  });
+  // Countdowns: <span data-countdown="ISO" data-done="text when passed">. No offset = viewer's local midnight.
+  function tick() {
+    document.querySelectorAll('[data-countdown]').forEach(function (el) {
+      var ms = new Date(el.dataset.countdown) - new Date();
+      if (isNaN(ms)) return;
+      if (ms <= 0) { el.textContent = el.dataset.done || 'Now'; return; }
+      var m = Math.floor(ms / 60000), d = Math.floor(m / 1440), h = Math.floor((m % 1440) / 60), mm = m % 60;
+      el.textContent = (d ? d + 'd ' : '') + (d || h ? h + 'h ' : '') + mm + 'm';
+    });
+  }
+  tick(); setInterval(tick, 30000);
+})();
+</script><script type="module" src="../app/app.js"></script>
+</body>
+</html>

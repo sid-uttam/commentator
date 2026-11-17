@@ -6,7 +6,7 @@
 <title>UFC 335: Oliveira vs Lopes · Keycard</title>
 <meta name="description" content="UFC 335: Oliveira vs Lopes: the build-up, the big moments and the aftermath on one page.">
 <meta property="og:title" content="UFC 335: Oliveira vs Lopes · Keycard">
-<meta property="og:description" content="Sat 12 Dec (US) · early Sun 13 Dec in Dubai">
+<meta property="og:description" content="Sat 12 Dec (US)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Keycard">
 <meta property="og:url" content="https://sid-uttam.github.io/commentator/ufc-335-oliveira-lopes/">
@@ -194,7 +194,7 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
 <section class="kc-hero">
   <div class="eyebrow">UFC · MMA · UFC 335 · BMF title</div>
   <h1 class="display kc-title">UFC 335: Oliveira vs Lopes</h1>
-<div class="kc-status kc-status-upcoming"><span class="dot"></span><span>Sat 12 Dec (US) · early Sun 13 Dec in Dubai</span></div></section>
+<div class="kc-status kc-status-upcoming"><span class="dot"></span><span>Sat 12 Dec (US)</span></div></section>
 
 <section class="card kc-now">
   <div class="kc-h"><span class="label">Right now</span></div>
@@ -243,7 +243,7 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
 <details class="kc-fold"><summary><span>Sources on this keycard</span><span class="kc-count">13</span></summary><div class="kc-fold-body"><div class="kc-row"><span class="kc-row-t">UFC</span><span class="kc-row-m">Official · YouTube · good for official, highlights, press conferences</span></div><div class="kc-row"><span class="kc-row-t">UFC Fight Pass</span><span class="kc-row-m">Official · YouTube · good for live watch-along</span></div><div class="kc-row"><span class="kc-row-t">Ariel Helwani</span><span class="kc-row-m">Creator · YouTube · good for scoops, interviews</span></div><div class="kc-row"><span class="kc-row-t">Deep Waters</span><span class="kc-row-m">Creator · YouTube · good for discussion</span></div><div class="kc-row"><span class="kc-row-t">Luke Thomas</span><span class="kc-row-m">Creator · YouTube · good for analysis</span></div><div class="kc-row"><span class="kc-row-t">r/mma</span><span class="kc-row-m">Fans · Reddit · good for fan mood, debate · added by hand</span></div><div class="kc-row"><span class="kc-row-t">BJPenn.com</span><span class="kc-row-m">News · Website · good for news, quotes</span></div><div class="kc-row"><span class="kc-row-t">Bloody Elbow</span><span class="kc-row-m">News · Website · good for news, analysis</span></div><div class="kc-row"><span class="kc-row-t">Cageside Press</span><span class="kc-row-m">News · Website · good for news</span></div><div class="kc-row"><span class="kc-row-t">MMA Fighting</span><span class="kc-row-m">News · Website · good for news</span></div><div class="kc-row"><span class="kc-row-t">MMA Mania</span><span class="kc-row-m">News · Website · good for news</span></div><div class="kc-row"><span class="kc-row-t">Sherdog</span><span class="kc-row-m">News · Website · good for news</span></div><div class="kc-row"><span class="kc-row-t">Google News search</span><span class="kc-row-m">News search · Web · good for wider coverage</span></div></div></details><details class="kc-fold"><summary><span>Keycard updates</span><span class="kc-count">1</span></summary><div class="kc-fold-body"><div class="kc-row"><span class="kc-row-t">Page created.</span><span class="kc-row-m">Mon 16 Nov</span></div></div></details></section>
 <footer class="footer">
   Keycard is in beta. Sources are named on every keycard; AI updates only use a keycard's own sources. Unofficial; not affiliated with any league, promotion or company covered here.<br>
-  Built 2026-11-17 17:52 UTC.
+  Built 2026-11-17 18:22 UTC.
 </footer>
 </div>
 <nav class="tabbar" aria-label="Main">
@@ -253,16 +253,31 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
 </nav>
 <script>
 (function () {
-  var fmt = { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' };
-  document.querySelectorAll('time[data-t]').forEach(function (t) {
-    try { var d = new Date(t.dataset.t); if (!isNaN(d)) t.textContent = d.toLocaleString(undefined, fmt); } catch (err) {}
+  // Every time on the site is shown in the viewer's own time zone.
+  var W = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  var M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  function day(d) { return W[d.getDay()] + ' ' + d.getDate() + ' ' + M[d.getMonth()]; }
+  // "Sun 22 Nov · 8:30pm". Midnight belongs to the evening before: "Tue 24 Nov · midnight".
+  function local(d) {
+    var h = d.getHours(), m = d.getMinutes();
+    if (h === 0 && m === 0) return day(new Date(d - 60000)) + ' · midnight';
+    return day(d) + ' · ' + (h % 12 || 12) + (m ? ':' + String(m).padStart(2, '0') : '') + (h < 12 ? 'am' : 'pm');
+  }
+  document.querySelectorAll('time[data-local], time[data-t]').forEach(function (t) {
+    var d = new Date(t.dataset.local || t.dataset.t);
+    if (!isNaN(d)) { t.textContent = local(d); t.title = 'Your time'; }
+  });
+  // Release days: the date as written, no time zone shift (a film opens on the 18th everywhere).
+  document.querySelectorAll('time[data-day]').forEach(function (t) {
+    var d = new Date(t.dataset.day + 'T12:00:00');
+    if (!isNaN(d)) t.textContent = day(d);
   });
   document.querySelectorAll('time[data-ago]').forEach(function (t) {
     var m = Math.round((new Date() - new Date(t.dataset.ago)) / 60000);
     if (isNaN(m)) return;
     t.textContent = m < 1 ? 'just now' : m < 60 ? m + 'm ago' : m < 1440 ? Math.round(m / 60) + 'h ago' : Math.round(m / 1440) + 'd ago';
   });
-  // Countdowns: <span data-countdown="ISO" data-done="text when passed">
+  // Countdowns: <span data-countdown="ISO" data-done="text when passed">. No offset = viewer's local midnight.
   function tick() {
     document.querySelectorAll('[data-countdown]').forEach(function (el) {
       var ms = new Date(el.dataset.countdown) - new Date();
@@ -292,19 +307,6 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
   var start = location.hash.replace('#', '');
   show(['buildup', 'live', 'aftermath'].indexOf(start) > -1 ? start : 'buildup', false);
 
-  document.querySelectorAll('time[data-t]').forEach(function (t) {
-    try {
-      var d = new Date(t.dataset.t);
-      if (!isNaN(d)) t.textContent = d.toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
-    } catch (err) {}
-  });
-  var el = null;
-  if (el) {
-    try {
-      var d = new Date(el.dataset.start);
-      el.textContent = 'Your time: ' + d.toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
-    } catch (err) {}
-  }
 })();
 </script>
 <script type="module" src="../app/app.js"></script>

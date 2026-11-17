@@ -213,7 +213,7 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
 <details class="kc-fold"><summary><span>Sources on this keycard</span><span class="kc-count">6</span></summary><div class="kc-fold-body"><div class="kc-row"><span class="kc-row-t">Mark Wiens</span><span class="kc-row-m">Creator · YouTube · good for Thai street food, Bangkok eating</span></div><div class="kc-row"><span class="kc-row-t">Pailin&#39;s Kitchen</span><span class="kc-row-m">Creator · YouTube · good for Thai home cooking, the why behind dishes</span></div><div class="kc-row"><span class="kc-row-t">Eating Thai Food</span><span class="kc-row-m">News · Website · good for Bangkok restaurants, street food</span></div><div class="kc-row"><span class="kc-row-t">Hot Thai Kitchen</span><span class="kc-row-m">News · Website · good for recipes</span></div><div class="kc-row"><span class="kc-row-t">Leela Punyaratabandhu (Substack)</span><span class="kc-row-m">News · Website · good for Thai food writing</span></div><div class="kc-row"><span class="kc-row-t">Google News search</span><span class="kc-row-m">News search · Web · good for wider coverage</span></div></div></details><details class="kc-fold"><summary><span>Keycard updates</span><span class="kc-count">1</span></summary><div class="kc-fold-body"><div class="kc-row"><span class="kc-row-t">Keycard created from Manav&#39;s Google Maps list (exported 17 Nov): 101 places, 7 flagged as closed.</span><span class="kc-row-m">Tue 17 Nov</span></div></div></details></section>
 <footer class="footer">
   Keycard is in beta. Sources are named on every keycard; AI updates only use a keycard's own sources. Unofficial; not affiliated with any league, promotion or company covered here.<br>
-  Built 2026-11-17 17:52 UTC.
+  Built 2026-11-17 18:22 UTC.
 </footer>
 </div>
 <nav class="tabbar" aria-label="Main">
@@ -223,16 +223,31 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
 </nav>
 <script>
 (function () {
-  var fmt = { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' };
-  document.querySelectorAll('time[data-t]').forEach(function (t) {
-    try { var d = new Date(t.dataset.t); if (!isNaN(d)) t.textContent = d.toLocaleString(undefined, fmt); } catch (err) {}
+  // Every time on the site is shown in the viewer's own time zone.
+  var W = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  var M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  function day(d) { return W[d.getDay()] + ' ' + d.getDate() + ' ' + M[d.getMonth()]; }
+  // "Sun 22 Nov · 8:30pm". Midnight belongs to the evening before: "Tue 24 Nov · midnight".
+  function local(d) {
+    var h = d.getHours(), m = d.getMinutes();
+    if (h === 0 && m === 0) return day(new Date(d - 60000)) + ' · midnight';
+    return day(d) + ' · ' + (h % 12 || 12) + (m ? ':' + String(m).padStart(2, '0') : '') + (h < 12 ? 'am' : 'pm');
+  }
+  document.querySelectorAll('time[data-local], time[data-t]').forEach(function (t) {
+    var d = new Date(t.dataset.local || t.dataset.t);
+    if (!isNaN(d)) { t.textContent = local(d); t.title = 'Your time'; }
+  });
+  // Release days: the date as written, no time zone shift (a film opens on the 18th everywhere).
+  document.querySelectorAll('time[data-day]').forEach(function (t) {
+    var d = new Date(t.dataset.day + 'T12:00:00');
+    if (!isNaN(d)) t.textContent = day(d);
   });
   document.querySelectorAll('time[data-ago]').forEach(function (t) {
     var m = Math.round((new Date() - new Date(t.dataset.ago)) / 60000);
     if (isNaN(m)) return;
     t.textContent = m < 1 ? 'just now' : m < 60 ? m + 'm ago' : m < 1440 ? Math.round(m / 60) + 'h ago' : Math.round(m / 1440) + 'd ago';
   });
-  // Countdowns: <span data-countdown="ISO" data-done="text when passed">
+  // Countdowns: <span data-countdown="ISO" data-done="text when passed">. No offset = viewer's local midnight.
   function tick() {
     document.querySelectorAll('[data-countdown]').forEach(function (el) {
       var ms = new Date(el.dataset.countdown) - new Date();
