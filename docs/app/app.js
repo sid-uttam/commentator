@@ -44,9 +44,12 @@ ready.then(f => {
   });
 });
 
+let signingIn = false;   // one sign-in window at a time, however many taps
 export async function signIn() {
+  if (signingIn) return null;
   const f = await ready;
   if (!f) { toast('Sign-in opens very soon.'); return null; }
+  signingIn = true;
   const provider = new f.A.GoogleAuthProvider();
   provider.setCustomParameters({ prompt: 'select_account' });
   try {
@@ -59,7 +62,7 @@ export async function signIn() {
       console.error(e); toast("Couldn't sign you in. Try again?");
     }
     return null;
-  }
+  } finally { signingIn = false; }
 }
 export async function signOut() { const f = await ready; if (f) await f.A.signOut(f.auth); }
 
@@ -73,10 +76,32 @@ function runPending(u) {
   sessionStorage.removeItem(PENDING);
   actions[p.name](...(p.args || []));
 }
+// Signed out and tapped Follow or Copy: say why we need sign-in, and open Google only when they tap
+// "Continue" (a direct tap, so popup blockers allow it). The action they wanted runs straight after.
 export async function withUser(name, ...args) {
   if (me) return actions[name](...args);
   sessionStorage.setItem(PENDING, JSON.stringify({ name, args, at: Date.now() }));
-  await signIn();                // onAuthStateChanged runs the pending action
+  const why = name.startsWith('follow') ? ['Sign in to follow', "You'll see its updates on your Mine page, plus one short email on Sundays."]
+    : name === 'copy' ? ['Sign in to copy', 'Your copy is saved to your account, credited to the original. Change anything you like.']
+    : ['Sign in to continue', 'So your keycards are saved and you can share them.'];
+  signInSheet(...why);
+}
+function signInSheet(title, body) {
+  document.querySelector('.kc-sheet')?.remove();
+  const el = document.createElement('div');
+  el.className = 'kc-sheet';
+  el.innerHTML = `<div class="kc-sheet-box" role="dialog" aria-modal="true" aria-label="${esc(title)}">
+      <b>${esc(title)}</b><p>${esc(body)}</p>
+      <button class="kc-btn kc-btn-main" type="button" data-go>Continue with Google</button>
+      <button class="kc-btn kc-btn-quiet" type="button" data-no>Not now</button>
+      <small>Free. We only see your name and photo.</small></div>`;
+  const close = () => el.remove();
+  el.addEventListener('click', e => {
+    if (e.target === el || e.target.closest('[data-no]')) { sessionStorage.removeItem(PENDING); close(); }
+    if (e.target.closest('[data-go]')) { close(); signIn(); }
+  });
+  document.body.appendChild(el);
+  el.querySelector('[data-go]').focus();
 }
 
 // ---------- keycards ----------
@@ -311,12 +336,16 @@ export function fold(title, rows, open, steps) {
   return `<details class="kc-fold"${open ? ' open' : ''}><summary><span>${esc(title)}</span><span class="kc-count">${rows.length}</span></summary><div class="kc-fold-body${steps ? ' kc-steps' : ''}">${rows.join('')}</div></details>`;
 }
 export function briefingCard(b, title, note) {
-  if (!b || !b.points || !b.points.length) return '';
+  const fl = (b && b.from_list) || [];
+  if (!b || ((!b.points || !b.points.length) && !fl.length)) return '';
+  b.points = b.points || [];
   const pt = p => `<li class="kc-pt"><span class="kc-lbl kc-lbl-${esc((p.label || 'reported').replace(/ /g, '-'))}">${esc(p.label || 'reported')}</span> ${esc(p.text)} ${
     (p.sources || []).slice(0, 2).map(s => (safeUrl(s.url) ? `<a class="kc-src" href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)}</a>` : `<span class="kc-src">${esc(s.name)}</span>`)
       + (s.date ? `<span class="kc-src"> · ${esc(ago(s.date))}</span>` : '')).join(' · ')}</li>`;
   return `<section class="card kc-now"><div class="kc-h"><span class="label">${esc(title)}</span></div>
-    ${b.headline ? `<p class="kc-head">${esc(b.headline)}</p>` : ''}<ul class="kc-pts">${b.points.slice(0, 3).map(pt).join('')}</ul>
+    ${b.headline ? `<p class="kc-head">${esc(b.headline)}</p>` : ''}
+    ${fl.length ? `<div class="kc-fine" style="padding-top:4px">From the list</div>${fl.map(x => `<div class="kc-row"><span class="kc-row-t">${esc(x.name)}</span>${x.why ? `<span class="kc-row-m">${esc(x.why)}</span>` : ''}</div>`).join('')}
+      ${b.points.length ? '<div class="kc-fine" style="padding-top:10px">New</div>' : ''}` : ''}<ul class="kc-pts">${b.points.slice(0, 3).map(pt).join('')}</ul>
     ${b.points.length > 3 ? `<details class="kc-more"><summary>${b.points.length - 3} more points</summary><ul class="kc-pts">${b.points.slice(3).map(pt).join('')}</ul></details>` : ''}
     <div class="kc-fine">${esc(note)}</div></section>`;
 }

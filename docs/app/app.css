@@ -213,3 +213,9 @@ body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 .kc-stats i{font-style:normal;color:var(--faint)}
 .tile-n{display:inline-block;margin-top:6px;font:700 12px Inter,system-ui,sans-serif;color:var(--accent)}
 .tile-n:empty{display:none}
+/* Sign-in sheet (Follow / Copy when signed out) */
+.kc-sheet{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center}
+.kc-sheet-box{width:100%;max-width:520px;background:var(--card);border:1px solid var(--line2);border-radius:20px 20px 0 0;padding:22px 20px calc(18px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px;font-family:Inter,system-ui,sans-serif}
+.kc-sheet-box b{font-size:20px;color:var(--ink)}
+.kc-sheet-box p{margin:0 0 6px;color:var(--ink2);font-size:15px;line-height:1.45}
+.kc-sheet-box small{color:var(--faint);text-align:center;font-size:12px}

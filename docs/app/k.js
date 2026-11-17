@@ -54,7 +54,7 @@ async function show() {
     ${k.tagline ? `<p class="kc-body" style="margin-top:-6px">${esc(k.tagline)}</p>` : ''}
     <div class="kc-actions" id="acts"></div>
     <div id="mine"></div>
-    ${shape === 'picks' ? folds + '<div id="live"></div>' : '<div id="live"></div>' + folds}`;
+    ${shape === 'picks' && !k.watch ? folds + '<div id="live"></div>' : '<div id="live"></div>' + folds}`;
 
   onUser(u => {
     const own = u && u.uid === k.owner;
@@ -79,6 +79,7 @@ async function show() {
           <a class="kc-btn" href="${esc(makeUrl(docId, '&focus=title'))}">Rename</a>
           <a class="kc-btn" href="${esc(makeUrl(docId, '&focus=add'))}">Add your own</a>
           <a class="kc-btn" href="${esc(makeUrl(docId, '&focus=remove'))}">Remove some</a>
+          <a class="kc-btn" href="${esc(makeUrl(docId, '&focus=watch'))}">Ask AI to watch for you</a>
         </div></section>`;
       if (params.get('new')) history.replaceState(null, '', location.pathname + '?id=' + encodeURIComponent(docId));
       return;
@@ -107,13 +108,18 @@ async function show() {
 
   // Living: the keycard's own AI update from its links; otherwise a copy of a live keycard shows the original's.
   // Picks (a restaurant list, favourite films) don't get news: general updates don't belong on someone's list.
-  if (shape === 'picks') return;
+  // ...unless the owner asked AI to watch something for them ("which are in Downtown? new places like these").
+  if (shape === 'picks' && !k.watch) return;
   let mineB = null;
   try { const r = await fetch(ROOT + 'u/' + docId + '/briefing.json', { cache: 'no-cache' }); if (r.ok) mineB = await r.json(); } catch (e) {}
   const title = "What's new";
-  if (mineB && mineB.points && mineB.points.length) {
-    document.getElementById('live').innerHTML = briefingCard(mineB, `${title} · ${ago(mineB.updated)}`,
-      'AI summary of the links on this keycard only. Labels show how solid each point is.');
+  if (mineB && ((mineB.points && mineB.points.length) || (mineB.from_list && mineB.from_list.length))) {
+    document.getElementById('live').innerHTML = briefingCard(mineB, `${k.watch ? 'For ' + first : title} · ${ago(mineB.updated)}`,
+      k.watch ? `${first} asked: “${k.watch.replace(/[.\s]+$/, '')}” Picks from the list only use what's on this keycard. Anything new links to where it came from.`
+              : 'AI summary of the links on this keycard only. Labels show how solid each point is.');
+  } else if (k.watch && shape === 'picks') {
+    document.getElementById('live').innerHTML = `<section class="card kc-now"><div class="kc-h"><span class="label">For ${esc(first)}</span></div>
+      <p class="kc-body">Watching for: “${esc(k.watch)}”. The first update arrives within a few hours.</p></section>`;
   } else if (cf && cf.live) {
     try {
       const src = await loadKeycard(cf.live);

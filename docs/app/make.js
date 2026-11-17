@@ -115,13 +115,16 @@ function render() {
         <button class="kc-btn kc-btn-quiet" type="button" data-addsec>+ Section</button>
         ${showSources ? '' : '<button class="kc-btn kc-btn-quiet" type="button" data-addsrc>+ Sources for updates</button>'}
       </div>
+      <section class="ed-sec ed-ai" id="ai-box">
+        <span class="label">Ask AI to watch for you <small style="text-transform:none;letter-spacing:0;font-weight:500">optional</small></span>
+        <textarea data-p="watch" placeholder="${esc(watchFor(k).ph)}" maxlength="300">${esc(k.watch || '')}</textarea>
+        <div class="ed-chips">${watchFor(k).ex.map(x => `<button type="button" class="ed-chip" data-watchchip="${esc(x)}">${esc(x)}</button>`).join('')}</div>
+        <small class="kc-fine">Your own instruction, just for your keycard. AI checks every few hours and links everything it finds. Leave it empty and nothing changes.</small>
+      </section>
       <details class="ed-more"${moreOpen ? ' open' : ''}>
         <summary>More options</summary>
         <div class="ed-field"><span>Subject</span>
           <div class="ed-chips">${SUBJECTS.map(x => `<button type="button" class="ed-chip${catOf(k.subject) === x && k.subject ? ' on' : ''}" data-subject="${x}">${x}</button>`).join('')}</div></div>
-        <label class="ed-field"><span>What should it keep an eye on?</span>
-          <textarea data-p="instruction" placeholder="e.g. New openings that suit this list, and anything that has closed.">${esc(k.instruction)}</textarea>
-          <small>For the short AI updates. They only use the sources on this keycard.</small></label>
         ${k.shape === 'playbook' ? `<label class="ed-field"><span>Tested with</span>
           <input data-p="tested" value="${esc(k.tested || '')}" placeholder="e.g. Claude, Nov 2026"><small>Tools change fast. This tells people how fresh your playbook is.</small></label>` : ''}
         <div class="ed-field"><span>Who can see it</span>
@@ -173,6 +176,7 @@ box.addEventListener('click', async e => {
   const d = t.dataset;
   if (d.starter) { start(d.starter); return; }
   if (d.ivchip) { const t = document.getElementById('iv-topic'); t.value = d.ivchip.replace('…', ' '); t.focus(); return; }
+  if (d.watchchip) { const t = box.querySelector('[data-p="watch"]'); t.value = (t.value.trim() ? t.value.trim() + ' ' : '') + d.watchchip; setPath('watch', t.value); dirty = true; t.focus(); return; }
   if (d.choice) { pick = d.choice; starters(); scrollTo(0, 0); return; }
   if (d.idea) {
     if (d.idea.includes('…')) {                       // "My 5 favourite restaurants in …": they finish the sentence
@@ -230,7 +234,7 @@ async function save(btn) {
     title: k.title.trim(), tagline: k.tagline.trim(), subject: k.subject || '',
     sections: k.sections.map(s => ({ title: s.title.trim() || 'Picks', items: s.items.filter(keep).map(tidy) })).filter(s => s.items.length),
     sources: k.sources.filter(keep).map(tidy), instruction: k.instruction.trim(),
-    shape: k.shape || '', tested: (k.tested || '').trim(),
+    shape: k.shape || '', tested: (k.tested || '').trim(), watch: (k.watch || '').trim(),
     visibility: k.visibility, copiedFrom: k.copiedFrom || null, edited: !!(k.edited || (k.copiedFrom && dirty) || !k.copiedFrom),
   };
   if (!docId && made) data.made = { how: made.how, secs: Math.round((Date.now() - made.t0) / 1000) };
@@ -352,6 +356,14 @@ const CHOICES = [
   { key: 'sources', label: 'People and sources I trust', sub: 'Who I follow, and why',
     ideas: ['Who I follow to understand AI', 'YouTube channels I actually watch', 'Podcasts and newsletters I really read', 'The best people to follow for football', 'Money and investing sources I trust'] },
 ];
+// Your own AI instruction on a keycard (including a copy of someone else's): what it should watch for you.
+const WATCH = {
+  picks: { ph: 'e.g. Which of these are in Downtown? Tell me about new places like these.',
+           ex: ['Which of these are near …?', 'New openings like these', 'Tell me if any of these close'] },
+  sources: { ph: "e.g. Only the big stuff, and anything about Nvidia's next chips.", ex: ['Only the big stuff', 'Anything about …', 'Where they disagree'] },
+  playbook: { ph: 'e.g. Tell me when a better way to do this comes out.', ex: ['New tools that do this better', 'Updates from the people I learned from'] },
+};
+const watchFor = k => WATCH[k.shape] || (k.copiedFrom && k.copiedFrom.live && !/^site:guide-/.test(k.copiedFrom.live) ? WATCH.sources : WATCH.picks);
 const FIND_QS = ['What do friends or colleagues usually come to you for?', "What's something you've spent ages learning or figuring out?", 'What do you love recommending or explaining?'];
 let pick = null, found = null;   // which choice is open; ideas the AI suggested
 
@@ -465,5 +477,6 @@ onUser(async u => {
     if (focus === 'title') { const t = box.querySelector('[data-p="title"]'); t.focus(); t.select(); }
     if (focus === 'add') box.querySelector(`[data-p="${k.sections.length ? 'sections.0.items' : 'sources'}.0.name"]`).focus();
     if (focus === 'remove') toast('Tap × on anything you don\'t want, then Save');
+    if (focus === 'watch') { const w = box.querySelector('[data-p="watch"]'); w.scrollIntoView({ block: 'center' }); w.focus(); }
   } catch (e) { box.innerHTML = `<section class="card"><p class="kc-body">We couldn't find that keycard. <a href="${ROOT}me/">Your keycards</a></p></section>`; }
 });
