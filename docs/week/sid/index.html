@@ -63,6 +63,7 @@ a{color:var(--accent)} a:hover{color:#FFC56B}
 .status-live .dot{background:#FF5A5A} .status-live{color:#FF8A8A}
 .footer{font-size:12px;line-height:1.6;color:var(--faint);padding:8px 4px 0;border-top:1px solid var(--line);margin-top:8px}
 </style>
+<link rel="stylesheet" href="../../app/app.css">
 <style>
 .hero{display:flex;flex-direction:column;gap:6px}
 .hero h1{margin:0;font-size:48px;line-height:.95}
@@ -199,7 +200,7 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
 </head>
 <body>
 <div class="wrap">
-<header class="topbar"><a class="brand" href="../../">COMMENTATOR</a><span class="chip">My week</span></header>
+<header class="topbar"><a class="brand" href="../../">COMMENTATOR</a><span data-account></span></header>
 <section class="kc-hero">
   <div class="eyebrow">16–22 Nov</div>
   <h1 class="display kc-title">Sid's week</h1>
@@ -229,8 +230,8 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
 </section>
 
 <footer class="footer">
-  Commentator is a pilot. Sources are named on every card. Unofficial; not affiliated with any league, promotion or company covered here.<br>
-  Built 2026-11-17 10:41 UTC.
+  Commentator is in beta. Sources are named on every keycard; AI updates only use a keycard's own sources. Unofficial; not affiliated with any league, promotion or company covered here.<br>
+  Built 2026-11-17 11:12 UTC.
 </footer>
 </div>
 <script>
@@ -256,5 +257,6 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
   }
   tick(); setInterval(tick, 30000);
 })();
-</script></body>
+</script><script type="module" src="../../app/app.js"></script>
+</body>
 </html>

@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Commentator · keycards for what you care about</title>
-<meta name="description" content="Follow trusted people's keycards and get short, sourced briefings on what matters.">
-<meta property="og:title" content="Commentator · keycards for what you care about">
+<title>Commentator · borrow the setups of people who know</title>
+<meta name="description" content="Find someone who already knows, and make their knowledge your own. Follow and copy keycards made by people whose taste you trust.">
+<meta property="og:title" content="Commentator · borrow the setups of people who know">
 <meta property="og:description" content="Find someone who already knows, and make their knowledge your own. Follow and copy keycards made by people whose taste you trust.">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Commentator">
@@ -63,6 +63,7 @@ a{color:var(--accent)} a:hover{color:#FFC56B}
 .status-live .dot{background:#FF5A5A} .status-live{color:#FF8A8A}
 .footer{font-size:12px;line-height:1.6;color:var(--faint);padding:8px 4px 0;border-top:1px solid var(--line);margin-top:8px}
 </style>
+<link rel="stylesheet" href="app/app.css">
 <style>
 .hero{display:flex;flex-direction:column;gap:6px}
 .hero h1{margin:0;font-size:48px;line-height:.95}
@@ -185,39 +186,45 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
 .kc-li b{font-weight:600;color:var(--ink)}.kc-li i{font-style:normal;font-size:12px;color:var(--faint);grid-column:1}
 .kc-li em{font-style:normal;grid-row:1/3;grid-column:2;align-self:center;font-weight:700;font-size:13px;text-align:right}
 </style><style>
-.intro h1{margin:0;font-size:40px;line-height:.95}
-.intro p{margin:8px 0 0;color:var(--muted);font-size:15px;line-height:1.45}
-.kc-tile{display:flex;flex-direction:column;gap:3px;padding:12px 0;border-top:1px solid var(--line);text-decoration:none}
-.kc-tile:first-of-type{border-top:0}
-.kc-tile b{font-family:'Barlow Condensed',sans-serif;font-size:24px;letter-spacing:.4px;text-transform:uppercase;line-height:1;color:var(--ink)}
-.kc-tile .s{font-size:13px;font-weight:600;color:var(--accent)}
-.kc-tile .h{font-size:14px;line-height:1.4;color:var(--ink2)}
-.kc-tile .m{font-size:12px;color:var(--faint)}
+.intro h1{margin:0;font-size:44px;line-height:.92}
+.intro p{margin:10px 0 0;color:var(--ink2);font-size:16px;line-height:1.45}
+.intro .chip{display:inline-block;margin-bottom:10px;border-color:var(--accent-line);color:var(--accent)}
+.cta{display:flex;gap:8px}
 </style>
 </head>
 <body>
 <div class="wrap">
-<header class="topbar"><span class="brand">COMMENTATOR</span><span class="chip">Pilot</span></header>
+<header class="topbar"><span class="brand">COMMENTATOR</span><span data-account></span></header>
 <section class="intro">
-  <h1 class="display">FEEL INFORMED,<br>NOT OVERLOADED.</h1>
-  <p>Follow keycards made by people whose taste you trust. Each one turns their sources into a short briefing, with every point linked.</p>
+  <span class="chip">Beta</span>
+  <h1 class="display">FIND SOMEONE WHO<br>ALREADY KNOWS.</h1>
+  <p>A <b>keycard</b> is someone's setup for a subject they know: the sources they trust, their best picks, and why. Follow one to stay up to date, or copy it and make it your own.</p>
 </section>
 
-<a class="card card-hl" href="week/sid/" style="text-decoration:none">
-  <div class="kc-h"><span class="label">Sid's week · 16–22 Nov</span><span class="kc-fine">6 keycards</span></div>
-  <div class="kc-body">UFC · Iran–USA · Premier League · FPL · GTA VI · AI &amp; Tech Stocks</div>
-</a>
-
 <section class="card">
-  <div class="kc-h"><span class="label">Keycards</span></div>
+  <div class="steps">
+    <div class="step"><div><b>Find a keycard</b><span>From someone whose taste you trust, like Manav's Dubai eats.</span></div></div>
+    <div class="step"><div><b>Follow it, or copy it</b><span>Follow for short, sourced updates. Copy it to keep what you like and add your own. They keep the credit.</span></div></div>
+    <div class="step"><div><b>Make your own</b><span>Share what you know in a couple of minutes, and see who copies it.</span></div></div>
+  </div>
+  <div class="cta"><a class="kc-btn kc-btn-main" href="make/">Make a keycard</a><a class="kc-btn" href="#people">Browse</a></div>
+</section>
+
+<section class="card" id="people">
+  <div class="kc-h"><span class="label">Keycards by people</span></div>
   <a class="kc-tile" href="guide-dubai-eats-manav/">
     <b>Dubai eats by Manav</b>
-<span class="s">94 picks · curated</span><span class="h">Dubai is using AI to read Google reviews and check kitchens for food safety, and several new restaurant openings are in the news.</span>    <span class="m">Food · by Manav Daryanani</span>
+<span class="h">94 places worth eating at in Dubai, from someone who&#39;s been finding them for 10+ years.</span>    <span class="m">Food · by Manav Daryanani · 94 picks · curated</span>
   </a>
   <a class="kc-tile" href="guide-thai-food/">
     <b>Thai food</b>
-<span class="s">13 picks · curated</span><span class="h">Pailin&#39;s newest video says UHT carton coconut milk tastes better than canned, and many fans are now looking for it.</span>    <span class="m">Food · by Sid</span>
+<span class="h">Cook it, understand it, and know where to eat it.</span>    <span class="m">Food · by Sid · 13 picks · curated</span>
   </a>
+  <div id="people-live"></div>
+</section>
+
+<section class="card">
+  <div class="kc-h"><span class="label">Live keycards</span><span class="kc-fine">updated every 30 minutes</span></div>
   <a class="kc-tile" href="topic-ai-tech-stocks/">
     <b>AI &amp; Tech Stocks</b>
 <span class="s">Next: Nvidia Q3 FY2027 earnings · in <span data-countdown="2026-11-18T01:20:00+04:00" data-done="now">…</span></span><span class="h">Nvidia faces its biggest earnings test yet after CEO Jensen Huang&#39;s resignation, while new US chip curbs hit AI and chip stocks a…</span>    <span class="m">Markets · Tech</span>
@@ -257,9 +264,14 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
     <b>UFC 335: Oliveira vs Lopes</b>
 <span class="s">Sat 12 Dec (US) · early Sun 13 Dec in Dubai</span><span class="m">In UFC</span>  </a>
 <details class="kc-more" style="margin-top:6px"><summary>Recent (1)</summary><a class="kc-row" href="ufc-334-gane-hokit/"><span class="kc-row-t">UFC 334: Gane vs Hokit</span><span class="kc-row-m">Sat 14 Nov</span></a></details></section>
+
+<a class="card" href="week/sid/" style="text-decoration:none">
+  <div class="kc-h"><span class="label">Sid's week · 16–22 Nov</span><span class="kc-fine">6 keycards</span></div>
+  <div class="kc-body">UFC · Iran–USA · Premier League · FPL · GTA VI · AI &amp; Tech Stocks</div>
+</a>
 <footer class="footer">
-  Commentator is a pilot. Sources are named on every card. Unofficial; not affiliated with any league, promotion or company covered here.<br>
-  Built 2026-11-17 10:41 UTC.
+  Commentator is in beta. Sources are named on every keycard; AI updates only use a keycard's own sources. Unofficial; not affiliated with any league, promotion or company covered here.<br>
+  Built 2026-11-17 11:12 UTC.
 </footer>
 </div>
 <script>
@@ -285,5 +297,15 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
   }
   tick(); setInterval(tick, 30000);
 })();
-</script></body>
+</script><script type="module">
+import { publicKeycards, esc } from './app/app.js';
+const box = document.getElementById('people-live');
+publicKeycards().then(list => {
+  list = list.filter(k => !k.copiedFrom || k.edited);
+  box.innerHTML = list.map(k => `<a class="kc-tile" href="k/?id=${encodeURIComponent(k.docId)}"><b>${esc(k.title)}</b>
+    ${k.tagline ? `<span class="h">${esc(k.tagline)}</span>` : ''}<span class="m">${esc([k.subject, 'by ' + (k.ownerName || 'someone')].filter(Boolean).join(' · '))}</span></a>`).join('');
+}).catch(e => console.warn(e));
+</script>
+<script type="module" src="app/app.js"></script>
+</body>
 </html>
