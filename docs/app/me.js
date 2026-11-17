@@ -67,6 +67,14 @@ async function betaResults() {
   made.forEach(k => { const h = (k.made || {}).how; if (h) howCount[h] = (howCount[h] || 0) + 1; });
   if (Object.keys(howCount).length) html += row('How they made them', Object.entries(howCount).map(([h, n]) => `${h} ${n}`).join(' · '));
 
+  // Coming back: did people return on another day, and a week later? (Opens are recorded once a day per keycard.)
+  const daysBy = {};
+  d.opens.forEach(o => { if (o.uid && o.at && o.at.toMillis) (daysBy[o.uid] = daysBy[o.uid] || new Set()).add(Math.floor(o.at.toMillis() / 864e5)); });
+  const visitors = Object.keys(daysBy).length;
+  const back = Object.values(daysBy).filter(x => x.size >= 2).length;
+  const week = Object.values(daysBy).filter(x => { const a = [...x]; return Math.max(...a) - Math.min(...a) >= 7; }).length;
+  html += row('Came back another day', `${back} of ${visitors} signed-in visitors`) + row('Came back a week later', `${week} of ${visitors}`);
+
   // Live vs personal: is it drifting into AI news?
   html += `<div class="kc-fine" style="padding:12px 0 4px">Live vs personal keycards</div>
     ${row('Opens', `${sum(d.opens, 'keycard', live)} live · ${sum(d.opens, 'keycard', x => !live(x))} personal`)}
