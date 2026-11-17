@@ -96,9 +96,18 @@ export async function loadKeycard(id) {
   return { ...snap.data(), id, docId: snap.id, url: keycardUrl(id) };
 }
 
+// In a copy, everything starts marked as from the original; what the owner adds later isn't.
 const clean = list => (list || []).map(s => ({
-  title: s.title || '', items: (s.items || []).map(i => ({ name: i.name || '', why: i.why || '', url: i.url || '' }))
+  title: s.title || '', items: (s.items || []).map(i => ({ name: i.name || '', why: i.why || '', url: i.url || '', copy: i.copy || '', from: true }))
 }));
+
+// A fingerprint of a keycard's contents, to tell a copier when the original has changed.
+export function kcHash(k) {
+  const pick = i => [i.name || '', i.why || '', i.url || '', i.copy || ''].join('|');
+  const txt = JSON.stringify([(k.sections || []).map(s => [s.title || '', (s.items || []).map(pick)]), (k.sources || []).map(pick)]);
+  let h = 5381; for (let i = 0; i < txt.length; i++) h = ((h << 5) + h + txt.charCodeAt(i)) | 0;
+  return (h >>> 0).toString(36);
+}
 
 export async function copyKeycard(id) {
   const f = await ready; if (!f || !me) return;
@@ -108,9 +117,10 @@ export async function copyKeycard(id) {
   const data = {
     owner: me.uid, ownerName: me.displayName || 'Someone', ownerPhoto: me.photoURL || '',
     title: (src.title || '').replace(/\s+by\s+[^]+$/i, '').trim() || src.title, tagline: '', subject: catOf(src.subject || ''),
-    sections: clean(src.sections), sources: (src.sources || []).map(s => ({ name: s.name || '', why: s.why || '', url: s.url || '' })),
+    sections: clean(src.sections), sources: (src.sources || []).map(s => ({ name: s.name || '', why: s.why || '', url: s.url || '', from: true })),
+    shape: src.shape || '', tested: src.tested || '',
     instruction: src.instruction || '', visibility: 'unlisted', edited: false,
-    copiedFrom: { id, title: src.title, by, live: src.copiedFrom && src.copiedFrom.live || (id.startsWith('site:') ? id : null) },
+    copiedFrom: { id, title: src.title, by, hash: kcHash(src), live: src.copiedFrom && src.copiedFrom.live || (id.startsWith('site:') ? id : null) },
     created: f.F.serverTimestamp(), updated: f.F.serverTimestamp(),
   };
   const ref = await f.F.addDoc(f.F.collection(f.db, 'keycards'), data);
@@ -256,12 +266,16 @@ export function mountActions(el, id, opts = {}) {
 const SHARE_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg>';
 
 // ---------- render a keycard someone made (same look as the site's curated keycards) ----------
-export function itemRow(it) {
+export function itemRow(it, mark) {
   const u = safeUrl(it.url);
   const meta = esc(it.why || (u ? new URL(u).hostname.replace(/^www\./, '') : ''));
-  return u
-    ? `<a class="kc-row" href="${esc(u)}" target="_blank" rel="noopener"><span class="kc-row-t">${esc(it.name || u)}</span>${meta ? `<span class="kc-row-m">${meta}</span>` : ''}</a>`
-    : `<div class="kc-row"><span class="kc-row-t">${esc(it.name)}</span>${meta ? `<span class="kc-row-m">${meta}</span>` : ''}</div>`;
+  const yours = mark && !it.from ? `<span class="kc-yours">${esc(mark)}</span>` : '';   // mark: e.g. "added by Arjun"
+  const t = `<span class="kc-row-t">${esc(it.name || u)}${yours}</span>${meta ? `<span class="kc-row-m">${meta}</span>` : ''}`;
+  if (it.copy) {
+    return `<div class="kc-row kc-row-copy">${u ? `<a href="${esc(u)}" target="_blank" rel="noopener" class="kc-row-a">${t}</a>` : t}
+      <div class="kc-copybox"><pre>${esc(it.copy)}</pre><button type="button" class="kc-copybtn" data-copytext>Copy</button></div></div>`;
+  }
+  return u ? `<a class="kc-row" href="${esc(u)}" target="_blank" rel="noopener">${t}</a>` : `<div class="kc-row">${t}</div>`;
 }
 export function fold(title, rows, open) {
   return `<details class="kc-fold"${open ? ' open' : ''}><summary><span>${esc(title)}</span><span class="kc-count">${rows.length}</span></summary><div class="kc-fold-body">${rows.join('')}</div></details>`;
@@ -277,4 +291,11 @@ export function briefingCard(b, title, note) {
 }
 
 mountMine();
+// Copy buttons on playbook items: copy the text right above them.
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-copytext]'); if (!b) return;
+  const text = b.parentElement.querySelector('pre').textContent;
+  try { await navigator.clipboard.writeText(text); } catch (err) { prompt('Copy this', text); return; }
+  b.textContent = 'Copied ✓'; setTimeout(() => { b.textContent = 'Copy'; }, 1600);
+});
 document.querySelectorAll('[data-keycard]').forEach(el => mountActions(el, el.dataset.keycard, { title: el.dataset.title }));
