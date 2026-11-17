@@ -151,3 +151,13 @@ body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 .kc-yours{margin-left:8px;font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--good);border:1px solid rgba(127,211,168,.4);border-radius:5px;padding:1px 5px;vertical-align:2px}
 .kc-tested{font-size:12px;color:var(--faint)}
 .ed-item textarea.copy{min-height:90px;font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink2)}
+/* This week: what's on, one swipe */
+.wk-strip{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px 2px}
+.wk-strip::-webkit-scrollbar{display:none}
+.wk{flex:none;width:152px;display:flex;flex-direction:column;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-decoration:none}
+.wk .when{font-size:12px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:6px}
+.wk.live{border-color:rgba(255,107,107,.5)}.wk.live .when{color:#FF6B6B}
+.wk.live i{width:7px;height:7px;border-radius:50%;background:#FF6B6B;animation:pulse 1.4s infinite}
+@keyframes pulse{50%{opacity:.3}}
+.wk b{font:700 17px/1.05 'Barlow Condensed',sans-serif;letter-spacing:.3px;text-transform:uppercase;color:var(--ink)}
+.wk .in{font-size:11px;color:var(--faint);margin-top:auto}

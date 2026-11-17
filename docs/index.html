@@ -196,6 +196,34 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
   <button type="button" aria-label="Got it" id="hello-x">×</button>
 </div>
 <section class="disc-h"><h1 class="display">DISCOVER</h1></section>
+<div class="sec-l">This week</div>
+<div class="wk-strip">
+  <a class="wk" href="nvidia-q3-fy2027-earnings/">
+    <span class="when"><time data-wk="2026-11-18T01:20:00+04:00">2026-11-18</time></span>
+    <b>Nvidia Q3 FY2027 earnings</b>
+    <span class="in">AI &amp; Tech Stocks</span>
+  </a>
+  <a class="wk" href="gta-6-launch/">
+    <span class="when"><time data-wk="2026-11-19T00:00:00+04:00">2026-11-19</time></span>
+    <b>GTA VI</b>
+    <span class="in">Gaming</span>
+  </a>
+  <a class="wk" href="topic-fpl/">
+    <span class="when"><time data-wk="2026-11-21T11:00:00+00:00">2026-11-21</time></span>
+    <b>Gameweek 11 deadline</b>
+    <span class="in">FPL</span>
+  </a>
+  <a class="wk" href="ufc-qatar-prochazka-stirling/">
+    <span class="when"><time data-wk="2026-11-21T22:00:00+04:00">2026-11-21</time></span>
+    <b>Procházka vs Stirling</b>
+    <span class="in">UFC</span>
+  </a>
+  <a class="wk" href="liverpool-man-utd-2026-11-22/">
+    <span class="when"><time data-wk="2026-11-22T20:30:00+04:00">2026-11-22</time></span>
+    <b>Liverpool vs Man United</b>
+    <span class="in">Premier League</span>
+  </a>
+</div>
 <div class="chips" id="chips" role="tablist" aria-label="Filter keycards"></div>
 <div class="grid" id="grid">
   <a class="tile" href="guide-dubai-eats-manav/" data-cat="Food">
@@ -231,7 +259,7 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
 </div>
 <footer class="footer">
   Commentator is in beta. Sources are named on every keycard; AI updates only use a keycard's own sources. Unofficial; not affiliated with any league, promotion or company covered here.<br>
-  Built 2026-11-17 12:51 UTC.
+  Built 2026-11-17 13:22 UTC.
 </footer>
 </div>
 <nav class="tabbar" aria-label="Main">
@@ -265,6 +293,20 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
 </script><script type="module">
 import { publicKeycards, tileHTML, catOf, user, onUser } from './app/app.js';
 const grid = document.getElementById('grid'), chips = document.getElementById('chips');
+// "This week": short local day and time, e.g. "Sat 10pm", "Tonight 1:20am", "Wed midnight".
+document.querySelectorAll('time[data-wk]').forEach(t => {
+  let d = new Date(t.dataset.wk); if (isNaN(d)) return;
+  const h = d.getHours(), m = d.getMinutes();
+  const midnight = h === 0 && m === 0;
+  if (midnight) d = new Date(d - 60000);                       // midnight belongs to the evening before
+  const time = midnight ? 'midnight' : `${h % 12 || 12}${m ? ':' + String(m).padStart(2, '0') : ''}${h < 12 ? 'am' : 'pm'}`;
+  const days = Math.round((new Date(d.toDateString()) - new Date(new Date().toDateString())) / 864e5);
+  const late = !midnight && h < 5;                              // 1:20am reads as tonight
+  const wd = d.toLocaleDateString('en-GB', { weekday: 'short' });
+  const day = midnight ? (days === 0 ? 'Tonight' : wd)
+    : days === 0 || (days === 1 && late) ? (late || h >= 17 ? 'Tonight' : 'Today') : days === 1 ? 'Tomorrow' : wd;
+  t.textContent = `${day} ${time}`;
+});
 const hello = document.getElementById('hello');
 try { if (localStorage.getItem('kc-hello')) hello.hidden = true; } catch (e) {}
 document.getElementById('hello-x').onclick = () => { hello.hidden = true; try { localStorage.setItem('kc-hello', '1'); } catch (e) {} };
