@@ -312,7 +312,11 @@ async function ivAsk() {
   try {
     const d = await askAI('ask', iv.topic, iv.turns);
     if (d.done) return ivDraft();
-    iv.q = d.question; ivSave(); renderIv();
+    // Never leave a blank question: if the AI sends nothing back, ask a sensible next one ourselves.
+    const fallback = ['Walk me through it, step by step.', 'Why do you do it this way?', 'What did you get wrong when you started?',
+                      'What would you tell someone just starting out?', 'Anything else someone should know?'];
+    iv.q = (d.question || '').trim() || fallback[Math.min(iv.turns.length, fallback.length - 1)];
+    ivSave(); renderIv();
   } catch (e) { renderIv(null, e.message); }
 }
 

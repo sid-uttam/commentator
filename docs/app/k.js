@@ -2,7 +2,7 @@
 // One layout for every shape: who made it and how fresh it is, then the most useful thing first.
 //   Picks: the list first, "what's new" after it.  Sources: "right now" first.  Playbook: numbered steps + copy boxes.
 import { loadKeycard, mountActions, onUser, esc, itemRow, fold, briefingCard, keycardUrl, makeUrl, share, kcHash,
-         markChecked, ago, toast, ROOT, live } from './app.js';
+         markChecked, ago, toast, ROOT, live, SHAPE_LABEL } from './app.js';
 
 const box = document.getElementById('kc');
 const params = new URLSearchParams(location.search);
@@ -43,7 +43,7 @@ async function show() {
 
   box.innerHTML = `
     <section class="kc-hero">
-      <div class="eyebrow">${esc(k.subject || 'Keycard')}</div>
+      <div class="eyebrow">${esc([SHAPE_LABEL[shape], k.subject].filter(Boolean).join(' · ') || 'Keycard')}</div>
       <h1 class="display kc-title">${esc(k.title)}</h1>
       <div class="kc-cur">By <b>${esc(by)}</b>${cf ? ` · based on <a href="${esc(keycardUrl(cf.id))}" style="color:inherit">${esc(cf.by)}'s</a>` : ''}</div>
       ${stale ? `<div class="kc-stale">Not checked for ${Math.round(days / 30)} months, so some of this may be out of date</div>` : fresh ? `<div class="kc-fresh">${fresh}</div>` : ''}
@@ -60,7 +60,9 @@ async function show() {
     const own = u && u.uid === k.owner;
     const acts = document.getElementById('acts');
     const visEl = document.getElementById('vis'); if (visEl) visEl.hidden = !own;   // only the owner needs to know who can see it
-    if (!own) { mountActions(acts, k.id, { title: k.title, url: ROOT + 'u/' + docId + '/' }); return; }
+    const noun = { picks: 'pick', sources: 'source', playbook: 'step' }[shape] || 'thing';
+    const copyNote = main.length ? `Copy to get all ${main.length} ${noun}${main.length === 1 ? '' : 's'} as your own, credited to ${first}. Change anything; ${first}'s stays as it is.` : '';
+    if (!own) { mountActions(acts, k.id, { title: k.title, url: ROOT + 'u/' + docId + '/', copyNote }); return; }
     acts.innerHTML = `<div class="kc-act-row"><a class="kc-btn kc-btn-main" href="${esc(makeUrl(docId))}">Edit</a>
       <button class="kc-btn" type="button" id="sh">Share</button></div>`;
     document.getElementById('sh').onclick = () => share(k.title, ROOT + 'u/' + docId + '/');
@@ -104,6 +106,8 @@ async function show() {
   });
 
   // Living: the keycard's own AI update from its links; otherwise a copy of a live keycard shows the original's.
+  // Picks (a restaurant list, favourite films) don't get news: general updates don't belong on someone's list.
+  if (shape === 'picks') return;
   let mineB = null;
   try { const r = await fetch(ROOT + 'u/' + docId + '/briefing.json', { cache: 'no-cache' }); if (r.ok) mineB = await r.json(); } catch (e) {}
   const title = "What's new";

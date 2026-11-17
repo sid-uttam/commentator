@@ -244,15 +244,17 @@ const CATS = { Football: 'Sport', FPL: 'Sport', UFC: 'Sport', Markets: 'Money & 
 export const SUBJECTS = ['Food', 'Travel', 'Sport', 'Fitness', 'Money & tech', 'Pop culture', 'Learning', 'Other'];
 export const catOf = s => CATS[s] || (SUBJECTS.includes(s) || s === 'News' ? s : 'Other');
 
-export function tileHTML({ url, cat, title, by, line, mine }) {
-  return `<a class="tile${mine ? ' mine' : ''}" href="${esc(url)}" data-cat="${esc(cat)}"><span class="c">${esc(cat)}</span>
-    <b>${esc(title)}</b>${line ? `<span class="s">${esc(line)}</span>` : ''}<span class="by">${esc(by)}</span></a>`;
+export const SHAPE_LABEL = { picks: 'Picks', sources: 'Sources', playbook: 'Playbook' };
+export function tileHTML({ url, cat, title, by, line, mine, shape, id }) {
+  const type = SHAPE_LABEL[shape] || '';
+  return `<a class="tile${mine ? ' mine' : ''}" href="${esc(url)}" data-cat="${esc(cat)}"><span class="c">${type ? esc(type) + ' · ' : ''}${esc(cat)}</span>
+    <b>${esc(title)}</b>${line ? `<span class="s">${esc(line)}</span>` : ''}<span class="by">${esc(by)}</span>${id ? `<span class="tile-n" data-n="${esc(id)}"></span>` : ''}</a>`;
 }
 
 // Follow / copy / share buttons, plus follower and copy counts.
 export function mountActions(el, id, opts = {}) {
   const title = opts.title || document.title;
-  el.innerHTML = `<div class="kc-act-row">
+  el.innerHTML = `<div class="kc-stats" hidden></div><div class="kc-act-row">
       <button class="kc-btn kc-btn-main" data-a="follow" type="button">Follow</button>
       <button class="kc-btn" data-a="copy" type="button">Copy</button>
       <button class="kc-btn kc-btn-icon" data-a="share" type="button" aria-label="Share">${SHARE_ICON}</button>
@@ -262,9 +264,12 @@ export function mountActions(el, id, opts = {}) {
   const paint = () => { fBtn.textContent = following ? 'Following ✓' : 'Follow'; fBtn.classList.toggle('on', following); };
   const showCounts = async () => {
     const out = el.querySelector('.kc-counts'); const c = await counts(id);
-    const help = 'Follow for its updates. Copy to make your own version.';
-    const n = c ? [c.followers ? plural(c.followers, 'follower') : '', c.copies ? plural(c.copies, 'copy', 'copies') : ''].filter(Boolean) : [];
-    out.textContent = n.length ? `${n.join(' · ')}. ${help}` : help;
+    out.textContent = opts.copyNote ? `Follow to get its updates. ${opts.copyNote}` : 'Follow to get its updates. Copy to make your own version: change anything, and the original stays as it is.';
+    // Copies are the proof a keycard is worth borrowing, so they lead, big and bold.
+    const st = el.querySelector('.kc-stats');
+    const bits = c ? [c.copies ? `<span><b>${c.copies}</b> ${c.copies === 1 ? 'person has' : 'people have'} copied this</span>` : '',
+                      c.followers ? `<span><b>${c.followers}</b> following</span>` : ''].filter(Boolean) : [];
+    st.innerHTML = bits.join('<i>·</i>'); st.hidden = !bits.length;
   };
   registerAction('follow:' + id, async () => { changed++; await follow(id); following = true; paint(); toast("Following. You'll get its updates."); showCounts(); });
   fBtn.onclick = async () => {
@@ -324,4 +329,4 @@ document.addEventListener('click', async e => {
   try { await navigator.clipboard.writeText(text); } catch (err) { prompt('Copy this', text); return; }
   b.textContent = 'Copied ✓'; setTimeout(() => { b.textContent = 'Copy'; }, 1600);
 });
-document.querySelectorAll('[data-keycard]').forEach(el => mountActions(el, el.dataset.keycard, { title: el.dataset.title }));
+document.querySelectorAll('[data-keycard]').forEach(el => mountActions(el, el.dataset.keycard, { title: el.dataset.title, copyNote: el.dataset.copynote }));

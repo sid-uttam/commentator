@@ -227,55 +227,50 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
 <div class="chips" id="chips" role="tablist" aria-label="Filter keycards"></div>
 <div class="grid" id="grid">
   <a class="tile" href="guide-dubai-eats-manav/" data-cat="Food">
-    <span class="c">Food</span>
+    <span class="c">Picks · Food</span>
     <b>Dubai eats by Manav</b>
 <span class="s">94 picks</span>    <span class="by">by Manav Daryanani</span>
-  </a>
-  <a class="tile" href="guide-thai-food/" data-cat="Food">
-    <span class="c">Food</span>
-    <b>Thai food</b>
-<span class="s">13 picks</span>    <span class="by">by Sid</span>
-  </a>
+<span class="tile-n" data-n="site:guide-dubai-eats-manav"></span>  </a>
   <a class="tile" href="topic-ai-tech-stocks/" data-cat="Money &amp; tech">
-    <span class="c">Money &amp; tech</span>
+    <span class="c">Live · Money &amp; tech</span>
     <b>AI &amp; Tech Stocks</b>
 <span class="s">Next: Nvidia Q3 FY2027 earnings</span>    <span class="by">by Sid · live</span>
-  </a>
+<span class="tile-n" data-n="site:topic-ai-tech-stocks"></span>  </a>
   <a class="tile" href="topic-champions-league/" data-cat="Sport">
-    <span class="c">Sport</span>
+    <span class="c">Live · Sport</span>
     <b>Champions League</b>
 <span class="s">Next: Arsenal vs Dortmund</span>    <span class="by">by Sid · live</span>
-  </a>
+<span class="tile-n" data-n="site:topic-champions-league"></span>  </a>
   <a class="tile" href="topic-fpl/" data-cat="Sport">
-    <span class="c">Sport</span>
+    <span class="c">Live · Sport</span>
     <b>FPL</b>
 <span class="s">Gameweek 11 deadline: <time data-t="2026-11-21T11:00:00Z">Sat 21 Nov</time></span>    <span class="by">by Sid · live</span>
-  </a>
+<span class="tile-n" data-n="site:topic-fpl"></span>  </a>
   <a class="tile" href="topic-gaming/" data-cat="Pop culture">
-    <span class="c">Pop culture</span>
+    <span class="c">Live · Pop culture</span>
     <b>Gaming</b>
 <span class="s">Next: GTA VI</span>    <span class="by">by Sid · live</span>
-  </a>
+<span class="tile-n" data-n="site:topic-gaming"></span>  </a>
   <a class="tile" href="topic-movies/" data-cat="Pop culture">
-    <span class="c">Pop culture</span>
+    <span class="c">Live · Pop culture</span>
     <b>Movies</b>
 <span class="s">Next: Avengers: Doomsday</span>    <span class="by">by Sid · live</span>
-  </a>
+<span class="tile-n" data-n="site:topic-movies"></span>  </a>
   <a class="tile" href="topic-music/" data-cat="Pop culture">
-    <span class="c">Pop culture</span>
+    <span class="c">Live · Pop culture</span>
     <b>Music</b>
 <span class="s">Awards season, the big drops and the end-of-year lists.</span>    <span class="by">by Sid · live</span>
-  </a>
+<span class="tile-n" data-n="site:topic-music"></span>  </a>
   <a class="tile" href="topic-premier-league/" data-cat="Sport">
-    <span class="c">Sport</span>
+    <span class="c">Live · Sport</span>
     <b>Premier League</b>
 <span class="s">Next: Liverpool vs Man United</span>    <span class="by">by Sid · live</span>
-  </a>
+<span class="tile-n" data-n="site:topic-premier-league"></span>  </a>
   <a class="tile" href="topic-ufc/" data-cat="Sport">
-    <span class="c">Sport</span>
+    <span class="c">Live · Sport</span>
     <b>UFC</b>
 <span class="s">Next: Procházka vs Stirling</span>    <span class="by">by Sid · live</span>
-  </a>
+<span class="tile-n" data-n="site:topic-ufc"></span>  </a>
 </div>
 <footer class="footer">
   Keycard is in beta. AI updates only use each keycard's listed sources. Not affiliated with anyone it covers.
@@ -327,7 +322,7 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
   tick(); setInterval(tick, 30000);
 })();
 </script><script type="module">
-import { publicKeycards, tileHTML, catOf, user, onUser } from './app/app.js';
+import { publicKeycards, tileHTML, catOf, user, onUser, counts } from './app/app.js';
 const grid = document.getElementById('grid'), chips = document.getElementById('chips');
 // "This week": short local day and time, e.g. "Sat 10pm", "Tonight 1:20am", "Wed midnight".
 document.querySelectorAll('time[data-wk]').forEach(t => {
@@ -358,14 +353,23 @@ function filter() {
 chips.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; current = b.dataset.c; paintChips(); filter(); });
 paintChips();
 
+// How many people copied each keycard, on its tile. Copies are the proof something is worth borrowing.
+function tileCounts() {
+  grid.querySelectorAll('[data-n]:empty').forEach(async el => {
+    const c = await counts(el.dataset.n);
+    if (c && c.copies) el.textContent = `${c.copies} ${c.copies === 1 ? 'copy' : 'copies'}`;
+  });
+}
+tileCounts();
+
 // Keycards friends made (public ones), first in the grid.
 publicKeycards().then(list => {
   list = list.filter(k => !k.copiedFrom || k.edited);
   if (!list.length) return;
   grid.insertAdjacentHTML('afterbegin', list.map(k => tileHTML({
-    url: `k/?id=${encodeURIComponent(k.docId)}`, cat: catOf(k.subject), title: k.title,
+    url: `k/?id=${encodeURIComponent(k.docId)}`, cat: catOf(k.subject), title: k.title, shape: k.shape, id: 'user:' + k.docId,
     by: 'by ' + (k.ownerName || 'someone'), line: k.tagline })).join(''));
-  paintChips(); filter();
+  paintChips(); filter(); tileCounts();
 }).catch(e => console.warn(e));
 </script>
 <script type="module" src="app/app.js"></script>
