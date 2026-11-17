@@ -1,5 +1,5 @@
 [hidden]{display:none!important}
-/* Commentator beta: buttons, forms and account bits. Uses the colour variables from the page. */
+/* Keycard beta: buttons, forms and account bits. Uses the colour variables from the page. */
 .kc-acct{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink2);font-size:13px;font-weight:600}
 .kc-acct img,.kc-acct span{width:30px;height:30px;border-radius:50%;object-fit:cover;background:var(--line2);display:flex;align-items:center;justify-content:center;color:var(--ink);font-weight:700}
 .kc-acct b{font-weight:600}

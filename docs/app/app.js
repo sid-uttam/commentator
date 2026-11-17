@@ -1,4 +1,4 @@
-// Commentator beta: sign-in, follow, copy and saving keycards (Firebase), shared by every page.
+// Keycard beta: sign-in, follow, copy and saving keycards (Firebase), shared by every page.
 // Firebase is loaded from Google's CDN only when the site has a config (app/config.js).
 import * as cfg from './config.js';
 const firebaseConfig = cfg.firebaseConfig;
@@ -115,7 +115,7 @@ export async function copyKeycard(id) {
   const f = await ready; if (!f || !me) return;
   toast('Making your copy…');
   const src = await loadKeycard(id);
-  const by = src.curator || src.ownerName || 'Commentator';
+  const by = src.curator || src.ownerName || 'Keycard';
   const data = {
     owner: me.uid, ownerName: me.displayName || 'Someone', ownerPhoto: me.photoURL || '',
     title: `${(me.displayName || 'My').split(' ')[0]}'s ${(src.title || '').replace(/\s+by\s+[^]+$/i, '').trim() || src.title}`, tagline: '', subject: catOf(src.subject || ''),

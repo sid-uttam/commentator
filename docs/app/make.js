@@ -148,6 +148,8 @@ box.addEventListener('input', e => {
 });
 box.addEventListener('change', e => { if (e.target.name === 'vis') k.visibility = e.target.value; });
 box.addEventListener('click', async e => {
+  if (e.target.closest('[data-showpaste]')) { e.preventDefault(); const pb = document.getElementById('paste-box'); pb.hidden = false; pb.querySelector('textarea').focus(); return; }
+  if (e.target.closest('[data-blank]')) { e.preventDefault(); start('picks'); return; }
   if (e.target.closest('[data-ivquit]')) { e.preventDefault(); iv = null; try { sessionStorage.removeItem(IV); } catch (x) {} starters(); return; }
   const t = e.target.closest('button'); if (!t) return;
   const d = t.dataset;
@@ -300,27 +302,26 @@ async function ivDraft() {
   } catch (e) { renderIv(null, e.message); }
 }
 
+// One obvious way in: the interview (or a paste, until the interview is switched on). No shapes to choose:
+// the interview or the paste works out the shape; "start blank" is there for people who know what they want.
 function starters() {
+  const paste = `<section class="ed-sec ed-start" id="paste-box"${aiUrl ? ' hidden' : ''}>
+      <span class="label">Paste what you already have</span>
+      <textarea id="paste0" placeholder="A list, a note, your Maps list copied out… One thing per line. Headings become sections.&#10;&#10;Japanese:&#10;Kinoya – best ramen in town&#10;Kokoro – hand rolls"></textarea>
+      <button class="kc-btn kc-btn-main" type="button" data-frompaste>Turn it into a keycard</button>
+    </section>`;
   box.innerHTML = `<section class="kc-hero"><div class="eyebrow">New keycard</div>
       <h1 class="display kc-title">WHAT DO PEOPLE ASK YOU ABOUT?</h1>
-      <p class="kc-body">Where to eat, who to follow, how you do something. Share what you've already figured out. Even if nobody copies it, you'll have it all in one place.</p></section>
+      <p class="kc-body">Share what you've already figured out. Even if nobody copies it, it's all in one place.</p></section>
     ${aiUrl ? `<section class="ed-sec ed-start">
       <span class="label">Interview me</span>
-      <p class="kc-body" style="font-size:14px">Not sure how to write it down? Answer a few questions and it becomes a keycard, in your words.</p>
+      <p class="kc-body" style="font-size:14px">Answer a few questions and it becomes a keycard, in your words.</p>
       <input id="iv-topic" placeholder="e.g. My stretching routine" maxlength="80">
       <div class="ed-chips">${['My routine for…', 'How I use…', 'My favourite places in…', 'How I plan…'].map(x => `<button type="button" class="ed-chip" data-ivchip="${x}">${x}</button>`).join('')}</div>
       <button class="kc-btn kc-btn-main" type="button" data-ivstart>Start the interview</button>
-    </section>
-    <div class="sec-l">Or paste what you already have</div>` : ''}
-    <section class="ed-sec ed-start">
-      ${aiUrl ? '' : '<span class="label">Paste what you already have</span>'}
-      <textarea id="paste0" placeholder="A list, a note, your Maps list copied out… One thing per line. Headings become sections.&#10;&#10;Japanese:&#10;Kinoya – best ramen in town&#10;Kokoro – hand rolls"></textarea>
-      <button class="kc-btn kc-btn-main" type="button" data-frompaste>Turn it into a keycard</button>
-    </section>
-    <div class="sec-l">Or start from a shape</div>
-    <div class="starters">${Object.entries(STARTERS).map(([key, s]) =>
-      `<button class="starter" type="button" data-starter="${key}"><b>${s.name}</b><span>${s.blurb}</span><i>${s.eg}</i></button>`).join('')}</div>
-    <p class="kc-fine" style="text-align:center">Or find one on <a href="${ROOT}">Discover</a>, tap Copy and make it yours.</p>`;
+    </section>` : ''}
+    ${paste}
+    <p class="kc-fine" style="text-align:center">${aiUrl ? '<a href="#" data-showpaste>Already have a list? Paste it</a> · ' : ''}<a href="#" data-blank>Start blank</a> · <a href="${ROOT}">Copy one from Discover</a></p>`;
 }
 
 function signInFirst() {

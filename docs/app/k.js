@@ -18,7 +18,7 @@ async function show() {
   if (!live()) return notFound('Keycards made by people open very soon.');
   let k;
   try { k = await loadKeycard('user:' + docId); } catch (e) { return notFound("We couldn't find that keycard."); }
-  document.title = `${k.title} · Commentator`;
+  document.title = `${k.title} · Keycard`;
   const by = k.ownerName || 'Someone', first = by.split(' ')[0];
   const cf = k.copiedFrom;
   const sections = (k.sections || []).map(s => ({ ...s, items: (s.items || []).filter(i => i.name || i.url || i.copy) })).filter(s => s.items.length);
@@ -42,7 +42,6 @@ async function show() {
     </section>` : `<section class="card"><p class="kc-body">Nothing on here yet.</p></section>`;
 
   box.innerHTML = `
-    <div id="banner"></div>
     <section class="kc-hero">
       <div class="eyebrow">${esc(k.subject || 'Keycard')}</div>
       <h1 class="display kc-title">${esc(k.title)}</h1>
@@ -82,8 +81,9 @@ async function show() {
       return;
     }
 
-    // Keeping it fresh: after a month, one tap to confirm it's still right.
-    if (touched && days > 30) {
+    // One message at a time: the original changed (if they copied it) comes before "still accurate?".
+    const stillAccurate = () => {
+      if (!(touched && days > 30)) return;
       mine.innerHTML = `<div class="kc-check"><span>Still accurate?</span><div class="kc-act-row">
         <button class="kc-btn kc-btn-main" type="button" id="ok">Yes, still good</button>
         <a class="kc-btn" href="${esc(makeUrl(docId))}">Edit</a></div></div>`;
@@ -91,19 +91,15 @@ async function show() {
         await markChecked(docId); mine.innerHTML = ''; toast('Thanks. Marked as checked today.');
         const f = box.querySelector('.kc-fresh, .kc-stale'); if (f) { f.className = 'kc-fresh'; f.textContent = `Checked by ${first} just now`; }
       };
-    }
-
-    // The original changed since they copied it: tell them, once, in plain words.
-    if (cf && cf.hash) {
-      loadKeycard(cf.id).then(orig => {
-        const seenKey = 'kc-seen-' + docId + '-' + kcHash(orig);
-        let seen = false; try { seen = !!localStorage.getItem(seenKey); } catch (e) {}
-        if (kcHash(orig) !== cf.hash && !seen) {
-          document.getElementById('banner').innerHTML = `<div class="kc-banner"><b>${esc(cf.by)} has updated the original</b> since you copied it. <a href="${esc(keycardUrl(cf.id))}" style="color:var(--accent)">See what's new</a>, then add anything you like to yours.</div>`;
-          document.querySelector('#banner a').onclick = () => { try { localStorage.setItem(seenKey, '1'); } catch (e) {} };
-        }
-      }).catch(() => {});
-    }
+    };
+    if (!(cf && cf.hash)) return stillAccurate();
+    loadKeycard(cf.id).then(orig => {
+      const seenKey = 'kc-seen-' + docId + '-' + kcHash(orig);
+      let seen = false; try { seen = !!localStorage.getItem(seenKey); } catch (e) {}
+      if (kcHash(orig) === cf.hash || seen) return stillAccurate();
+      mine.innerHTML = `<div class="kc-banner"><b>${esc(cf.by)} has updated the original</b> since you copied it. <a href="${esc(keycardUrl(cf.id))}" style="color:var(--accent)">See what's new</a>, then add anything you like to yours.</div>`;
+      mine.querySelector('a').onclick = () => { try { localStorage.setItem(seenKey, '1'); } catch (e) {} };
+    }).catch(stillAccurate);
   });
 
   // Living: the keycard's own AI update from its links; otherwise a copy of a live keycard shows the original's.
