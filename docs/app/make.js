@@ -1,5 +1,5 @@
 // Make or edit a keycard: /make/ (new) or /make/?id=<doc id> (edit). Never a blank page: start from a shape or a copy.
-import { onUser, signIn, loadKeycard, saveKeycard, deleteKeycard, keycardUrl, esc, toast, ROOT, live, SUBJECTS, catOf } from './app.js';
+import { onUser, signIn, loadKeycard, saveKeycard, deleteKeycard, keycardUrl, esc, toast, ROOT, live, SUBJECTS, catOf, aiUrl, askAI } from './app.js';
 
 const box = document.getElementById('ed');
 const params = new URLSearchParams(location.search);
@@ -148,9 +148,23 @@ box.addEventListener('input', e => {
 });
 box.addEventListener('change', e => { if (e.target.name === 'vis') k.visibility = e.target.value; });
 box.addEventListener('click', async e => {
+  if (e.target.closest('[data-ivquit]')) { e.preventDefault(); iv = null; try { sessionStorage.removeItem(IV); } catch (x) {} starters(); return; }
   const t = e.target.closest('button'); if (!t) return;
   const d = t.dataset;
   if (d.starter) { start(d.starter); return; }
+  if (d.ivchip) { const t = document.getElementById('iv-topic'); t.value = d.ivchip.replace('…', ' '); t.focus(); return; }
+  if (d.ivstart !== undefined) {
+    const topic = document.getElementById('iv-topic').value.trim();
+    if (!topic) { toast('What should the interview be about?'); return; }
+    iv = { topic, turns: [], q: '' }; ivAsk(); return;
+  }
+  if (d.ivnext !== undefined) {
+    const a = document.getElementById('iv-a').value.trim();
+    if (!a) { toast('Type an answer, even a short one'); return; }
+    iv.turns.push({ q: iv.q, a }); iv.q = ''; ivSave(); ivAsk(); return;
+  }
+  if (d.ivdone !== undefined) { const a = document.getElementById('iv-a'); if (a && a.value.trim()) iv.turns.push({ q: iv.q, a: a.value.trim() }); ivDraft(); return; }
+  if (d.ivretry !== undefined) { iv.q ? renderIv() : ivAsk(); return; }
   if (d.frompaste !== undefined) { startFromPaste(document.getElementById('paste0').value); return; }
   if (d.copyopen) { copyOpen.add(d.copyopen); const it = getPath(d.copyopen); if (it.copy === undefined) it.copy = ''; render(); box.querySelector(`[data-p="${d.copyopen}.copy"]`).focus(); return; }
   if (d.link) { linkOpen.add(d.link); render(); box.querySelector(`[data-p="${d.link}.url"]`).focus(); return; }
@@ -234,12 +248,72 @@ function startFromPaste(text) {
   box.querySelector('[data-p="title"]').focus();
 }
 
+// ---------- "Interview me": a short conversation that becomes a keycard, in your words ----------
+const IV = 'kc-interview';
+let iv = null;   // { topic, turns: [{q, a}], q }
+const ivSave = () => { try { sessionStorage.setItem(IV, JSON.stringify(iv)); } catch (e) {} };
+
+function renderIv(state, err) {
+  const n = iv.turns.length;
+  box.innerHTML = `<section class="iv">
+      <div class="eyebrow">Interview · ${esc(iv.topic)}</div>
+      ${n ? `<details class="iv-past"${n <= 2 ? ' open' : ''}><summary>Your answers so far (${n})</summary>
+        ${iv.turns.map(t => `<div class="iv-turn"><span>${esc(t.q)}</span><p>${esc(t.a)}</p></div>`).join('')}</details>` : ''}
+      ${state === 'drafting' ? `<p class="iv-q">Writing your keycard, in your words…</p><div class="iv-dots"><i></i><i></i><i></i></div>`
+        : state === 'thinking' ? `<div class="iv-dots"><i></i><i></i><i></i></div>`
+        : `<p class="iv-q">${esc(iv.q)}</p>
+           <textarea id="iv-a" placeholder="Type your answer. As long or short as you like."></textarea>
+           <div class="ed-row">
+             <button class="kc-btn kc-btn-main" type="button" data-ivnext>Next</button>
+             ${n >= 3 ? '<button class="kc-btn" type="button" data-ivdone>Make my keycard</button>' : ''}
+           </div>`}
+      ${err ? `<div class="kc-banner">${esc(err)} <button class="kc-btn kc-btn-quiet" type="button" data-ivretry>Try again</button></div>` : ''}
+      <p class="kc-fine">${state ? '' : `Question ${n + 1} of about 6. `}You'll see and edit everything before it's saved.
+        <a href="#" data-ivquit style="color:var(--faint)">Stop</a></p>
+    </section>`;
+  const a = document.getElementById('iv-a'); if (a) a.focus();
+}
+
+async function ivAsk() {
+  renderIv('thinking');
+  try {
+    const d = await askAI('ask', iv.topic, iv.turns);
+    if (d.done) return ivDraft();
+    iv.q = d.question; ivSave(); renderIv();
+  } catch (e) { renderIv(null, e.message); }
+}
+
+async function ivDraft() {
+  renderIv('drafting');
+  try {
+    const kd = (await askAI('draft', iv.topic, iv.turns)).keycard || {};
+    const shape = ['picks', 'sources', 'playbook'].includes(kd.shape) ? kd.shape : 'playbook';
+    const item = i => ({ name: i.name || '', why: i.why || '', url: i.url || '', ...(i.copy ? { copy: i.copy } : {}) });
+    k = { title: kd.title || iv.topic, tagline: kd.tagline || '', subject: SUBJECTS.includes(kd.subject) ? kd.subject : '',
+          visibility: 'public', copiedFrom: null, kind: shape, shape, tested: '',
+          sections: (kd.sections || []).map(x => ({ title: x.title || '', items: (x.items || []).map(item) })).filter(x => x.items.length),
+          sources: (kd.sources || []).map(item), instruction: kd.instruction || STARTERS[shape].k.instruction };
+    if (!k.sections.length && !k.sources.length) k.sections = [{ title: 'My picks', items: [blankItem()] }];
+    try { sessionStorage.removeItem(IV); } catch (e) {}
+    iv = null; dirty = true; render();
+    toast("Here's your draft. Fix anything that's off, then Save.");
+  } catch (e) { renderIv(null, e.message); }
+}
+
 function starters() {
   box.innerHTML = `<section class="kc-hero"><div class="eyebrow">New keycard</div>
       <h1 class="display kc-title">WHAT DO PEOPLE ASK YOU ABOUT?</h1>
       <p class="kc-body">Where to eat, who to follow, how you do something. Share what you've already figured out. Even if nobody copies it, you'll have it all in one place.</p></section>
+    ${aiUrl ? `<section class="ed-sec ed-start">
+      <span class="label">Interview me</span>
+      <p class="kc-body" style="font-size:14px">Not sure how to write it down? Answer a few questions and it becomes a keycard, in your words.</p>
+      <input id="iv-topic" placeholder="e.g. My stretching routine" maxlength="80">
+      <div class="ed-chips">${['My routine for…', 'How I use…', 'My favourite places in…', 'How I plan…'].map(x => `<button type="button" class="ed-chip" data-ivchip="${x}">${x}</button>`).join('')}</div>
+      <button class="kc-btn kc-btn-main" type="button" data-ivstart>Start the interview</button>
+    </section>
+    <div class="sec-l">Or paste what you already have</div>` : ''}
     <section class="ed-sec ed-start">
-      <span class="label">Paste what you already have</span>
+      ${aiUrl ? '' : '<span class="label">Paste what you already have</span>'}
       <textarea id="paste0" placeholder="A list, a note, your Maps list copied out… One thing per line. Headings become sections.&#10;&#10;Japanese:&#10;Kinoya – best ramen in town&#10;Kokoro – hand rolls"></textarea>
       <button class="kc-btn kc-btn-main" type="button" data-frompaste>Turn it into a keycard</button>
     </section>
@@ -269,7 +343,11 @@ onUser(async u => {
     k = { tagline: '', visibility: 'public', copiedFrom: null, kind: tpl.shape, sources: [], instruction: STARTERS[tpl.shape].k.instruction, ...JSON.parse(JSON.stringify(tpl)) };
     return render();
   }
-  if (!docId) return starters();
+  if (!docId) {
+    try { iv = JSON.parse(sessionStorage.getItem(IV) || 'null'); } catch (e) { iv = null; }
+    if (iv && iv.q && aiUrl) return renderIv();
+    return starters();
+  }
   try {
     const got = await loadKeycard('user:' + docId);
     if (got.owner !== u.uid) { location.href = keycardUrl('user:' + docId); return; }

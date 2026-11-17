@@ -1,6 +1,8 @@
 // Commentator beta: sign-in, follow, copy and saving keycards (Firebase), shared by every page.
 // Firebase is loaded from Google's CDN only when the site has a config (app/config.js).
-import { firebaseConfig } from './config.js';
+import * as cfg from './config.js';
+const firebaseConfig = cfg.firebaseConfig;
+export const aiUrl = cfg.aiUrl || '';
 
 const FB = 'https://www.gstatic.com/firebasejs/11.0.2/';
 export const ROOT = new URL('../', import.meta.url).href;   // the site root, wherever we're hosted
@@ -189,6 +191,16 @@ export async function counts(id) {
     f.F.query(f.F.collection(f.db, col), f.F.where(field, '==', id)))).data().count;
   try { const [followers, copies] = await Promise.all([n('follows', 'keycard'), n('copies', 'from')]); return { followers, copies }; }
   catch (e) { console.warn(e); return null; }
+}
+
+// ---------- the interviewer (Cloudflare worker; checks your sign-in) ----------
+export async function askAI(action, topic, turns) {
+  if (!aiUrl || !me) throw new Error('unavailable');
+  const r = await fetch(aiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + await me.getIdToken() },
+                                 body: JSON.stringify({ action, topic, turns }) });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.error || 'The interviewer hit a snag. Try again in a moment.');
+  return d;
 }
 
 // ---------- little UI helpers ----------
