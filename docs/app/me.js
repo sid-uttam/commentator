@@ -1,5 +1,5 @@
 // Mine: the keycards you made or copied, and the ones you follow.
-import { onUser, signIn, signOut, myKeycards, myFollows, loadKeycard, keycardUrl, tileHTML, catOf, esc, ROOT, live } from './app.js';
+import { onUser, signIn, signOut, myKeycards, myFollows, loadKeycard, keycardUrl, tileHTML, catOf, esc, ROOT, live, getWeekly, setWeekly, toast } from './app.js';
 
 const box = document.getElementById('me');
 const VIS = { public: 'Everyone', unlisted: 'Link only', private: 'Just me' };
@@ -16,7 +16,12 @@ onUser(async u => {
   box.innerHTML = `<section class="disc-h"><h1 class="display">MINE</h1></section>
     <div class="sec-l">Made by you</div><div class="grid" id="mine"><div class="grid-empty">Loading…</div></div>
     <div class="sec-l">Following</div><div class="grid" id="fol"><div class="grid-empty">Loading…</div></div>
+    <label class="kc-toggle"><span><b>Weekly email</b><small>One short note on Sundays: what's coming up and what changed.</small></span>
+      <input type="checkbox" id="wk" checked></label>
     <p class="kc-fine" style="text-align:center">Signed in as ${esc(u.displayName || u.email || '')} · <a href="#" id="so" style="color:var(--muted)">Sign out</a></p>`;
+  const wk = document.getElementById('wk');
+  getWeekly().then(v => { wk.checked = v !== false; });
+  wk.onchange = async () => { await setWeekly(wk.checked); toast(wk.checked ? 'Weekly email on' : 'Weekly email off'); };
   document.getElementById('so').onclick = async e => { e.preventDefault(); await signOut(); location.href = ROOT; };
 
   const mine = await myKeycards().catch(e => { console.error(e); return []; });

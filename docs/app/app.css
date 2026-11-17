@@ -136,3 +136,8 @@ body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 .hello p b.k{font:inherit;font-weight:700;color:var(--accent);text-transform:none;letter-spacing:0}
 .hello .eg{font-size:13px;color:var(--accent-ink);opacity:.9;margin-top:4px;line-height:1.5}
 .hello .eg a{color:var(--accent-ink);font-weight:600;text-underline-offset:2px}
+.kc-toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;cursor:pointer}
+.kc-toggle span{display:flex;flex-direction:column;gap:2px}.kc-toggle b{font-size:15px;color:var(--ink)}.kc-toggle small{font-size:12px;color:var(--faint);line-height:1.4}
+.kc-toggle input{appearance:none;-webkit-appearance:none;flex:none;width:46px;height:28px;border-radius:999px;background:var(--line2);position:relative;cursor:pointer;transition:background .15s}
+.kc-toggle input::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .15s}
+.kc-toggle input:checked{background:var(--accent)}.kc-toggle input:checked::after{transform:translateX(18px)}

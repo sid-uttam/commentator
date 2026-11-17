@@ -141,6 +141,14 @@ export async function publicKeycards(n = 40) {
 const ms = t => (t && t.toMillis ? t.toMillis() : 0);
 const byUpdated = (a, b) => ms(b.updated) - ms(a.updated);
 
+// ---------- weekly email preference (users/{uid}.weekly) ----------
+export async function getWeekly() {
+  const f = await ready; if (!f || !me) return true;
+  const d = await f.F.getDoc(f.F.doc(f.db, 'users', me.uid)).catch(() => null);
+  return d && d.exists() ? d.data().weekly : true;
+}
+export async function setWeekly(on) { const f = await ready; await f.F.setDoc(f.F.doc(f.db, 'users', me.uid), { weekly: !!on }, { merge: true }); }
+
 // ---------- follow & counts ----------
 const followId = id => me.uid + '_' + id;
 export async function isFollowing(id) {
