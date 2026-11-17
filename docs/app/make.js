@@ -1,5 +1,5 @@
 // Make or edit a keycard: /make/ (new) or /make/?id=<doc id> (edit). Never a blank page: start from a shape or a copy.
-import { onUser, signIn, loadKeycard, saveKeycard, deleteKeycard, keycardUrl, esc, toast, ROOT, live, SUBJECTS, catOf, aiUrl, askAI } from './app.js';
+import { onUser, signIn, noteStart, loadKeycard, saveKeycard, deleteKeycard, keycardUrl, esc, toast, ROOT, live, SUBJECTS, catOf, aiUrl, askAI } from './app.js';
 
 const box = document.getElementById('ed');
 const params = new URLSearchParams(location.search);
@@ -152,27 +152,40 @@ box.addEventListener('change', e => { if (e.target.name === 'vis') k.visibility 
 const MAKE_PENDING = 'kc-make-pending';
 box.addEventListener('click', e => {
   if (owner) return;
-  const b = e.target.closest('[data-ivstart],[data-frompaste],[data-blank]'); if (!b) return;
+  const b = e.target.closest('[data-ivstart],[data-frompaste],[data-blank],[data-idea],[data-findideas]'); if (!b) return;
+  if (b.matches('[data-idea]') && b.dataset.idea.includes('…')) return;   // just fills the box; no need to sign in yet
   e.preventDefault(); e.stopImmediatePropagation();
-  const act = b.matches('[data-ivstart]') ? 'ivstart' : b.matches('[data-frompaste]') ? 'frompaste' : 'blank';
-  const topic = ((document.getElementById('iv-topic') || {}).value || '').trim();
-  if (act === 'ivstart' && !topic) { toast('What should the interview be about?'); return; }
-  try { sessionStorage.setItem(MAKE_PENDING, JSON.stringify({ act, topic, paste: (document.getElementById('paste0') || {}).value || '' })); } catch (x) {}
+  const act = b.matches('[data-ivstart],[data-idea]') ? 'ivstart' : b.matches('[data-findideas]') ? 'find' : b.matches('[data-frompaste]') ? 'frompaste' : 'blank';
+  const topic = b.matches('[data-idea]') ? b.dataset.idea : ((document.getElementById('iv-topic') || {}).value || '').trim();
+  if (act === 'ivstart' && !topic) { toast('What would you like to share?'); return; }
+  const answers = [0, 1, 2].map(i => (document.getElementById('fq' + i) || {}).value || '');
+  if (act === 'find' && !answers.some(a => a.trim())) { toast('Answer at least one, even briefly'); return; }
+  try { sessionStorage.setItem(MAKE_PENDING, JSON.stringify({ act, topic, answers, paste: (document.getElementById('paste0') || {}).value || '' })); } catch (x) {}
   signIn();
 }, true);
 
 box.addEventListener('click', async e => {
   if (e.target.closest('[data-showpaste]')) { e.preventDefault(); const pb = document.getElementById('paste-box'); pb.hidden = false; pb.querySelector('textarea').focus(); return; }
   if (e.target.closest('[data-blank]')) { e.preventDefault(); start('picks'); return; }
-  if (e.target.closest('[data-ivquit]')) { e.preventDefault(); iv = null; try { sessionStorage.removeItem(IV); } catch (x) {} starters(); return; }
+  if (e.target.closest('[data-ivquit]')) { e.preventDefault(); iv = null; pick = null; try { sessionStorage.removeItem(IV); } catch (x) {} starters(); return; }
+  if (e.target.closest('[data-back]')) { e.preventDefault(); pick = null; starters(); scrollTo(0, 0); return; }
   const t = e.target.closest('button'); if (!t) return;
   const d = t.dataset;
   if (d.starter) { start(d.starter); return; }
   if (d.ivchip) { const t = document.getElementById('iv-topic'); t.value = d.ivchip.replace('…', ' '); t.focus(); return; }
+  if (d.choice) { pick = d.choice; starters(); scrollTo(0, 0); return; }
+  if (d.idea) {
+    if (d.idea.includes('…')) {                       // "My 5 favourite restaurants in …": they finish the sentence
+      const t = document.getElementById('iv-topic'); t.value = d.idea.replace('…', '').trim() + ' ';
+      t.focus(); t.setSelectionRange(t.value.length, t.value.length); toast('Finish the sentence, then Start'); return;
+    }
+    startInterview(d.idea); return;
+  }
+  if (d.findideas !== undefined) { findIdeas([0, 1, 2].map(i => document.getElementById('fq' + i).value)); return; }
   if (d.ivstart !== undefined) {
     const topic = document.getElementById('iv-topic').value.trim();
-    if (!topic) { toast('What should the interview be about?'); return; }
-    iv = { topic, turns: [], q: '' }; ivAsk(); return;
+    if (!topic) { toast('What would you like to share?'); return; }
+    startInterview(topic); return;
   }
   if (d.ivnext !== undefined) {
     const a = document.getElementById('iv-a').value.trim();
@@ -208,6 +221,7 @@ box.addEventListener('click', async e => {
 });
 function focusLast(path) { const els = box.querySelectorAll(`[data-p^="${path}."][data-p$=".name"]`); if (els.length) els[els.length - 1].focus(); }
 
+let made = null;   // how this keycard was started, and when: { how, t0 }
 async function save(btn) {
   if (!k.title.trim()) { toast('Give it a name first'); box.querySelector('[data-p="title"]').focus(); return; }
   const keep = it => (it.name || '').trim() || (it.url || '').trim() || (it.copy || '').trim();
@@ -219,6 +233,7 @@ async function save(btn) {
     shape: k.shape || '', tested: (k.tested || '').trim(),
     visibility: k.visibility, copiedFrom: k.copiedFrom || null, edited: !!(k.edited || (k.copiedFrom && dirty) || !k.copiedFrom),
   };
+  if (!docId && made) data.made = { how: made.how, secs: Math.round((Date.now() - made.t0) / 1000) };
   btn.disabled = true; btn.textContent = 'Saving…';
   try {
     const id = await saveKeycard(docId, data);
@@ -228,6 +243,7 @@ async function save(btn) {
 }
 
 function start(kind) {
+  if (!made) { made = { how: 'blank', t0: Date.now() }; noteStart('blank'); }
   const s = STARTERS[kind];
   k = { title: '', tagline: '', subject: '', visibility: 'public', copiedFrom: null, kind, shape: kind, tested: '', ...JSON.parse(JSON.stringify(s.k)) };
   if (kind === 'playbook') k.sections.filter(sec => sec.title === 'Copy these').forEach(sec => sec.items.forEach(it => { it.copy = ''; }));
@@ -254,6 +270,7 @@ function fromPaste(text) {
 function startFromPaste(text) {
   const sections = fromPaste(text);
   if (!sections.length) return toast('Paste a few lines first');
+  made = { how: 'paste', t0: Date.now() }; noteStart('paste');
   const links = sections.flatMap(s => s.items).filter(i => /youtu|\/feed|rss/.test(i.url || '')).length;
   const kind = links > sections.flatMap(s => s.items).length / 2 ? 'sources' : 'picks';
   k = { title: '', tagline: '', subject: '', visibility: 'public', copiedFrom: null, kind, shape: kind, tested: '',
@@ -284,7 +301,7 @@ function renderIv(state, err) {
              ${n >= 3 ? '<button class="kc-btn" type="button" data-ivdone>Make my keycard</button>' : ''}
            </div>`}
       ${err ? `<div class="kc-banner">${esc(err)} <button class="kc-btn kc-btn-quiet" type="button" data-ivretry>Try again</button></div>` : ''}
-      <p class="kc-fine">${state ? '' : `Question ${n + 1} of about 6. `}You'll see and edit everything before it's saved.
+      <p class="kc-fine">${state ? '' : `Question ${n + 1} of about 5. `}You'll see and edit everything before it's saved.
         <a href="#" data-ivquit style="color:var(--faint)">Stop</a></p>
     </section>`;
   const a = document.getElementById('iv-a'); if (a) a.focus();
@@ -303,6 +320,7 @@ async function ivDraft() {
   renderIv('drafting');
   try {
     const kd = (await askAI('draft', iv.topic, iv.turns)).keycard || {};
+    made = { how: 'interview', t0: iv.t0 || Date.now() };
     const shape = ['picks', 'sources', 'playbook'].includes(kd.shape) ? kd.shape : 'playbook';
     const item = i => ({ name: i.name || '', why: i.why || '', url: i.url || '', ...(i.copy ? { copy: i.copy } : {}) });
     k = { title: kd.title || iv.topic, tagline: kd.tagline || '', subject: SUBJECTS.includes(kd.subject) ? kd.subject : '',
@@ -318,25 +336,85 @@ async function ivDraft() {
 
 // One obvious way in: the interview (or a paste, until the interview is switched on). No shapes to choose:
 // the interview or the paste works out the shape; "start blank" is there for people who know what they want.
+// First-time making: don't ask "what keycard?". Help people notice what they already know.
+// Four kinds of thing to share, each with a few small, relatable ideas; or let the AI find one with them.
+const CHOICES = [
+  { key: 'places', label: 'My favourite places', sub: 'Restaurants, trips, things to do',
+    ideas: ['My 5 favourite restaurants in …', 'Where I take friends visiting …', 'My perfect weekend in …', 'My favourite coffee spots in …', "Trips I'd happily do again"] },
+  { key: 'figured', label: "Something I've figured out", sub: "Advice, lessons, what I wish I'd known",
+    ideas: ["What I wish I'd known before moving abroad", "My beginner's guide to …", 'Lessons from travelling solo', 'Things I learned the hard way about money', "Advice I'd give someone starting their career"] },
+  { key: 'how', label: 'How I do something', sub: 'Routines, systems, how I use AI',
+    ideas: ['How I get the most out of ChatGPT or Claude', 'My morning routine', 'How I recover after sport', 'How I plan a holiday', 'How I approach FPL every week'] },
+  { key: 'sources', label: 'People and sources I trust', sub: 'Who I follow, and why',
+    ideas: ['Who I follow to understand AI', 'YouTube channels I actually watch', 'Podcasts and newsletters I really read', 'The best people to follow for football', 'Money and investing sources I trust'] },
+];
+const FIND_QS = ['What do friends or colleagues usually come to you for?', "What's something you've spent ages learning or figuring out?", 'What do you love recommending or explaining?'];
+let pick = null, found = null;   // which choice is open; ideas the AI suggested
+
 function starters() {
+  if (pick === 'find') return renderFind();
+  const c = CHOICES.find(x => x.key === pick);
+  if (c) return renderChoice(c);
   const paste = `<section class="ed-sec ed-start" id="paste-box"${aiUrl ? ' hidden' : ''}>
       <span class="label">Paste what you already have</span>
       <textarea id="paste0" placeholder="A list, a note, your Maps list copied out… One thing per line. Headings become sections.&#10;&#10;Japanese:&#10;Kinoya – best ramen in town&#10;Kokoro – hand rolls"></textarea>
       <button class="kc-btn kc-btn-main" type="button" data-frompaste>Turn it into a keycard</button>
     </section>`;
   box.innerHTML = `<section class="kc-hero">
-      <h1 class="display kc-title">WHAT DO PEOPLE ASK YOU ABOUT?</h1>
-      <p class="kc-body">Turn what you know into a keycard friends can follow and copy. It takes about three minutes.</p></section>
-    ${aiUrl ? `<section class="ed-sec ed-start">
-      <span class="label">Interview me</span>
-      <p class="kc-body" style="font-size:14px">Answer a few questions and it becomes a keycard, in your words.</p>
-      <input id="iv-topic" placeholder="e.g. My stretching routine" maxlength="80">
-      <div class="ed-chips">${['My routine for…', 'How I use…', 'My favourite places in…', 'How I plan…'].map(x => `<button type="button" class="ed-chip" data-ivchip="${x}">${x}</button>`).join('')}</div>
-      <button class="kc-btn kc-btn-main" type="button" data-ivstart>Start the interview</button>
-    </section>` : ''}
+      <h1 class="display kc-title">EVERYONE KNOWS SOMETHING.</h1>
+      <p class="kc-body">Turn something you've figured out into a keycard someone else can borrow. What would you like to share?</p></section>
+    ${aiUrl ? `<div class="mk-choices">
+      ${CHOICES.map(x => `<button type="button" class="mk-choice" data-choice="${x.key}"><b>${esc(x.label)}</b><span>${esc(x.sub)}</span></button>`).join('')}
+      <button type="button" class="mk-choice mk-find" data-choice="find"><b>Help me find an idea</b><span>Three quick questions, then a few ideas to pick from</span></button>
+    </div>` : ''}
     ${paste}
     <p class="kc-fine" style="text-align:center">${aiUrl ? '<a href="#" data-showpaste>Already have a list? Paste it</a> · ' : ''}<a href="#" data-blank>Start blank</a> · <a href="${ROOT}">Copy one from Discover</a></p>
     ${owner ? '' : '<p class="kc-fine" style="text-align:center">Free. You\'ll sign in with Google when you start, so it\'s saved.</p>'}`;
+}
+
+function renderChoice(c) {
+  box.innerHTML = `<a href="#" class="mk-back" data-back>‹ Back</a>
+    <section class="kc-hero"><h1 class="display kc-title">${esc(c.label.toUpperCase())}</h1>
+      <p class="kc-body">Tap one to start, or say it your way. Small is good: five things is plenty.</p></section>
+    <div class="mk-ideas">${c.ideas.map(i => `<button type="button" class="mk-idea" data-idea="${esc(i)}">${esc(i)}</button>`).join('')}</div>
+    <section class="ed-sec ed-start">
+      <span class="label">Or in your own words</span>
+      <input id="iv-topic" placeholder="e.g. ${esc(c.ideas[0].replace(' …', ' Dubai'))}" maxlength="80">
+      <button class="kc-btn kc-btn-main" type="button" data-ivstart>Start</button>
+    </section>
+    <p class="kc-fine" style="text-align:center">A few questions, then AI writes it up in your words. You check it before it's saved.</p>`;
+}
+
+function renderFind(state, err) {
+  const vals = [0, 1, 2].map(i => ((document.getElementById('fq' + i) || {}).value) || (found && found.answers ? found.answers[i] : '') || '');
+  box.innerHTML = `<a href="#" class="mk-back" data-back>‹ Back</a>
+    <section class="kc-hero"><h1 class="display kc-title">HELP ME FIND AN IDEA</h1>
+      <p class="kc-body">Answer one or all three. A few words is fine.</p></section>
+    <section class="ed-sec ed-start">
+      ${FIND_QS.map((q, i) => `<label class="mk-q"><span>${esc(q)}</span><textarea id="fq${i}" rows="2" maxlength="400">${esc(vals[i])}</textarea></label>`).join('')}
+      <button class="kc-btn kc-btn-main" type="button" data-findideas>${found && found.ideas ? 'Suggest different ideas' : 'Suggest ideas'}</button>
+    </section>
+    ${state === 'thinking' ? '<div class="iv-dots"><i></i><i></i><i></i></div>' : ''}
+    ${err ? `<div class="kc-banner">${esc(err)}</div>` : ''}
+    ${found && found.ideas && state !== 'thinking' ? `<span class="label" style="display:block;margin:18px 4px 8px">Tap one to start</span>
+      <div class="mk-ideas">${found.ideas.map(i => `<button type="button" class="mk-idea" data-idea="${esc(i.start)}"><b>${esc(i.title)}</b></button>`).join('')}</div>` : ''}`;
+}
+
+async function findIdeas(answers) {
+  if (!answers.some(a => a.trim())) { toast('Answer at least one, even briefly'); return; }
+  found = { answers, ideas: found && found.ideas };
+  renderFind('thinking');
+  try {
+    const d = await askAI('ideas', 'Help me find an idea', FIND_QS.map((q, i) => ({ q, a: answers[i] || '' })));
+    found = { answers, ideas: d.ideas || [] };
+    renderFind();
+    const first = box.querySelector('.mk-ideas'); if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (!found.ideas.length) renderFind(null, "Couldn't come up with ideas from that. Add a bit more and try again?");
+  } catch (e) { renderFind(null, e.message); }
+}
+
+function startInterview(topic) {
+  iv = { topic, turns: [], q: '', t0: Date.now() }; noteStart('interview'); ivAsk();
 }
 
 window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
@@ -359,7 +437,8 @@ onUser(async u => {
       starters();
       if (pend.act === 'blank') return start('picks');
       if (pend.act === 'frompaste') return startFromPaste(pend.paste);
-      if (pend.act === 'ivstart' && aiUrl) { iv = { topic: pend.topic, turns: [], q: '' }; return ivAsk(); }
+      if (pend.act === 'ivstart' && aiUrl) return startInterview(pend.topic);
+      if (pend.act === 'find' && aiUrl) { pick = 'find'; found = { answers: pend.answers || [] }; starters(); return findIdeas(pend.answers || []); }
     }
     try { iv = JSON.parse(sessionStorage.getItem(IV) || 'null'); } catch (e) { iv = null; }
     if (iv && iv.q && aiUrl) return renderIv();

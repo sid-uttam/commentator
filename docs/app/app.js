@@ -168,6 +168,10 @@ export async function getWeekly() {
   const d = await f.F.getDoc(f.F.doc(f.db, 'users', me.uid)).catch(() => null);
   return d && d.exists() ? d.data().weekly : true;
 }
+// For the beta results: did this person start making a keycard, and how? (Finishing is recorded on the keycard itself.)
+export async function noteStart(how) {
+  try { const f = await ready; if (me) await f.F.setDoc(f.F.doc(f.db, 'users', me.uid), { lastStart: { how, at: f.F.serverTimestamp() } }, { merge: true }); } catch (e) {}
+}
 export async function setWeekly(on) { const f = await ready; await f.F.setDoc(f.F.doc(f.db, 'users', me.uid), { weekly: !!on }, { merge: true }); }
 
 // ---------- follow & counts ----------

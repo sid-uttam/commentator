@@ -193,3 +193,17 @@ body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 .iv-dots i{width:9px;height:9px;border-radius:50%;background:var(--accent);animation:ivd 1s infinite}
 .iv-dots i:nth-child(2){animation-delay:.15s}.iv-dots i:nth-child(3){animation-delay:.3s}
 @keyframes ivd{50%{opacity:.25;transform:translateY(-3px)}}
+/* Make: first-time choices and idea lists */
+.mk-choices,.mk-ideas{display:flex;flex-direction:column;gap:10px;margin:4px 0 18px}
+.mk-choice{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;width:100%;padding:16px 18px;border-radius:16px;border:1px solid var(--line2);background:var(--card);color:var(--ink);cursor:pointer;font-family:Inter,system-ui,sans-serif}
+.mk-choice b{font-size:17px;font-weight:700}
+.mk-choice span{font-size:14px;color:var(--muted)}
+.mk-choice:active,.mk-idea:active{transform:scale(.99)}
+.mk-find{border-style:dashed;background:transparent}
+.mk-find b{color:var(--accent)}
+.mk-idea{text-align:left;width:100%;padding:14px 16px;border-radius:14px;border:1px solid var(--line2);background:var(--card);color:var(--ink);font:500 16px/1.35 Inter,system-ui,sans-serif;cursor:pointer}
+.mk-idea b{font-weight:700}
+.mk-back{display:inline-block;margin:0 0 6px;color:var(--muted);text-decoration:none;font:600 14px Inter,system-ui,sans-serif}
+.mk-q{display:block;margin-bottom:12px}
+.mk-q span{display:block;font:600 14px/1.35 Inter,system-ui,sans-serif;color:var(--ink);margin-bottom:6px}
+.ed .mk-q textarea,.mk-q textarea{min-height:56px;height:56px}
