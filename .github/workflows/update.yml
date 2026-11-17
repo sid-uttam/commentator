@@ -8,12 +8,18 @@ name: Collect and rebuild
 #   ENGINE_TOKEN     fine-grained token with Contents: read and write on sid-uttam/commentator-engine
 #   YOUTUBE_API_KEY  YouTube Data API v3 key (optional: without it, news only)
 #   ANTHROPIC_API_KEY  Claude API key for AI briefings (optional: without it, no AI briefings)
+#   GMAIL_APP_PASSWORD  Gmail app password for the weekly email (optional)
+#   FIREBASE_SERVICE_ACCOUNT  Firebase service-account JSON, to read who's signed in for the weekly email (optional)
 
 on:
   workflow_dispatch:
     inputs:
       brief_now:
         description: "Write AI briefings and suggestions now (ignore the timer)"
+        type: boolean
+        default: false
+      email_now:
+        description: "Send the weekly email now (still only to addresses in nudge.only while that's set)"
         type: boolean
         default: false
   schedule:
@@ -39,7 +45,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install
-        run: pip install -q jinja2 pillow
+        run: pip install -q jinja2 pillow cryptography
 
       - name: Fetch the engine
         env:
@@ -55,6 +61,14 @@ jobs:
         run: |
           cd engine
           python run.py --out ../docs ${{ inputs.brief_now && '--brief-now' || '' }}
+
+      - name: Weekly email (Sundays from 9am Dubai)
+        env:
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          cd engine
+          python nudge.py --out ../docs ${{ inputs.email_now && '--force' || '' }}
 
       - name: Save collected data to the engine
         run: |
