@@ -21,6 +21,7 @@ on:
 
 permissions:
   contents: write
+  actions: write   # lets a round queue the next one (see "next" below)
 
 concurrency:
   group: collect
@@ -75,3 +76,27 @@ jobs:
             git commit -q -m "Pages update $(date -u +%Y-%m-%dT%H:%MZ)"
             for i in 1 2 3; do git pull -q --rebase origin main && git push -q origin main && break; sleep 5; done
           fi
+
+  # GitHub's own timer often skips scheduled runs on small repos (it fired once in 15 hours on 16-17 Nov).
+  # So each round queues the next one itself, 30 minutes after it started. The schedule above stays as a backup
+  # that restarts the chain if it ever breaks. If another round is already waiting, this one doesn't queue a second.
+  next:
+    needs: collect
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Wait, then queue the next round
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          started=$(gh api "repos/$REPO/actions/runs/$RUN_ID" -q .run_started_at)
+          wait=$(( $(date -d "$started" +%s) + 1800 - $(date +%s) ))
+          if [ "$wait" -gt 0 ]; then echo "Next round in $((wait / 60)) minutes"; sleep "$wait"; fi
+          waiting=$(gh api "repos/$REPO/actions/workflows/update.yml/runs?per_page=20" \
+            -q "[.workflow_runs[] | select(.id != $RUN_ID and (.status == \"queued\" or .status == \"pending\" or .status == \"waiting\" or .status == \"requested\" or .status == \"in_progress\"))] | length")
+          if [ "$waiting" -gt 0 ]; then echo "Another round is already waiting; not queuing a second."; exit 0; fi
+          gh api -X POST "repos/$REPO/actions/workflows/update.yml/dispatches" -f ref=main
+          echo "Queued the next round."
