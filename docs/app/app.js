@@ -343,14 +343,21 @@ export function askContext(k, brief) {
 const ASK_SECOND = { live: 'Where do sources disagree?', picks: 'Where should I start?', playbook: 'Where do I start?', sources: 'Who should I follow first?' };
 // getCtx: async () => context text. kind: live | picks | playbook | sources.
 export function mountAsk(el, id, getCtx, kind, ownerFirst) {
-  const qs = ['What matters here?', ASK_SECOND[kind] || ASK_SECOND.picks];
-  el.innerHTML = `<section class="card kc-ask"><div class="kc-h"><span class="label">Ask this keycard</span></div>
-    <div class="ask-chips">${qs.map(q => `<button type="button" class="ask-chip" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>
-    <form class="ask-row"><input type="text" name="q" maxlength="200" placeholder="Ask anything about it" aria-label="Ask this keycard" autocomplete="off">
-      <button class="kc-btn kc-btn-main" type="submit">Ask</button></form>
-    <div class="ask-out" aria-live="polite"></div>
-    <div class="kc-fine">Answers come only from ${kind === 'live' ? "this keycard and its sources' latest update" : esc(ownerFirst ? ownerFirst + "'s keycard" : 'this keycard')}. If it isn't on here, it says so.</div></section>`;
-  const out = el.querySelector('.ask-out'), input = el.querySelector('input'), btn = el.querySelector('[type=submit]');
+  const second = ASK_SECOND[kind] || ASK_SECOND.picks;
+  const from = kind === 'live' ? "this keycard and its sources' latest update" : esc(ownerFirst ? ownerFirst + "'s keycard" : 'this keycard');
+  // One slim line under Follow / Copy: a field plus "What matters?". Tapping the field opens the rest.
+  el.innerHTML = `<div class="ask-bar">
+    <form class="ask-row"><input type="text" name="q" maxlength="200" placeholder="Ask this keycard" aria-label="Ask this keycard" autocomplete="off">
+      <button type="button" class="ask-hot" data-q="What matters here?">What matters?</button>
+      <button class="ask-go" type="submit" hidden>Ask</button></form>
+    <div class="ask-more" hidden><button type="button" class="ask-chip" data-q="${esc(second)}">${esc(second)}</button>
+      <span class="kc-fine">Answers come only from ${from}. If it isn't on here, it says so.</span></div>
+    <div class="ask-out" aria-live="polite"></div></div>`;
+  const out = el.querySelector('.ask-out'), input = el.querySelector('input'), go = el.querySelector('.ask-go'),
+        hot = el.querySelector('.ask-hot'), more = el.querySelector('.ask-more');
+  const open = on => { more.hidden = !on; go.hidden = !on; hot.hidden = on; };
+  input.addEventListener('focus', () => open(true));
+  input.addEventListener('blur', () => setTimeout(() => { if (!input.value.trim() && !el.contains(document.activeElement)) open(false); }, 150));
   const render = (q, a, covered) => {
     const lines = String(a).split('\n').map(x => x.trim()).filter(Boolean);
     let html = '', inList = false;
@@ -359,26 +366,28 @@ export function mountAsk(el, id, getCtx, kind, ownerFirst) {
       else { if (inList) { html += '</ul>'; inList = false; } html += `<p>${esc(l)}</p>`; }
     });
     if (inList) html += '</ul>';
-    out.innerHTML = `<div class="ask-q">${esc(q)}</div><div class="ask-a${covered ? '' : ' ask-gap'}">${html}</div>`;
+    out.innerHTML = `<div class="ask-q"><span>${esc(q)}</span><button type="button" class="ask-x" aria-label="Close answer">×</button></div>
+      <div class="ask-a${covered ? '' : ' ask-gap'}">${html}</div><div class="kc-fine">From ${from} only.</div>`;
+    out.querySelector('.ask-x').onclick = () => { out.innerHTML = ''; };
   };
   const run = async q => {
     q = String(q || '').trim(); if (!q) return;
     if (!me) return withUser('ask:' + id, q);
-    input.value = q; btn.disabled = true;
-    out.innerHTML = `<div class="ask-q">${esc(q)}</div><div class="ask-a ask-wait">Reading the keycard…</div>`;
+    input.value = ''; input.blur(); open(false); go.disabled = hot.disabled = true;
+    out.innerHTML = `<div class="ask-q"><span>${esc(q)}</span></div><div class="ask-a ask-wait">Reading the keycard…</div>`;
     try {
       const d = await askAI('askcard', q.slice(0, 120), [], { question: q, context: await getCtx() });
-      render(q, d.answer || "Couldn't find an answer on this keycard.", d.covered !== false); input.value = '';
+      render(q, d.answer || "Couldn't find an answer on this keycard.", d.covered !== false);
     } catch (e) {
       const msg = /unknown action/i.test(e.message) ? 'Asking switches on very soon.' : e.message === 'unavailable' ? 'Asking is not available right now.' : e.message;
       out.innerHTML = `<div class="ask-a ask-gap"><p>${esc(msg)}</p></div>`;
     }
-    btn.disabled = false;
+    go.disabled = hot.disabled = false;
   };
   registerAction('ask:' + id, q => { el.scrollIntoView({ block: 'center' }); run(q); });
   if (me) runPending(me);   // signed in just now, before this box existed
   el.querySelector('form').onsubmit = e => { e.preventDefault(); run(input.value); };
-  el.querySelectorAll('.ask-chip').forEach(b => { b.onclick = () => run(b.dataset.q); });
+  el.querySelectorAll('[data-q]').forEach(b => { b.onmousedown = e => e.preventDefault(); b.onclick = () => run(b.dataset.q); });
 }
 
 // ---------- versions: copies people made public, shown on the original ----------

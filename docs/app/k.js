@@ -61,8 +61,9 @@ async function show() {
     </section>
     ${k.tagline ? `<p class="kc-body" style="margin-top:-6px">${esc(k.tagline)}</p>` : ''}
     <div class="kc-actions" id="acts"></div>
+    <div id="ask"></div>
     <div id="mine"></div>
-    ${shape === 'picks' && !k.watch ? '<div id="ask"></div>' + folds + '<div id="live"></div>' : '<div id="live"></div><div id="ask"></div>' + folds}`;
+    ${shape === 'picks' && !k.watch ? folds + '<div id="live"></div>' : '<div id="live"></div>' + folds}`;
   // Ask this keycard: answers only from what's on it, plus whatever update is showing.
   let shownBrief = null;
   if (all.length) mountAsk(document.getElementById('ask'), k.id, async () => askContext({ ...k, sections, sources }, shownBrief), cf && cf.live ? 'live' : shape, first);
