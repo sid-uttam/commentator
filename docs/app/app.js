@@ -101,6 +101,7 @@ export async function withUser(name, ...args) {
   sessionStorage.setItem(PENDING, JSON.stringify({ name, args, at: Date.now() }));
   const why = name.startsWith('follow') ? ['Sign in to follow', "You'll see its updates on your Mine page, plus one short email on Sundays."]
     : name === 'copy' ? ['Sign in to copy', 'Your copy is saved to your account, credited to the original. Change anything you like.']
+    : name.startsWith('ask:') ? ['Sign in to ask', 'Asking uses AI, so it needs a free account. Answers come only from this keycard.']
     : ['Sign in to continue', 'So your keycards are saved and you can share them.'];
   signInSheet(...why);
 }
@@ -304,13 +305,92 @@ export async function counts(id) {
 }
 
 // ---------- the interviewer (Cloudflare worker; checks your sign-in) ----------
-export async function askAI(action, topic, turns) {
+export async function askAI(action, topic, turns, extra = {}) {
   if (!aiUrl || !me) throw new Error('unavailable');
   const r = await fetch(aiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + await me.getIdToken() },
-                                 body: JSON.stringify({ action, topic, turns }) });
+                                 body: JSON.stringify({ ...extra, action, topic, turns }) });
   const d = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(d.error || 'The interviewer hit a snag. Try again in a moment.');
   return d;
+}
+
+// ---------- ask this keycard: answers only from what's on it (and its sources' latest update) ----------
+// Everything the AI may use, as plain text: the owner's items and reasons, sources, and the latest sourced update.
+export function askContext(k, brief) {
+  const by = k.curator || k.ownerName || '';
+  const L = [`Keycard: ${k.title || ''}${by ? ` (by ${by})` : ''}`];
+  if (k.tagline) L.push(`About: ${k.tagline}`);
+  if (k.status) L.push(`Coming up: ${k.status}`);
+  (k.sections || []).forEach(sec => {
+    const items = (sec.items || []).filter(i => i.name || i.copy);
+    if (!items.length) return;
+    L.push('', `## ${sec.title || 'Items'}`);
+    items.forEach(i => L.push(`- ${i.name || ''}${i.type ? ` [${i.type}]` : ''}${i.why ? `: ${i.why}` : ''}${i.copy ? `\n  Exact text: ${String(i.copy).slice(0, 600)}` : ''}`));
+  });
+  const src = (k.sources || []).filter(x => x.name && !/google news search/i.test(x.name));
+  if (src.length) { L.push('', '## Sources the owner follows'); src.forEach(x => L.push(`- ${x.name}${x.why ? `: ${x.why}` : ''}`)); }
+  const b = brief || k.briefing;
+  if (b && ((b.points && b.points.length) || (b.from_list && b.from_list.length))) {
+    L.push('', `## Latest AI update from its sources${b.updated ? ` (${ago(b.updated)})` : ''}`);
+    if (b.headline) L.push(b.headline);
+    (b.from_list || []).forEach(x => L.push(`- From the list: ${x.name}${x.why ? `: ${x.why}` : ''}`));
+    (b.points || []).forEach(p => L.push(`- [${p.label || 'reported'}] ${p.text} (${(p.sources || []).map(s => s.name + (s.date ? ', ' + ago(s.date) : '')).join('; ')})`));
+    (b.differences || []).forEach(d => L.push(`- [sources differ] ${d.text}`));
+  }
+  return L.join('\n').slice(0, 15000);
+}
+
+const ASK_SECOND = { live: 'Where do sources disagree?', picks: 'Where should I start?', playbook: 'Where do I start?', sources: 'Who should I follow first?' };
+// getCtx: async () => context text. kind: live | picks | playbook | sources.
+export function mountAsk(el, id, getCtx, kind, ownerFirst) {
+  const qs = ['What matters here?', ASK_SECOND[kind] || ASK_SECOND.picks];
+  el.innerHTML = `<section class="card kc-ask"><div class="kc-h"><span class="label">Ask this keycard</span></div>
+    <div class="ask-chips">${qs.map(q => `<button type="button" class="ask-chip" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>
+    <form class="ask-row"><input type="text" name="q" maxlength="200" placeholder="Ask anything about it" aria-label="Ask this keycard" autocomplete="off">
+      <button class="kc-btn kc-btn-main" type="submit">Ask</button></form>
+    <div class="ask-out" aria-live="polite"></div>
+    <div class="kc-fine">Answers come only from ${kind === 'live' ? "this keycard and its sources' latest update" : esc(ownerFirst ? ownerFirst + "'s keycard" : 'this keycard')}. If it isn't on here, it says so.</div></section>`;
+  const out = el.querySelector('.ask-out'), input = el.querySelector('input'), btn = el.querySelector('[type=submit]');
+  const render = (q, a, covered) => {
+    const lines = String(a).split('\n').map(x => x.trim()).filter(Boolean);
+    let html = '', inList = false;
+    lines.forEach(l => {
+      if (/^[-•*]\s+/.test(l)) { if (!inList) { html += '<ul>'; inList = true; } html += `<li>${esc(l.replace(/^[-•*]\s+/, ''))}</li>`; }
+      else { if (inList) { html += '</ul>'; inList = false; } html += `<p>${esc(l)}</p>`; }
+    });
+    if (inList) html += '</ul>';
+    out.innerHTML = `<div class="ask-q">${esc(q)}</div><div class="ask-a${covered ? '' : ' ask-gap'}">${html}</div>`;
+  };
+  const run = async q => {
+    q = String(q || '').trim(); if (!q) return;
+    if (!me) return withUser('ask:' + id, q);
+    input.value = q; btn.disabled = true;
+    out.innerHTML = `<div class="ask-q">${esc(q)}</div><div class="ask-a ask-wait">Reading the keycard…</div>`;
+    try {
+      const d = await askAI('askcard', q.slice(0, 120), [], { question: q, context: await getCtx() });
+      render(q, d.answer || "Couldn't find an answer on this keycard.", d.covered !== false); input.value = '';
+    } catch (e) {
+      const msg = /unknown action/i.test(e.message) ? 'Asking switches on very soon.' : e.message === 'unavailable' ? 'Asking is not available right now.' : e.message;
+      out.innerHTML = `<div class="ask-a ask-gap"><p>${esc(msg)}</p></div>`;
+    }
+    btn.disabled = false;
+  };
+  registerAction('ask:' + id, q => { el.scrollIntoView({ block: 'center' }); run(q); });
+  if (me) runPending(me);   // signed in just now, before this box existed
+  el.querySelector('form').onsubmit = e => { e.preventDefault(); run(input.value); };
+  el.querySelectorAll('.ask-chip').forEach(b => { b.onclick = () => run(b.dataset.q); });
+}
+
+// ---------- versions: copies people made public, shown on the original ----------
+export async function versionsOf(id) {
+  try { return (await publicKeycards(200)).filter(k => k.copiedFrom && k.copiedFrom.id === id); }
+  catch (e) { return []; }
+}
+export function versionsHTML(list) {
+  if (!list.length) return '';
+  const name = k => (k.ownerName || 'Someone').split(' ')[0];
+  return `<div class="kc-versions"><span>${list.length} version${list.length === 1 ? '' : 's'}:</span> ${list.slice(0, 6).map(k =>
+    `<a href="${esc(keycardUrl(k.id))}">${esc(name(k))}'s</a>`).join('<i>·</i>')}${list.length > 6 ? ` <i>+${list.length - 6}</i>` : ''}</div>`;
 }
 
 // ---------- little UI helpers ----------
@@ -379,6 +459,7 @@ export function mountActions(el, id, opts = {}) {
     const bits = c ? [c.copies ? `<span><b>${c.copies}</b> ${c.copies === 1 ? 'person has' : 'people have'} copied this</span>` : '',
                       c.followers ? `<span><b>${c.followers}</b> following</span>` : ''].filter(Boolean) : [];
     st.innerHTML = bits.join('<i>·</i>'); st.hidden = !bits.length;
+    if (c && c.copies && !el.dataset.v) (el.dataset.v = '1', versionsOf(id)).then(v => { if (v.length) st.insertAdjacentHTML('afterend', versionsHTML(v)); });
   };
   registerAction('follow:' + id, async () => { changed++; await follow(id); following = true; paint(); toast("Following. You'll get its updates."); showCounts(); });
   fBtn.onclick = async () => {
@@ -445,3 +526,7 @@ document.addEventListener('click', async e => {
   b.textContent = 'Copied ✓'; setTimeout(() => { b.textContent = 'Copy'; }, 1600);
 });
 document.querySelectorAll('[data-keycard]').forEach(el => mountActions(el, el.dataset.keycard, { title: el.dataset.title, copyNote: el.dataset.copynote }));
+document.querySelectorAll('[data-ask]').forEach(el => {
+  let k = null;
+  mountAsk(el, el.dataset.ask, async () => askContext(k || (k = await loadKeycard(el.dataset.ask))), el.dataset.kind, el.dataset.by);
+});

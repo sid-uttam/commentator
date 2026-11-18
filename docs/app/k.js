@@ -2,7 +2,7 @@
 // One layout for every shape: who made it and how fresh it is, then the most useful thing first.
 //   Picks: the list first, "what's new" after it.  Sources: "right now" first.  Playbook: numbered steps + copy boxes.
 import { loadKeycard, mountActions, onUser, esc, itemRow, fold, briefingCard, keycardUrl, makeUrl, share, kcHash,
-         markChecked, ago, toast, ROOT, live, SHAPE_LABEL, whoFor } from './app.js';
+         markChecked, ago, toast, ROOT, live, SHAPE_LABEL, whoFor, mountAsk, askContext, versionsOf, versionsHTML } from './app.js';
 
 const box = document.getElementById('kc');
 const params = new URLSearchParams(location.search);
@@ -62,7 +62,10 @@ async function show() {
     ${k.tagline ? `<p class="kc-body" style="margin-top:-6px">${esc(k.tagline)}</p>` : ''}
     <div class="kc-actions" id="acts"></div>
     <div id="mine"></div>
-    ${shape === 'picks' && !k.watch ? folds + '<div id="live"></div>' : '<div id="live"></div>' + folds}`;
+    ${shape === 'picks' && !k.watch ? '<div id="ask"></div>' + folds + '<div id="live"></div>' : '<div id="live"></div><div id="ask"></div>' + folds}`;
+  // Ask this keycard: answers only from what's on it, plus whatever update is showing.
+  let shownBrief = null;
+  if (all.length) mountAsk(document.getElementById('ask'), k.id, async () => askContext({ ...k, sections, sources }, shownBrief), cf && cf.live ? 'live' : shape, first);
 
   onUser(u => {
     const preview = params.get('as') === 'friend';     // the owner, seeing it exactly as a friend would
@@ -86,6 +89,7 @@ async function show() {
       const list = (names, verb) => names.length ? `<div><b>${names.length}</b> ${verb} <span>${esc(names.slice(0, 4).join(', '))}${names.length > 4 ? ` and ${names.length - 4} more` : ''}</span></div>` : '';
       const lines = [r.opens ? `<div><b>${r.opens}</b> open${r.opens === 1 ? '' : 's'}</div>` : '', list(r.copiers, r.copiers.length === 1 ? 'copy by' : 'copies by'), list(r.followers, 'following:')].filter(Boolean);
       el.insertAdjacentHTML('afterend', `<a class="kc-fine kc-asfriend" href="?id=${encodeURIComponent(docId)}&as=friend">See it as a friend would ›</a>`);
+      if (r.copiers.length) versionsOf(k.id).then(v => { if (v.length) el.insertAdjacentHTML('beforeend', versionsHTML(v)); });
       el.innerHTML = lines.length ? lines.join('') : `<div class="kc-fine">Your keycard is ready to travel. Share it with someone who'd find it useful, and you'll see here when people open, follow or make their own version.</div>`;
     });
     const mine = document.getElementById('mine');
@@ -144,6 +148,7 @@ async function show() {
   try { const r = await fetch(ROOT + 'u/' + docId + '/briefing.json', { cache: 'no-cache' }); if (r.ok) mineB = await r.json(); } catch (e) {}
   const title = "What's new";
   if (mineB && ((mineB.points && mineB.points.length) || (mineB.from_list && mineB.from_list.length))) {
+    shownBrief = mineB;
     document.getElementById('live').innerHTML = briefingCard(mineB, `${k.watch ? 'For ' + first : title} · ${ago(mineB.updated)}`,
       k.watch ? `${first} asked: “${k.watch.replace(/[.\s]+$/, '')}” Picks from the list only use what's on this keycard. Anything new links to where it came from.`
               : 'AI summary of the links on this keycard only. Labels show how solid each point is.');
@@ -153,6 +158,7 @@ async function show() {
   } else if (cf && cf.live) {
     try {
       const src = await loadKeycard(cf.live);
+      if (src.briefing) shownBrief = src.briefing;
       if (src.briefing) document.getElementById('live').innerHTML = briefingCard(src.briefing, `${title}${src.briefing.updated ? ' · ' + ago(src.briefing.updated) : ''}`,
         `AI summary of ${src.title}'s sources. Labels show how solid each point is.`);
     } catch (e) { /* no update yet */ }
