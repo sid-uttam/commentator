@@ -373,15 +373,26 @@ function renderIv(state, err) {
   const a = document.getElementById('iv-a'); if (a) a.focus();
 }
 
+// Two questions are "the same" if they're nearly word for word, so the interview never asks one twice.
+const qKey = q => String(q || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
 async function ivAsk() {
+  const last = iv.turns[iv.turns.length - 1];
+  // They've just answered "anything else?" with enough said already: that's the end, go to the reveal.
+  if (last && iv.turns.length >= 3 && /\banything else\b/i.test(last.q)) return ivDraft();
   renderIv('thinking');
   try {
     const d = await askAI('ask', iv.topic, iv.turns);
-    if (d.done) return ivDraft();
-    // Never leave a blank question: if the AI sends nothing back, ask a sensible next one ourselves.
+    const q = String(d.question || '').trim().replace(/^["'“”]+|["'“”]+$/g, '').trim();
+    // The AI says it's done in different ways ("DONE", "Done.", quotes, nothing at all once there's enough): all mean finish.
+    if (d.done || /^\W*done\W*$/i.test(q) || (!q && iv.turns.length >= 4)) return ivDraft();
+    const asked = new Set(iv.turns.map(t => qKey(t.q)));
+    if (q && asked.has(qKey(q))) return iv.turns.length >= 3 ? ivDraft() : (iv.q = 'Why do you do it this way?', ivSave(), renderIv());
+    // Never leave a blank question: if the AI sends nothing back early on, ask a sensible one we haven't asked yet.
     const fallback = ['Walk me through it, step by step.', 'Why do you do it this way?', 'What did you get wrong when you started?',
                       'What would you tell someone just starting out?', 'Anything else someone should know?'];
-    iv.q = (d.question || '').trim() || fallback[Math.min(iv.turns.length, fallback.length - 1)];
+    const next = q || fallback.find(f => !asked.has(qKey(f)));
+    if (!next) return ivDraft();
+    iv.q = next;
     ivSave(); renderIv();
   } catch (e) { renderIv(null, e.message); }
 }
