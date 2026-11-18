@@ -244,7 +244,7 @@ export async function searchKeycards(q) {
   const friends = await publicKeycards(80).catch(() => []);
   const all = [...siteIdx.map(k => ({ ...k, url: ROOT + k.url })),
                ...friends.filter(k => !k.copiedFrom || k.edited).map(k => ({ id: k.id, url: keycardUrl(k.id), title: k.title, tagline: k.tagline || '',
-                 subject: catOf(k.subject), type: SHAPE_LABEL[k.shape] || '', by: k.ownerName || '',
+                 subject: catOf(k.subject), type: SHAPE_LABEL[k.shape] || '', live: hasLive(k), by: k.ownerName || '',
                  words: [k.title, k.tagline, k.subject, ...(k.sections || []).flatMap(x => [x.title, ...(x.items || []).map(i => i.name)])].join(' ') }))];
   return all.map(k => { const have = new Set(words(k.words + ' ' + k.title).map(stem)); return { k, n: want.filter(w => have.has(w)).length }; })
     .filter(x => x.n > 0).sort((a, b) => b.n - a.n).slice(0, 6).map(x => x.k);
@@ -325,7 +325,7 @@ export function askContext(k, brief) {
     const items = (sec.items || []).filter(i => i.name || i.copy);
     if (!items.length) return;
     L.push('', `## ${sec.title || 'Items'}`);
-    items.forEach(i => L.push(`- ${i.name || ''}${i.type ? ` [${i.type}]` : ''}${i.why ? `: ${i.why}` : ''}${i.copy ? `\n  Exact text: ${String(i.copy).slice(0, 600)}` : ''}`));
+    items.forEach(i => L.push(`- ${i.name || ''}${i.star ? ' (one of the owner\'s top 3)' : ''}${i.type ? ` [${i.type}]` : ''}${i.why ? `: ${i.why}` : ''}${i.copy ? `\n  Exact text: ${String(i.copy).slice(0, 600)}` : ''}`));
   });
   const src = (k.sources || []).filter(x => x.name && !/google news search/i.test(x.name));
   if (src.length) { L.push('', '## Sources the owner follows'); src.forEach(x => L.push(`- ${x.name}${x.why ? `: ${x.why}` : ''}`)); }
@@ -402,6 +402,37 @@ export function versionsHTML(list) {
     `<a href="${esc(keycardUrl(k.id))}">${esc(name(k))}'s</a>`).join('<i>·</i>')}${list.length > 6 ? ` <i>+${list.length - 6}</i>` : ''}</div>`;
 }
 
+// ---------- new since your last visit ----------
+// Each browser remembers when it last opened a keycard. Points whose newest source is later than that get a "New" tag,
+// and the update says how many. A visit is one sitting: reloads within half an hour compare against the visit before.
+const SEEN = 'kc-seen:', VISIT = 30 * 60 * 1000;
+function lastVisit(key) {
+  const now = Date.now();
+  let v = {};
+  try { v = JSON.parse(localStorage.getItem(SEEN + key) || '{}'); } catch (e) {}
+  if (!v.last || now - v.last > VISIT) { v = { prev: v.last || 0, last: now }; }
+  else v.last = now;
+  try { localStorage.setItem(SEEN + key, JSON.stringify(v)); } catch (e) {}
+  return v.prev || 0;
+}
+export function markNew(root = document, key = location.pathname + location.search) {
+  const cards = [...root.querySelectorAll('.kc-now')].filter(c => !c.dataset.newDone);
+  if (!cards.length) return;
+  const prev = lastVisit(key);
+  cards.forEach(card => {
+    card.dataset.newDone = '1';
+    if (!prev) return;                                   // first visit: nothing to compare with
+    const fresh = [...card.querySelectorAll('.kc-pt[data-d]')].filter(li => { const d = Date.parse(li.dataset.d); return d && d > prev; });
+    if (!fresh.length) return;
+    fresh.forEach(li => li.insertAdjacentHTML('afterbegin', '<span class="kc-new">New</span>'));
+    if (fresh.some(li => li.closest('details'))) fresh.forEach(li => { const d = li.closest('details'); if (d) d.open = true; });
+    const h = card.querySelector('.kc-h');
+    if (h) h.insertAdjacentHTML('afterend', `<p class="kc-newline">${fresh.length} new since you were last here</p>`);
+  });
+}
+document.addEventListener('DOMContentLoaded', () => markNew());
+if (document.readyState !== 'loading') setTimeout(() => markNew(), 0);
+
 // ---------- little UI helpers ----------
 export const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 export const safeUrl = u => /^https?:\/\//i.test(u || '') ? u : '';
@@ -455,10 +486,21 @@ export const SUBJECTS = ['Food', 'Travel', 'Sport', 'Fitness', 'Money & tech', '
 export const catOf = s => CATS[s] || (SUBJECTS.includes(s) || s === 'News' ? s : 'Other');
 
 export const SHAPE_LABEL = { picks: 'Picks', sources: 'Sources', playbook: 'Playbook' };
-export function tileHTML({ url, cat, title, by, line, mine, shape, id }) {
+// Three kinds (Picks, Playbook, Sources) by what's on a keycard. "Live updates" is something a keycard has, not a kind:
+// AI watches links it can read (YouTube, websites, podcasts) and writes "What's new". Lists only get it when the owner asks AI to watch.
+const NO_FEED = /(^|\.)(instagram|x|twitter|tiktok|facebook|reddit|linkedin|threads)\.(com|net)$|(^|\.)maps\.app\.goo\.gl$|(^|\.)goo\.gl$/;
+const followable = u => { try { const h = new URL(u).hostname.replace(/^www\./, ''); return /^https?:/.test(u) && !NO_FEED.test(h) && !(h === 'google.com' && u.includes('/maps')); } catch (e) { return false; } };
+export function hasLive(k) {
+  if (!k) return false;
+  if (k.live || k.briefing || k.watch || (k.copiedFrom && k.copiedFrom.live)) return true;
+  if ((k.shape || '') === 'picks') return false;
+  return (k.sources || []).some(x => followable(x.url || ''));
+}
+export const LIVE_BADGE = '<span class="live-badge">● Live updates</span>';
+export function tileHTML({ url, cat, title, by, line, mine, shape, id, live }) {
   const type = SHAPE_LABEL[shape] || '';
   return `<a class="tile${mine ? ' mine' : ''}" href="${esc(url)}" data-cat="${esc(cat)}"><span class="c">${type ? esc(type) + ' · ' : ''}${esc(cat)}</span>
-    <b>${esc(title)}</b>${line ? `<span class="s">${esc(line)}</span>` : ''}<span class="by">${esc(by)}</span>${id ? `<span class="tile-n" data-n="${esc(id)}"></span>` : ''}</a>`;
+    <b>${esc(title)}</b>${line ? `<span class="s">${esc(line)}</span>` : ''}<span class="by">${esc(by)}${live ? ' ' + LIVE_BADGE : ''}</span>${id ? `<span class="tile-n" data-n="${esc(id)}"></span>` : ''}</a>`;
 }
 
 // Follow / copy / share buttons, plus follower and copy counts.
@@ -527,7 +569,7 @@ export function briefingCard(b, title, note) {
   const fl = (b && b.from_list) || [];
   if (!b || ((!b.points || !b.points.length) && !fl.length)) return '';
   b.points = b.points || [];
-  const pt = p => `<li class="kc-pt"><span class="kc-lbl kc-lbl-${esc((p.label || 'reported').replace(/ /g, '-'))}">${esc(p.label || 'reported')}</span> ${esc(p.text)} ${
+  const pt = p => `<li class="kc-pt" data-d="${esc((p.sources || []).map(x => x.date || '').filter(Boolean).sort().pop() || '')}"><span class="kc-lbl kc-lbl-${esc((p.label || 'reported').replace(/ /g, '-'))}">${esc(p.label || 'reported')}</span> ${esc(p.text)} ${
     (p.sources || []).slice(0, 2).map(s => (safeUrl(s.url) ? `<a class="kc-src" href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)}</a>` : `<span class="kc-src">${esc(s.name)}</span>`)
       + (s.date ? `<span class="kc-src"> · ${esc(ago(s.date))}</span>` : '')).join(' · ')}</li>`;
   return `<section class="card kc-now"><div class="kc-h"><span class="label">${esc(title)}</span></div>

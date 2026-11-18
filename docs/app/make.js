@@ -74,8 +74,9 @@ function itemHTML(it, path) {
       ${!showLink || (!showCopy && k.shape === 'playbook') ? `<div class="ed-row" style="gap:12px">
         ${showLink ? '' : `<button class="ed-link" type="button" data-link="${path}">+ link</button>`}
         ${showCopy || k.shape !== 'playbook' ? '' : `<button class="ed-link" type="button" data-copyopen="${path}">+ text to copy</button>`}</div>` : ''}
-    </div><button class="ed-x" type="button" data-rm="${path}" aria-label="Remove">×</button></div>`;
+    </div>${k.shape === 'picks' && path.startsWith('sections.') ? `<button class="ed-star${it.star ? ' on' : ''}" type="button" data-star="${path}" aria-label="${it.star ? 'In your top 3' : 'Add to your top 3'}" aria-pressed="${!!it.star}">${it.star ? '★' : '☆'}</button>` : ''}<button class="ed-x" type="button" data-rm="${path}" aria-label="Remove">×</button></div>`;
 }
+const starCount = () => k.sections.reduce((n, sec) => n + sec.items.filter(i => i.star).length, 0);
 
 // Long copies (Manav's 94 places) start folded, so the editor stays short. Tap a section to open it.
 const shut = new Set();
@@ -190,6 +191,13 @@ box.addEventListener('click', async e => {
     renderReasons(); return;
   }
   if (d.watchchip) { const t = box.querySelector('[data-p="watch"]'); t.value = (t.value.trim() ? t.value.trim() + ' ' : '') + d.watchchip; setPath('watch', t.value); dirty = true; t.focus(); return; }
+  if (d.star !== undefined) {
+    const it = getPath(d.star);
+    if (!it.star && starCount() >= 3) { toast('Your top 3 is full. Untick one first.'); return; }
+    if (it.star) delete it.star; else it.star = true;
+    dirty = true; render();
+    const n = starCount(); toast(n === 3 ? 'Top 3 set. They show first as “Start here”.' : `${n} of 3 starred`); return;
+  }
   if (d.into !== undefined) { startInto(document.getElementById('into').value); return; }
   if (d.intoideas !== undefined) { if (owner) loadIntoIdeas(into.topic); return; }
   if (d.ask !== undefined) { await saveAsk(into.topic).catch(() => {}); into.asked = true; renderInto(); toast("Asked. We'll let you know."); return; }
@@ -244,7 +252,7 @@ function focusLast(path) { const els = box.querySelectorAll(`[data-p^="${path}."
 let made = null;   // how this keycard was started, and when: { how, t0 }
 function payload() {
   const keep = it => (it.name || '').trim() || (it.url || '').trim() || (it.copy || '').trim();
-  const tidy = it => ({ name: (it.name || '').trim(), why: (it.why || '').trim(), url: (it.url || '').trim(), ...(it.type ? { type: it.type } : {}), ...(it.copy ? { copy: it.copy.trim() } : {}), ...(it.from ? { from: true } : {}) });
+  const tidy = it => ({ name: (it.name || '').trim(), why: (it.why || '').trim(), url: (it.url || '').trim(), ...(it.type ? { type: it.type } : {}), ...(it.copy ? { copy: it.copy.trim() } : {}), ...(it.star ? { star: true } : {}), ...(it.from ? { from: true } : {}) });
   const data = {
     title: k.title.trim(), tagline: k.tagline.trim(), subject: k.subject || '',
     sections: k.sections.map(s => ({ title: s.title.trim() || 'Picks', items: s.items.filter(keep).map(tidy) })).filter(s => s.items.length),
@@ -379,6 +387,9 @@ async function ivAsk() {
   const last = iv.turns[iv.turns.length - 1];
   // They've just answered "anything else?" with enough said already: that's the end, go to the reveal.
   if (last && iv.turns.length >= 3 && /\banything else\b/i.test(last.q)) return ivDraft();
+  if (iv.kind === 'picks' && iv.turns.length === 3 && !iv.turns.some(t => /\b(three|top 3|top three)\b/i.test(t.q))) {
+    iv.q = TOP3_Q; ivSave(); return renderIv();
+  }
   renderIv('thinking');
   try {
     const d = await askAI('ask', iv.topic, iv.turns);
@@ -397,10 +408,22 @@ async function ivAsk() {
   } catch (e) { renderIv(null, e.message); }
 }
 
+// Star the items they named when asked for their top 3 (matched by name in their own answer).
+function starTop3(nk, turns) {
+  const t = (turns || []).find(x => /\b(three|top 3|top three)\b/i.test(x.q));
+  if (!t || nk.shape !== 'picks') return;
+  const ans = ' ' + t.a.toLowerCase().replace(/[^a-z0-9 ]/g, ' ') + ' ';
+  let n = 0;
+  nk.sections.forEach(sec => sec.items.forEach(it => {
+    const name = (it.name || '').toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\b(the|a)\b/g, ' ').replace(/\s+/g, ' ').trim();
+    if (n < 3 && name.length > 2 && ans.includes(' ' + name + ' ')) { it.star = true; n++; }
+  }));
+}
+
 // The draft, as a keycard the editor understands.
 function kFromDraft(kd) {
   const shape = ['picks', 'sources', 'playbook'].includes(kd.shape) ? kd.shape : 'playbook';
-  const item = i => ({ name: i.name || '', why: i.why || '', url: i.url || '', ...(i.copy ? { copy: i.copy } : {}) });
+  const item = i => ({ name: i.name || '', why: i.why || '', url: i.url || '', ...(i.copy ? { copy: i.copy } : {}), ...(i.star ? { star: true } : {}) });
   const nk = { title: kd.title || (rv || iv).topic, tagline: kd.tagline || '', subject: SUBJECTS.includes(kd.subject) ? kd.subject : '',
                visibility: 'public', copiedFrom: null, kind: shape, shape, tested: '',
                sections: (kd.sections || []).map(x => ({ title: x.title || '', items: (x.items || []).map(item) })).filter(x => x.items.length),
@@ -422,6 +445,7 @@ async function ivDraft(again) {
     const more = (Array.isArray(kd.more) ? kd.more : []).filter(x => x && x.title && x.start).slice(0, 3);
     rv = { topic: base.topic, turns: base.turns, t0: base.t0 || Date.now(), take, titles, noticed: String(kd.noticed || '').trim(), more, k: null };
     rv.k = kFromDraft(kd);
+    starTop3(rv.k, base.turns);
     k = rv.k; made = { how: 'interview', t0: rv.t0, takes: take };
     iv = null;
     try { sessionStorage.setItem(IV, JSON.stringify({ reveal: rv })); } catch (e) {}
@@ -453,6 +477,8 @@ function renderReveal() {
       <h1 class="display kc-title">${esc(k.title)}</h1>
       ${k.tagline ? `<p class="kc-body">${esc(k.tagline)}</p>` : ''}
       <div class="rv-by">by ${esc(first)}</div>
+      ${(() => { const top = k.sections.flatMap(x => x.items.filter(i => i.star)).slice(0, 3);
+        return top.length ? `<div class="rv-sec kc-start-in"><div class="label">Start here: ${esc(first)}'s top ${top.length}</div>${top.map(it => itemRow(it)).join('')}</div>` : ''; })()}
       ${k.sections.map(sec => `<div class="rv-sec"><div class="label">${esc(sec.title)}</div>${sec.items.map(it => itemRow(it)).join('')}</div>`).join('')}
       ${k.sources.length ? `<div class="rv-sec"><div class="label">Sources I follow</div>${k.sources.map(it => itemRow(it)).join('')}</div>` : ''}
     </article>
@@ -494,7 +520,7 @@ async function revealClick(t) {
     try { sessionStorage.removeItem(IV); } catch (e) {}
     rv = null; k = null; dirty = false; made = null;
     window.scrollTo(0, 0);
-    return startInterview(next.start);
+    return startInterview(next.start, next.type === 'picks' ? 'picks' : '');
   }
   if (t.dataset.rvquit !== undefined) {
     try { sessionStorage.removeItem(IV); } catch (e) {}
@@ -552,7 +578,7 @@ async function loadIntoIdeas(topic) {
 function renderInto() {
   const t = into.topic;
   const matches = into.matches === null ? '<p class="kc-fine">Looking…</p>'
-    : into.matches.length ? into.matches.map(k => `<a class="kc-row" href="${esc(k.url)}"><span class="kc-row-t">${esc(k.title)}</span><span class="kc-row-m">${esc([k.type, k.subject, k.by ? 'by ' + k.by : ''].filter(Boolean).join(' · '))}</span></a>`).join('')
+    : into.matches.length ? into.matches.map(k => `<a class="kc-row" href="${esc(k.url)}"><span class="kc-row-t">${esc(k.title)}</span><span class="kc-row-m">${esc([k.type, k.subject, k.by ? 'by ' + k.by : ''].filter(Boolean).join(' · '))}${k.live ? ' <span class="live-badge">● Live updates</span>' : ''}</span></a>`).join('')
     : `<p class="kc-body" style="font-size:15px">No one's made a keycard on “${esc(t)}” yet. You could be the first.</p>`;
   const ideas = !owner ? `<p class="kc-body" style="font-size:15px">Get ideas for keycards you could make from your own experience.</p>
         <button class="kc-btn kc-btn-main" type="button" data-intoideas>Show me ideas</button>`
@@ -654,8 +680,11 @@ async function findIdeas(answers) {
   } catch (e) { renderFind(null, e.message); }
 }
 
-function startInterview(topic) {
-  iv = { topic, turns: [], q: '', t0: Date.now() }; noteStart('interview'); ivAsk();
+// Lists of favourites get one fixed question: the top 3 become "Start here" on the keycard.
+const TOP3_Q = 'If someone only tried three, which would they be?';
+const guessKind = topic => (pick === 'places' || /\b(favou?rite|best|top \d|spots?|restaurants?|places|caf[eé]s?|bars?|where (i|to)|picks|eats)\b/i.test(topic)) ? 'picks' : '';
+function startInterview(topic, kind) {
+  iv = { topic, turns: [], q: '', t0: Date.now(), kind: kind || guessKind(topic) }; noteStart('interview'); ivAsk();
 }
 
 window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
@@ -707,6 +736,7 @@ onUser(async u => {
     if (focus === 'add') box.querySelector(`[data-p="${k.sections.length ? 'sections.0.items' : 'sources'}.0.name"]`).focus();
     if (focus === 'remove') toast('Tap × on anything you don\'t want, then Save');
     if (focus === 'reasons') return startReasons();
+    if (focus === 'star') { shut.clear(); render(); const b = box.querySelector('[data-star]'); if (b) b.scrollIntoView({ block: 'center' }); toast('Tap ☆ on your top 3'); }
     if (focus === 'watch') { const w = box.querySelector('[data-p="watch"]'); w.scrollIntoView({ block: 'center' }); w.focus(); }
   } catch (e) { box.innerHTML = `<section class="card"><p class="kc-body">We couldn't find that keycard. <a href="${ROOT}me/">Your keycards</a></p></section>`; }
 });

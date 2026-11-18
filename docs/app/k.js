@@ -2,7 +2,7 @@
 // One layout for every shape: who made it and how fresh it is, then the most useful thing first.
 //   Picks: the list first, "what's new" after it.  Sources: "right now" first.  Playbook: numbered steps + copy boxes.
 import { loadKeycard, mountActions, onUser, esc, itemRow, fold, briefingCard, keycardUrl, makeUrl, share, kcHash,
-         markChecked, ago, toast, ROOT, live, SHAPE_LABEL, whoFor, mountAsk, askContext, versionsOf, versionsHTML } from './app.js';
+         markChecked, ago, toast, ROOT, live, SHAPE_LABEL, whoFor, mountAsk, askContext, versionsOf, versionsHTML, markNew, hasLive, LIVE_BADGE } from './app.js';
 
 const box = document.getElementById('kc');
 const params = new URLSearchParams(location.search);
@@ -49,9 +49,14 @@ async function show() {
       ${sources.length ? fold('Sources', sources.map(it => itemRow(it, cf && `added by ${first}`)), !sections.length) : ''}
     </section>` : `<section class="card"><p class="kc-body">Nothing on here yet.</p></section>`;
 
+  // Start here: the owner's own top 3, so a long list opens with their taste, not item 1 of 94.
+  const top = shape === 'picks' ? sections.flatMap(x => x.items.filter(i => i.star)).slice(0, 3) : [];
+  const start = top.length ? `<section class="card kc-start"><div class="kc-h"><span class="label">Start here: ${esc(first)}'s top ${top.length}</span></div>
+      ${top.map(it => itemRow(it)).join('')}</section>` : '<div id="starthint"></div>';
+
   box.innerHTML = `
     <section class="kc-hero">
-      <div class="eyebrow">${esc([SHAPE_LABEL[shape], k.subject].filter(Boolean).join(' · ') || 'Keycard')}</div>
+      <div class="eyebrow">${esc([SHAPE_LABEL[shape], k.subject].filter(Boolean).join(' · ') || 'Keycard')}${hasLive(k) ? ' ' + LIVE_BADGE : ''}</div>
       <h1 class="display kc-title">${esc(k.title)}</h1>
       <div class="kc-cur kc-by">${k.ownerPhoto ? `<img src="${esc(k.ownerPhoto)}" alt="" referrerpolicy="no-referrer">` : `<span class="kc-av">${esc(first.slice(0, 1))}</span>`}<span>By <b>${esc(by)}</b>${cf ? ` · based on <a href="${esc(keycardUrl(cf.id))}" style="color:inherit">${esc(cf.by)}'s</a>` : ''}</span></div>
       ${stale ? `<div class="kc-stale">Not checked for ${Math.round(days / 30)} months, so some of this may be out of date</div>` : fresh ? `<div class="kc-fresh">${fresh}</div>` : ''}
@@ -63,6 +68,7 @@ async function show() {
     <div class="kc-actions" id="acts"></div>
     <div id="ask"></div>
     <div id="mine"></div>
+    ${start}
     ${shape === 'picks' && !k.watch ? folds + '<div id="live"></div>' : '<div id="live"></div>' + folds}`;
   // Ask this keycard: answers only from what's on it, plus whatever update is showing.
   let shownBrief = null;
@@ -71,6 +77,9 @@ async function show() {
   onUser(u => {
     const preview = params.get('as') === 'friend';     // the owner, seeing it exactly as a friend would
     const own = u && u.uid === k.owner && !preview;
+    const sh = document.getElementById('starthint');
+    if (sh && own && shape === 'picks' && sections.some(x => x.items.length > 3))
+      sh.innerHTML = `<a class="kc-starthint" href="${esc(makeUrl(docId, '&focus=star'))}">☆ Star your top 3 so people know where to start</a>`;
     if (preview && u && u.uid === k.owner && !document.querySelector('.kc-previewing'))
       box.insertAdjacentHTML('afterbegin', `<div class="kc-banner kc-previewing">This is what friends see. <a href="?id=${encodeURIComponent(docId)}" style="color:var(--accent)">Back to yours</a></div>`);
     const acts = document.getElementById('acts');
@@ -152,7 +161,7 @@ async function show() {
     shownBrief = mineB;
     document.getElementById('live').innerHTML = briefingCard(mineB, `${k.watch ? 'For ' + first : title} · ${ago(mineB.updated)}`,
       k.watch ? `${first} asked: “${k.watch.replace(/[.\s]+$/, '')}” Picks from the list only use what's on this keycard. Anything new links to where it came from.`
-              : 'AI summary of the links on this keycard only. Labels show how solid each point is.');
+              : 'AI summary of the links on this keycard only. Labels show how solid each point is.'); markNew(document, 'k:' + k.id);
   } else if (k.watch && shape === 'picks') {
     document.getElementById('live').innerHTML = `<section class="card kc-now"><div class="kc-h"><span class="label">For ${esc(first)}</span></div>
       <p class="kc-body">Watching for: “${esc(k.watch)}”. The first update arrives within a few hours.</p></section>`;
@@ -161,7 +170,7 @@ async function show() {
       const src = await loadKeycard(cf.live);
       if (src.briefing) shownBrief = src.briefing;
       if (src.briefing) document.getElementById('live').innerHTML = briefingCard(src.briefing, `${title}${src.briefing.updated ? ' · ' + ago(src.briefing.updated) : ''}`,
-        `AI summary of ${src.title}'s sources. Labels show how solid each point is.`);
+        `AI summary of ${src.title}'s sources. Labels show how solid each point is.`); markNew(document, 'k:' + k.id);
     } catch (e) { /* no update yet */ }
   }
 }

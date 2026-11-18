@@ -213,32 +213,32 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
 <span class="s">94 picks</span>    <span class="by">by Manav Daryanani</span>
 <span class="tile-n" data-n="site:guide-dubai-eats-manav"></span>  </a>
   <a class="tile" href="topic-ai-tech-stocks/" data-cat="Money &amp; tech">
-    <span class="c">Live · Money &amp; tech</span>
+    <span class="c">Sources · Money &amp; tech</span>
     <b>AI &amp; Tech Stocks</b>
-<span class="s">Latest: Nvidia Q3 FY2027 earnings</span>    <span class="by">by Sid · live</span>
+<span class="s">Latest: Nvidia Q3 FY2027 earnings</span>    <span class="by">by Sid <span class="live-badge">● Live updates</span></span>
 <span class="tile-n" data-n="site:topic-ai-tech-stocks"></span>  </a>
   <a class="tile" href="topic-fpl/" data-cat="Sport">
-    <span class="c">Live · Sport</span>
+    <span class="c">Sources · Sport</span>
     <b>FPL</b>
-<span class="s">Gameweek 11 deadline: <time data-t="2026-11-21T11:00:00Z">Sat 21 Nov</time></span>    <span class="by">by Sid · live</span>
+<span class="s">Gameweek 11 deadline: <time data-t="2026-11-21T11:00:00Z">Sat 21 Nov</time></span>    <span class="by">by Sid <span class="live-badge">● Live updates</span></span>
 <span class="tile-n" data-n="site:topic-fpl"></span>  </a>
   <a class="tile" href="topic-gaming/" data-cat="Pop culture">
-    <span class="c">Live · Pop culture</span>
+    <span class="c">Sources · Pop culture</span>
     <b>Gaming</b>
-<span class="s">Next: GTA VI</span>    <span class="by">by Sid · live</span>
+<span class="s">Next: GTA VI</span>    <span class="by">by Sid <span class="live-badge">● Live updates</span></span>
 <span class="tile-n" data-n="site:topic-gaming"></span>  </a>
   <a class="tile" href="topic-premier-league/" data-cat="Sport">
-    <span class="c">Live · Sport</span>
+    <span class="c">Sources · Sport</span>
     <b>Premier League</b>
-<span class="s">Next: Liverpool vs Man United</span>    <span class="by">by Sid · live</span>
+<span class="s">Next: Liverpool vs Man United</span>    <span class="by">by Sid <span class="live-badge">● Live updates</span></span>
 <span class="tile-n" data-n="site:topic-premier-league"></span>  </a>
   <a class="tile" href="topic-ufc/" data-cat="Sport">
-    <span class="c">Live · Sport</span>
+    <span class="c">Sources · Sport</span>
     <b>UFC</b>
-<span class="s">Next: Procházka vs Stirling</span>    <span class="by">by Sid · live</span>
+<span class="s">Next: Procházka vs Stirling</span>    <span class="by">by Sid <span class="live-badge">● Live updates</span></span>
 <span class="tile-n" data-n="site:topic-ufc"></span>  </a>
 </div>
-<div class="sec-l" style="margin-top:24px">Coming up on live keycards <small style="text-transform:none;letter-spacing:0;font-weight:500">· 4 · swipe ›</small></div>
+<div class="sec-l" style="margin-top:24px">Coming up <small style="text-transform:none;letter-spacing:0;font-weight:500">· 4 · swipe ›</small></div>
 <div class="wk-strip">
   <a class="wk" href="gta-6-launch/">
     <span class="when"><time data-wk="2026-11-19T00:00:00">2026-11-19</time></span>
@@ -333,7 +333,7 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
   tick(); setInterval(tick, 30000);
 })();
 </script><script type="module">
-import { publicKeycards, tileHTML, catOf, user, onUser, counts } from './app/app.js';
+import { publicKeycards, tileHTML, hasLive, catOf, user, onUser, counts } from './app/app.js';
 const grid = document.getElementById('grid'), chips = document.getElementById('chips');
 // "This week": short local day and time, e.g. "Sat 10pm", "Tonight 1:20am", "Wed midnight".
 document.querySelectorAll('time[data-wk]').forEach(t => {
@@ -397,7 +397,7 @@ publicKeycards().then(list => {
   list = list.filter(k => !k.copiedFrom || k.edited);
   if (!list.length) return;
   grid.insertAdjacentHTML('afterbegin', list.map(k => tileHTML({
-    url: `k/?id=${encodeURIComponent(k.docId)}`, cat: catOf(k.subject), title: k.title, shape: k.shape, id: 'user:' + k.docId,
+    url: `k/?id=${encodeURIComponent(k.docId)}`, cat: catOf(k.subject), title: k.title, shape: k.shape, id: 'user:' + k.docId, live: hasLive(k),
     by: 'by ' + (k.ownerName || 'someone'), line: k.tagline })).join(''));
   paintChips(); filter(); tileCounts();
 }).catch(e => console.warn(e));
