@@ -142,6 +142,7 @@ a{color:var(--accent)} a:hover{color:#FFC56B}
 .kc-status-live{color:#FF6B6B}.kc-status-finished,.kc-status-ongoing{color:var(--good)}
 .kc-status b,.kc-status time{color:inherit}
 .kc-fine{font-size:12px;color:var(--faint);line-height:1.4}
+.kc-old{margin:8px 0 0;font-size:12px;line-height:1.4;color:var(--accent)}
 .kc-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .kc-head{margin:0;font-size:18px;line-height:1.35;font-weight:700;color:var(--ink)}
 .kc-body{margin:0;font-size:15px;line-height:1.5;color:var(--ink2)}
@@ -236,11 +237,33 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
     var d = new Date(t.dataset.day + 'T12:00:00');
     if (!isNaN(d)) t.textContent = day(d);
   });
+  function ago(d) {
+    var m = Math.round((new Date() - d) / 60000);
+    if (isNaN(m)) return '';
+    return m < 1 ? 'just now' : m < 60 ? m + 'm ago' : m < 1440 ? Math.round(m / 60) + 'h ago' : Math.round(m / 1440) + 'd ago';
+  }
   document.querySelectorAll('time[data-ago]').forEach(function (t) {
-    var m = Math.round((new Date() - new Date(t.dataset.ago)) / 60000);
-    if (isNaN(m)) return;
-    t.textContent = m < 1 ? 'just now' : m < 60 ? m + 'm ago' : m < 1440 ? Math.round(m / 60) + 'h ago' : Math.round(m / 1440) + 'd ago';
+    var a = ago(new Date(t.dataset.ago));
+    if (a) t.textContent = a;
   });
+  // Live updates: when the engine last checked the sources, and a quiet note when an update may be out of date.
+  var olds = document.querySelectorAll('.kc-old'), checks = document.querySelectorAll('.kc-checked');
+  function freshness(checked) {
+    var now = new Date();
+    if (checked && !isNaN(checked)) checks.forEach(function (c) { c.querySelector('time').textContent = ago(checked); c.hidden = false; });
+    olds.forEach(function (p) {
+      var days = (now - new Date(p.dataset.changed)) / 86400000;
+      var hours = checked && !isNaN(checked) ? (now - checked) / 3600000 : 0;
+      if (hours >= 3) p.textContent = 'Not checked for ' + Math.round(hours) + ' hours, so this may be out of date.';
+      else if (days >= 3) p.textContent = 'Nothing new from its sources in ' + Math.floor(days) + ' days, so this may be out of date.';
+      else return;
+      p.hidden = false;
+    });
+  }
+  if (olds.length || checks.length) {
+    fetch('../checked.json', { cache: 'no-store' }).then(function (r) { return r.json(); })
+      .then(function (j) { freshness(new Date(j.at)); }).catch(function () { freshness(null); });
+  }
   // Countdowns: <span data-countdown="ISO" data-done="text when passed">. No offset = viewer's local midnight.
   function tick() {
     document.querySelectorAll('[data-countdown]').forEach(function (el) {
