@@ -191,20 +191,21 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
 <div class="wrap">
 <header class="topbar"><span class="brand">KEYCARD</span><span class="chip">Beta</span></header>
 <div class="hello" id="hello">
-  <b>Borrow what someone else knows.</b>
-  <p>A <b class="k">keycard</b> is what someone knows about one thing, packaged so you can use it.</p>
-  <div class="hello-two">
-    <div><b class="k">Follow</b><span>They keep it up to date. You see what changes.</span></div>
-    <div><b class="k">Copy</b><span>Your own version. Change anything; the original keeps the credit.</span></div>
+  <button type="button" aria-label="Got it" id="hello-x">×</button>
+  <h2 class="hello-h">Borrow what someone else knows</h2>
+  <p class="hello-p">A keycard is what someone knows about one thing, packaged so you can use it.</p>
+  <div class="hello-do">
+    <div class="hello-row"><span class="hello-v">Follow</span><span>They keep it up to date. You see what changes.</span></div>
+    <div class="hello-row"><span class="hello-v">Copy</span><span>Make your own version. Change anything; they keep the credit.</span></div>
   </div>
   <div class="hello-kinds">
-    <div><i>Picks</i>favourites, and why</div>
-    <div><i>Playbook</i>how someone does it</div>
-    <div><i>Sources</i>who they learn from</div>
-    <div><i>Live</i>AI keeps it current from those sources</div>
+    <div><b>Picks</b><span>favourites, and why</span></div>
+    <div><b>Playbook</b><span>how someone does it</span></div>
+    <div><b>Sources</b><span>who they learn from</span></div>
+    <div><b>Live</b><span>kept up to date by AI</span></div>
   </div>
-  <div class="eg">Try: <a href="guide-dubai-eats-manav/">Manav's Dubai eats</a> · <a href="topic-fpl/">an FPL setup</a> · <a href="topic-ai-tech-stocks/">AI &amp; tech stocks</a></div>
-  <button type="button" aria-label="Got it" id="hello-x">×</button>
+  <div class="hello-try"><span>Try one</span>
+    <a href="guide-dubai-eats-manav/">Dubai eats</a><a href="topic-fpl/">FPL</a><a href="topic-ai-tech-stocks/">AI &amp; tech</a></div>
 </div>
 <button type="button" class="hello-back" id="hello-back" hidden>What's a keycard?</button>
 
