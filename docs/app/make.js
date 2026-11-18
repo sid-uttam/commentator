@@ -110,7 +110,7 @@ function render() {
       <input class="ed-title" data-p="title" value="${esc(k.title)}" placeholder="Name it" maxlength="80" aria-label="Name">
       <input data-p="tagline" value="${esc(k.tagline)}" placeholder="${k.copiedFrom ? 'What makes your version yours?' : 'In one line: what should someone get out of it?'}" maxlength="160" aria-label="One line">
       ${(k.sections || []).map((s, i) => listBox(s.title, s.items, `sections.${i}.items`, '', `sections.${i}.title`)).join('')}
-      ${showSources ? listBox('Sources I follow', k.sources, 'sources', 'Paste links to YouTube channels or websites and you get a short AI update from them every few hours. Say why each one is good.') : ''}
+      ${showSources ? listBox('Sources I follow', k.sources, 'sources', 'Paste links to YouTube channels, websites or podcasts (Apple or Spotify) and you get a short AI update from them every few hours. Say why each one is good. X, Instagram and Reddit links can go here too, but they can\'t feed updates.') : ''}
       <div class="ed-row">
         <button class="kc-btn kc-btn-quiet" type="button" data-addsec>+ Section</button>
         ${showSources ? '' : '<button class="kc-btn kc-btn-quiet" type="button" data-addsrc>+ Sources for updates</button>'}
