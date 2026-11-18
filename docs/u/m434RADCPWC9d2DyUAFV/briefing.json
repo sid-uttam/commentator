@@ -1,0 +1,76 @@
+{
+ "headline": "Keep your FPL weekly check to about 15 minutes, and make a small, safe change only if you need one.",
+ "points": [
+  {
+   "text": "One creator is pushing a 15-minute-style weekly routine with small transfers, not big changes. Several videos cover Gameweek 11 transfer ideas.",
+   "label": "opinion",
+   "sources": [
+    {
+     "name": "Let's Talk FPL",
+     "url": "https://www.youtube.com/watch?v=EO2TTglGNcM",
+     "date": "2026-11-18T13:02:47Z"
+    }
+   ]
+  },
+  {
+   "text": "A creator suggests considering whether to sell Haaland, and calls it a question people are asking.",
+   "label": "opinion",
+   "sources": [
+    {
+     "name": "Let's Talk FPL",
+     "url": "https://www.youtube.com/watch?v=srWgsUqLBew",
+     "date": "2026-11-18T08:56:07Z"
+    }
+   ]
+  },
+  {
+   "text": "A creator says one transfer is already made and shares early Gameweek 11 thoughts. Treat this as one person's choice, not a rule.",
+   "label": "opinion",
+   "sources": [
+    {
+     "name": "Let's Talk FPL",
+     "url": "https://www.youtube.com/watch?v=5vj-PtywhMw",
+     "date": "2026-11-09T09:03:03Z"
+    }
+   ]
+  },
+  {
+   "text": "A creator compares Free Hit timing across several weeks. There is no clear answer given, so don't rush to use the chip.",
+   "label": "opinion",
+   "sources": [
+    {
+     "name": "Let's Talk FPL",
+     "url": "https://www.youtube.com/watch?v=wBf6HvTSgjs",
+     "date": "2026-11-10T08:58:05Z"
+    }
+   ]
+  },
+  {
+   "text": "A creator reacts to Gameweek 10 results and looks ahead to Gameweek 11. Use recent results to guide your weekly check.",
+   "label": "opinion",
+   "sources": [
+    {
+     "name": "Let's Talk FPL",
+     "url": "https://www.youtube.com/watch?v=lrA70pHOiVc",
+     "date": "2026-11-08T19:50:28Z"
+    }
+   ]
+  }
+ ],
+ "differences": [
+  {
+   "text": "Videos split on whether to keep or sell Manchester United attackers, and on whether Haaland should be sold. No clear agreement across sources.",
+   "sources": [
+    {
+     "name": "Let's Talk FPL",
+     "url": "https://www.youtube.com/watch?v=srWgsUqLBew",
+     "date": "2026-11-18T08:56:07Z"
+    }
+   ]
+  }
+ ],
+ "angles": [],
+ "updated": "2026-11-18T21:38:19Z",
+ "model": "claude-haiku-5-5",
+ "items": 8
+}
