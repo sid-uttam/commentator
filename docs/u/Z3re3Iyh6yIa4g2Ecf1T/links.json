@@ -1,0 +1,17 @@
+{
+ "updated": "2026-11-18T19:37:30Z",
+ "found": [
+  {
+   "name": "Google News search",
+   "url": "https://www.youtube.com/@googlenewsinitiative",
+   "label": "Google News Initiative",
+   "platform": "YouTube"
+  },
+  {
+   "name": "Instagram",
+   "url": "https://www.youtube.com/@instagram",
+   "label": "Instagram",
+   "platform": "YouTube"
+  }
+ ]
+}

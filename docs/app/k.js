@@ -2,7 +2,7 @@
 // One layout for every shape: who made it and how fresh it is, then the most useful thing first.
 //   Picks: the list first, "what's new" after it.  Sources: "right now" first.  Playbook: numbered steps + copy boxes.
 import { loadKeycard, mountActions, onUser, esc, itemRow, fold, briefingCard, keycardUrl, makeUrl, share, kcHash,
-         markChecked, ago, toast, ROOT, live, SHAPE_LABEL, whoFor, mountAsk, askContext, versionsOf, versionsHTML, markNew, hasLive, LIVE_BADGE } from './app.js';
+         markChecked, ago, toast, ROOT, live, SHAPE_LABEL, whoFor, mountAsk, askContext, versionsOf, versionsHTML, markNew, hasLive, LIVE_BADGE, saveKeycard } from './app.js';
 
 const box = document.getElementById('kc');
 const params = new URLSearchParams(location.search);
@@ -68,6 +68,7 @@ async function show() {
     <div class="kc-actions" id="acts"></div>
     <div id="ask"></div>
     <div id="mine"></div>
+    <div id="links"></div>
     ${start}
     ${shape === 'picks' && !k.watch ? folds + '<div id="live"></div>' : '<div id="live"></div>' + folds}`;
   // Ask this keycard: answers only from what's on it, plus whatever update is showing.
@@ -77,6 +78,7 @@ async function show() {
   onUser(u => {
     const preview = params.get('as') === 'friend';     // the owner, seeing it exactly as a friend would
     const own = u && u.uid === k.owner && !preview;
+    if (own) showLinkFinds(k, docId);
     const sh = document.getElementById('starthint');
     if (sh && own && shape === 'picks' && sections.some(x => x.items.length > 3))
       sh.innerHTML = `<a class="kc-starthint" href="${esc(makeUrl(docId, '&focus=star'))}">☆ Star your top 3 so people know where to start</a>`;
@@ -175,3 +177,40 @@ async function show() {
   }
 }
 show();
+
+// ---------- links found for named sources (owner only) ----------
+// The engine looks up sources people named without a link (YouTube channels, podcasts); subreddits are linked
+// straight away. Nothing is saved until the owner taps Use.
+async function showLinkFinds(k, docId) {
+  const el = document.getElementById('links'); if (!el) return;
+  let found = [];
+  try { const r = await fetch(ROOT + 'u/' + docId + '/links.json', { cache: 'no-cache' }); if (r.ok) found = (await r.json()).found || []; } catch (e) {}
+  const all = [...(k.sections || []).flatMap(x => x.items || []), ...(k.sources || [])];
+  all.forEach(i => {
+    const m = /\br\/([A-Za-z0-9_]+)/.exec(`${i.name || ''} ${i.why || ''}`);
+    if (m && !(i.url || '').trim() && !found.some(f => f.name === i.name))
+      found.push({ name: i.name, url: `https://www.reddit.com/r/${m[1]}/`, label: `r/${m[1]}`, platform: 'Reddit' });
+  });
+  let no = [];
+  try { no = JSON.parse(localStorage.getItem('kc-links-no:' + docId) || '[]'); } catch (e) {}
+  const need = found.filter(f => !no.includes(f.name) && all.some(i => i.name === f.name && !(i.url || '').trim()));
+  if (!need.length) { el.innerHTML = ''; return; }
+  el.innerHTML = `<section class="card kc-links"><div class="kc-h"><span class="label">Found links for ${need.length} of your sources</span></div>
+    <p class="kc-fine" style="margin:0 0 6px">Check each one. Linked sources open in their app, and YouTube channels and podcasts can feed What's new.</p>
+    ${need.map((f, i) => `<div class="kc-link-row"><div class="kc-link-t"><b>${esc(f.name)}</b>
+        <a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.platform)} · ${esc(f.label || f.url)} ↗</a></div>
+      <button class="kc-btn kc-link-use" type="button" data-linkuse="${i}">Use</button>
+      <button class="kc-btn kc-link-no" type="button" data-linkno="${i}" aria-label="Not this one">✕</button></div>`).join('')}
+    ${need.length > 1 ? '<button class="kc-btn kc-btn-main" type="button" data-linkall style="margin-top:8px;width:100%">Use all</button>' : ''}</section>`;
+  const use = async list => {
+    list.forEach(f => (k.sections || []).forEach(x => (x.items || []).forEach(i => { if (i.name === f.name && !(i.url || '').trim()) i.url = f.url; })));
+    list.forEach(f => (k.sources || []).forEach(i => { if (i.name === f.name && !(i.url || '').trim()) i.url = f.url; }));
+    try { await saveKeycard(docId, { sections: k.sections || [], sources: k.sources || [] }); toast(list.length > 1 ? 'Linked.' : `Linked ${list[0].name}.`); setTimeout(() => location.reload(), 600); }
+    catch (e) { toast("Couldn't save. Check your connection."); }
+  };
+  el.querySelectorAll('[data-linkuse]').forEach(b => { b.onclick = () => { b.disabled = true; use([need[+b.dataset.linkuse]]); }; });
+  el.querySelectorAll('[data-linkno]').forEach(b => { b.onclick = () => {
+    no.push(need[+b.dataset.linkno].name); try { localStorage.setItem('kc-links-no:' + docId, JSON.stringify(no)); } catch (e) {}
+    showLinkFinds(k, docId); }; });
+  const all2 = el.querySelector('[data-linkall]'); if (all2) all2.onclick = () => { all2.disabled = true; use(need); };
+}

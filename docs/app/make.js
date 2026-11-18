@@ -63,12 +63,14 @@ function parseLines(text) {
 }
 
 const linkOpen = new Set(), copyOpen = new Set();
+const fitWhy = t => { t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; };
+const fitAllWhy = () => box.querySelectorAll('textarea.why').forEach(fitWhy);
 function itemHTML(it, path) {
   const showLink = it.url || linkOpen.has(path);
   const showCopy = typeof it.copy === 'string' || copyOpen.has(path);   // items made for copying start with copy: ''
   return `<div class="ed-item"><div class="ed-item-f">
       <input data-p="${path}.name" value="${esc(it.name)}" placeholder="Name" aria-label="Name">
-      <input class="why" data-p="${path}.why" value="${esc(it.why)}" placeholder="Why? (one line)" aria-label="Why">
+      <textarea class="why" data-p="${path}.why" rows="1" placeholder="Why?" aria-label="Why">${esc(it.why)}</textarea>
       ${showLink ? `<input class="url" data-p="${path}.url" value="${esc(it.url)}" placeholder="Paste a link" inputmode="url" aria-label="Link">` : ''}
       ${showCopy ? `<textarea class="copy" data-p="${path}.copy" placeholder="Text people can copy: a prompt, instructions, settings…" aria-label="Text to copy">${esc(it.copy || '')}</textarea>` : ''}
       ${!showLink || (!showCopy && k.shape === 'playbook') ? `<div class="ed-row" style="gap:12px">
@@ -139,13 +141,14 @@ function render() {
         <a class="kc-btn" href="${docId ? esc(keycardUrl('user:' + docId)) : ROOT}">Cancel</a>
         <button class="kc-btn kc-btn-main" type="button" data-save>Save</button>
       </div>
-    </form>`;
+    </form>`;  fitAllWhy();
 }
 
 function getPath(path) { return path.split('.').reduce((o, p) => o[p], k); }
 function setPath(path, v) { const ps = path.split('.'); const last = ps.pop(); ps.reduce((o, p) => o[p], k)[last] = v; }
 
 box.addEventListener('input', e => {
+  if (e.target.matches && e.target.matches('textarea.why')) fitWhy(e.target);
   const p = e.target.dataset.p;
   if (p) { setPath(p, e.target.value); dirty = true; }
   if (e.target.name === 'vis') { k.visibility = e.target.value; dirty = true; }
@@ -392,15 +395,22 @@ async function ivAsk() {
   }
   renderIv('thinking');
   try {
-    const d = await askAI('ask', iv.topic, iv.turns);
-    const q = String(d.question || '').trim().replace(/^["'“”]+|["'“”]+$/g, '').trim();
+    const clean = d => String((d && d.question) || '').trim().replace(/^["'“”]+|["'“”]+$/g, '').trim();
+    let d = await askAI('ask', iv.topic, iv.turns);
+    let q = clean(d);
+    if (!d.done && !q && iv.turns.length < 4) { d = await askAI('ask', iv.topic, iv.turns); q = clean(d); }   // an empty reply: ask once more
     // The AI says it's done in different ways ("DONE", "Done.", quotes, nothing at all once there's enough): all mean finish.
     if (d.done || /^\W*done\W*$/i.test(q) || (!q && iv.turns.length >= 4)) return ivDraft();
     const asked = new Set(iv.turns.map(t => qKey(t.q)));
     if (q && asked.has(qKey(q))) return iv.turns.length >= 3 ? ivDraft() : (iv.q = 'Why do you do it this way?', ivSave(), renderIv());
     // Never leave a blank question: if the AI sends nothing back early on, ask a sensible one we haven't asked yet.
-    const fallback = ['Walk me through it, step by step.', 'Why do you do it this way?', 'What did you get wrong when you started?',
-                      'What would you tell someone just starting out?', 'Anything else someone should know?'];
+    // Stand-ins name their topic, so they never read as random.
+    const raw = iv.topic.trim().replace(/[.?!]+$/, '');
+    const t = /^how i\s+/i.test(raw) ? 'how you ' + raw.replace(/^how i\s+/i, '') : /^my\s+/i.test(raw) ? 'your ' + raw.replace(/^my\s+/i, '') : raw;
+    const fallback = iv.kind === 'picks'
+      ? [`Which ones would you send a friend to first, and why?`, `Which one is overrated, or one to skip?`, 'Anything else someone should know?']
+      : [`Take me through ${t}, from start to finish. What do you actually do?`, "What's the one step you'd never skip, and why?",
+         'What did you get wrong when you started?', 'Anything else someone should know?'];
     const next = q || fallback.find(f => !asked.has(qKey(f)));
     if (!next) return ivDraft();
     iv.q = next;
