@@ -317,3 +317,6 @@ body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 
 /* "Live updates" is a badge, not a kind */
 .live-badge{display:inline-block;white-space:nowrap;font:600 11px/1.2 Inter,system-ui,sans-serif;letter-spacing:.2px;text-transform:none;color:var(--good,#5bd38a)}
+
+/* Event pages live inside a keycard */
+.kc-event-tag{display:inline-block;color:var(--accent);background:var(--accent-bg);border:1px solid var(--accent-line);border-radius:6px;padding:2px 6px;margin-right:2px}

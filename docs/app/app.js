@@ -243,7 +243,7 @@ export async function searchKeycards(q) {
   if (!siteIdx) { try { siteIdx = await (await fetch(ROOT + 'keycards.json', { cache: 'no-cache' })).json(); } catch (e) { siteIdx = []; } }
   const friends = await publicKeycards(80).catch(() => []);
   const all = [...siteIdx.map(k => ({ ...k, url: ROOT + k.url })),
-               ...friends.filter(k => !k.copiedFrom || k.edited).map(k => ({ id: k.id, url: keycardUrl(k.id), title: k.title, tagline: k.tagline || '',
+               ...friends.filter(k => (!k.copiedFrom || k.edited) && !siteIdx.some(x => x.absorbs && String(x.absorbs).replace(/[^A-Za-z0-9]/g, '') === String(k.id || '').replace(/^user:/, '').replace(/[^A-Za-z0-9]/g, ''))).map(k => ({ id: k.id, url: keycardUrl(k.id), title: k.title, tagline: k.tagline || '',
                  subject: catOf(k.subject), type: SHAPE_LABEL[k.shape] || '', live: hasLive(k), by: k.ownerName || '',
                  words: [k.title, k.tagline, k.subject, ...(k.sections || []).flatMap(x => [x.title, ...(x.items || []).map(i => i.name)])].join(' ') }))];
   return all.map(k => { const have = new Set(words(k.words + ' ' + k.title).map(stem)); return { k, n: want.filter(w => have.has(w)).length }; })
@@ -345,10 +345,10 @@ const ASK_SECOND = { live: 'Where do sources disagree?', picks: 'Where should I 
 export function mountAsk(el, id, getCtx, kind, ownerFirst) {
   const second = ASK_SECOND[kind] || ASK_SECOND.picks;
   const from = kind === 'live' ? "this keycard and its sources' latest update" : esc(ownerFirst ? ownerFirst + "'s keycard" : 'this keycard');
-  // One slim line under Follow / Copy: a field plus "What matters?". Tapping the field opens the rest.
+  // One slim line under Follow / Copy: a field plus "Quick summary" (the 2-4 things that matter most). Tapping the field opens the rest.
   el.innerHTML = `<div class="ask-bar">
     <form class="ask-row"><input type="text" name="q" maxlength="200" placeholder="Ask this keycard" aria-label="Ask this keycard" autocomplete="off">
-      <button type="button" class="ask-hot" data-q="What matters here?">What matters?</button>
+      <button type="button" class="ask-hot" data-q="Quick summary: what matters most here?">Quick summary</button>
       <button class="ask-go" type="submit" hidden>Ask</button></form>
     <div class="ask-more" hidden><button type="button" class="ask-chip" data-q="${esc(second)}">${esc(second)}</button>
       <span class="kc-fine">Answers come only from ${from}. If it isn't on here, it says so.</span></div>
@@ -494,7 +494,8 @@ export function hasLive(k) {
   if (!k) return false;
   if (k.live || k.briefing || k.watch || (k.copiedFrom && k.copiedFrom.live)) return true;
   if ((k.shape || '') === 'picks') return false;
-  return (k.sources || []).some(x => followable(x.url || ''));
+  // Same links the engine reads: anything on the keycard, steps included, not just the sources list.
+  return [...(k.sources || []), ...(k.sections || []).flatMap(x => x.items || [])].some(x => followable(x.url || ''));
 }
 export const LIVE_BADGE = '<span class="live-badge">● Live updates</span>';
 export function tileHTML({ url, cat, title, by, line, mine, shape, id, live }) {

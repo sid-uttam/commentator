@@ -218,8 +218,8 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
 <span class="s">Latest: Nvidia Q3 FY2027 earnings</span>    <span class="by">by Sid <span class="live-badge">● Live updates</span></span>
 <span class="tile-n" data-n="site:topic-ai-tech-stocks"></span>  </a>
   <a class="tile" href="topic-fpl/" data-cat="Sport">
-    <span class="c">Sources · Sport</span>
-    <b>FPL</b>
+    <span class="c">Playbook · Sport</span>
+    <b>Quarter-Hour FPL: Synthesize, Then Decide</b>
 <span class="s">Gameweek 11 deadline: <time data-t="2026-11-21T11:00:00Z">Sat 21 Nov</time></span>    <span class="by">by Sid <span class="live-badge">● Live updates</span></span>
 <span class="tile-n" data-n="site:topic-fpl"></span>  </a>
   <a class="tile" href="topic-gaming/" data-cat="Pop culture">
@@ -393,8 +393,10 @@ function tileCounts() {
 tileCounts();
 
 // Keycards friends made (public ones), first in the grid.
+// A friend's keycard that has become a site keycard (e.g. Sid's playbook is the FPL keycard) shows once, as that keycard.
+const ABSORBED = ["m434RADCPWC9d2DyUAFV"].map(x => String(x).replace(/[^A-Za-z0-9]/g, ''));
 publicKeycards().then(list => {
-  list = list.filter(k => !k.copiedFrom || k.edited);
+  list = list.filter(k => (!k.copiedFrom || k.edited) && !ABSORBED.includes(String(k.docId || k.id || '').replace(/[^A-Za-z0-9]/g, '')));
   if (!list.length) return;
   grid.insertAdjacentHTML('afterbegin', list.map(k => tileHTML({
     url: `k/?id=${encodeURIComponent(k.docId)}`, cat: catOf(k.subject), title: k.title, shape: k.shape, id: 'user:' + k.docId, live: hasLive(k),
