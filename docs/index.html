@@ -197,7 +197,42 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
   <button type="button" aria-label="Got it" id="hello-x">×</button>
 </div>
 
-<div class="sec-l">This week <small style="text-transform:none;letter-spacing:0;font-weight:500">· 6 · swipe ›</small></div>
+<div class="disc-search"><input id="q" type="search" placeholder="Search keycards: food, FPL, routines…" aria-label="Search keycards" enterkeyhint="search"></div>
+<div class="disc-empty" id="qempty" hidden></div>
+<div class="chips" id="chips" role="tablist" aria-label="Filter keycards"></div>
+<div class="grid" id="grid">
+  <a class="tile" href="guide-dubai-eats-manav/" data-cat="Food">
+    <span class="c">Picks · Food</span>
+    <b>Dubai eats by Manav</b>
+<span class="s">94 picks</span>    <span class="by">by Manav Daryanani</span>
+<span class="tile-n" data-n="site:guide-dubai-eats-manav"></span>  </a>
+  <a class="tile" href="topic-ai-tech-stocks/" data-cat="Money &amp; tech">
+    <span class="c">Live · Money &amp; tech</span>
+    <b>AI &amp; Tech Stocks</b>
+<span class="s">Latest: Nvidia Q3 FY2027 earnings</span>    <span class="by">by Sid · live</span>
+<span class="tile-n" data-n="site:topic-ai-tech-stocks"></span>  </a>
+  <a class="tile" href="topic-fpl/" data-cat="Sport">
+    <span class="c">Live · Sport</span>
+    <b>FPL</b>
+<span class="s">Gameweek 11 deadline: <time data-t="2026-11-21T11:00:00Z">Sat 21 Nov</time></span>    <span class="by">by Sid · live</span>
+<span class="tile-n" data-n="site:topic-fpl"></span>  </a>
+  <a class="tile" href="topic-gaming/" data-cat="Pop culture">
+    <span class="c">Live · Pop culture</span>
+    <b>Gaming</b>
+<span class="s">Next: GTA VI</span>    <span class="by">by Sid · live</span>
+<span class="tile-n" data-n="site:topic-gaming"></span>  </a>
+  <a class="tile" href="topic-premier-league/" data-cat="Sport">
+    <span class="c">Live · Sport</span>
+    <b>Premier League</b>
+<span class="s">Next: Liverpool vs Man United</span>    <span class="by">by Sid · live</span>
+<span class="tile-n" data-n="site:topic-premier-league"></span>  </a>
+  <a class="tile" href="topic-ufc/" data-cat="Sport">
+    <span class="c">Live · Sport</span>
+    <b>UFC</b>
+<span class="s">Next: Procházka vs Stirling</span>    <span class="by">by Sid · live</span>
+<span class="tile-n" data-n="site:topic-ufc"></span>  </a>
+</div>
+<div class="sec-l" style="margin-top:24px">Coming up on live keycards <small style="text-transform:none;letter-spacing:0;font-weight:500">· 4 · swipe ›</small></div>
 <div class="wk-strip">
   <a class="wk" href="gta-6-launch/">
     <span class="when"><time data-wk="2026-11-19T00:00:00">2026-11-19</time></span>
@@ -219,66 +254,6 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
     <b>Liverpool vs Man United</b>
     <span class="in">Premier League</span>
   </a>
-  <a class="wk" href="arsenal-dortmund-2026-11-24/">
-    <span class="when"><time data-wk="2026-11-25T00:00:00+04:00">2026-11-25</time></span>
-    <b>Arsenal vs Dortmund</b>
-    <span class="in">Champions League</span>
-  </a>
-  <a class="wk" href="man-city-napoli-2026-11-24/">
-    <span class="when"><time data-wk="2026-11-25T00:00:00+04:00">2026-11-25</time></span>
-    <b>Man City vs Napoli</b>
-    <span class="in">Champions League</span>
-  </a>
-</div>
-<div class="disc-search"><input id="q" type="search" placeholder="Search keycards: food, FPL, routines…" aria-label="Search keycards" enterkeyhint="search"></div>
-<div class="disc-empty" id="qempty" hidden></div>
-<div class="chips" id="chips" role="tablist" aria-label="Filter keycards"></div>
-<div class="grid" id="grid">
-  <a class="tile" href="guide-dubai-eats-manav/" data-cat="Food">
-    <span class="c">Picks · Food</span>
-    <b>Dubai eats by Manav</b>
-<span class="s">94 picks</span>    <span class="by">by Manav Daryanani</span>
-<span class="tile-n" data-n="site:guide-dubai-eats-manav"></span>  </a>
-  <a class="tile" href="topic-ai-tech-stocks/" data-cat="Money &amp; tech">
-    <span class="c">Live · Money &amp; tech</span>
-    <b>AI &amp; Tech Stocks</b>
-<span class="s">Latest: Nvidia Q3 FY2027 earnings</span>    <span class="by">by Sid · live</span>
-<span class="tile-n" data-n="site:topic-ai-tech-stocks"></span>  </a>
-  <a class="tile" href="topic-champions-league/" data-cat="Sport">
-    <span class="c">Live · Sport</span>
-    <b>Champions League</b>
-<span class="s">Next: Arsenal vs Dortmund</span>    <span class="by">by Sid · live</span>
-<span class="tile-n" data-n="site:topic-champions-league"></span>  </a>
-  <a class="tile" href="topic-fpl/" data-cat="Sport">
-    <span class="c">Live · Sport</span>
-    <b>FPL</b>
-<span class="s">Gameweek 11 deadline: <time data-t="2026-11-21T11:00:00Z">Sat 21 Nov</time></span>    <span class="by">by Sid · live</span>
-<span class="tile-n" data-n="site:topic-fpl"></span>  </a>
-  <a class="tile" href="topic-gaming/" data-cat="Pop culture">
-    <span class="c">Live · Pop culture</span>
-    <b>Gaming</b>
-<span class="s">Next: GTA VI</span>    <span class="by">by Sid · live</span>
-<span class="tile-n" data-n="site:topic-gaming"></span>  </a>
-  <a class="tile" href="topic-movies/" data-cat="Pop culture">
-    <span class="c">Live · Pop culture</span>
-    <b>Movies</b>
-<span class="s">Next: Avengers: Doomsday</span>    <span class="by">by Sid · live</span>
-<span class="tile-n" data-n="site:topic-movies"></span>  </a>
-  <a class="tile" href="topic-music/" data-cat="Pop culture">
-    <span class="c">Live · Pop culture</span>
-    <b>Music</b>
-<span class="s">Latest: Grammy nominations</span>    <span class="by">by Sid · live</span>
-<span class="tile-n" data-n="site:topic-music"></span>  </a>
-  <a class="tile" href="topic-premier-league/" data-cat="Sport">
-    <span class="c">Live · Sport</span>
-    <b>Premier League</b>
-<span class="s">Next: Liverpool vs Man United</span>    <span class="by">by Sid · live</span>
-<span class="tile-n" data-n="site:topic-premier-league"></span>  </a>
-  <a class="tile" href="topic-ufc/" data-cat="Sport">
-    <span class="c">Live · Sport</span>
-    <b>UFC</b>
-<span class="s">Next: Procházka vs Stirling</span>    <span class="by">by Sid · live</span>
-<span class="tile-n" data-n="site:topic-ufc"></span>  </a>
 </div>
 <footer class="footer">
   Keycard is in beta. AI updates only use each keycard's listed sources. Not affiliated with anyone it covers.
