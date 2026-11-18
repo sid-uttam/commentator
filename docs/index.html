@@ -192,10 +192,21 @@ a.kc-row:hover .kc-row-t{color:var(--ink)}
 <header class="topbar"><span class="brand">KEYCARD</span><span class="chip">Beta</span></header>
 <div class="hello" id="hello">
   <b>Borrow what someone else knows.</b>
-  <p>People share <b class="k">keycards</b>: their go-to sources, picks and tips on something they know well. <b class="k">Follow</b> one for updates, or <b class="k">copy</b> it and make it yours. AI keeps it current.</p>
+  <p>A <b class="k">keycard</b> is what someone knows about one thing, packaged so you can use it.</p>
+  <div class="hello-two">
+    <div><b class="k">Follow</b><span>They keep it up to date. You see what changes.</span></div>
+    <div><b class="k">Copy</b><span>Your own version. Change anything; the original keeps the credit.</span></div>
+  </div>
+  <div class="hello-kinds">
+    <div><i>Picks</i>favourites, and why</div>
+    <div><i>Playbook</i>how someone does it</div>
+    <div><i>Sources</i>who they learn from</div>
+    <div><i>Live</i>AI keeps it current from those sources</div>
+  </div>
   <div class="eg">Try: <a href="guide-dubai-eats-manav/">Manav's Dubai eats</a> · <a href="topic-fpl/">an FPL setup</a> · <a href="topic-ai-tech-stocks/">AI &amp; tech stocks</a></div>
   <button type="button" aria-label="Got it" id="hello-x">×</button>
 </div>
+<button type="button" class="hello-back" id="hello-back" hidden>What's a keycard?</button>
 
 <div class="disc-search"><input id="q" type="search" placeholder="Search keycards: food, FPL, routines…" aria-label="Search keycards" enterkeyhint="search"></div>
 <div class="disc-empty" id="qempty" hidden></div>
@@ -344,8 +355,10 @@ document.querySelectorAll('time[data-wk]').forEach(t => {
   t.textContent = `${day} ${time}`;
 });
 const hello = document.getElementById('hello');
-try { if (localStorage.getItem('kc-hello')) hello.hidden = true; } catch (e) {}
-document.getElementById('hello-x').onclick = () => { hello.hidden = true; try { localStorage.setItem('kc-hello', '1'); } catch (e) {} };
+const helloBack = document.getElementById('hello-back');
+try { if (localStorage.getItem('kc-hello')) { hello.hidden = true; helloBack.hidden = false; } } catch (e) {}
+document.getElementById('hello-x').onclick = () => { hello.hidden = true; helloBack.hidden = false; try { localStorage.setItem('kc-hello', '1'); } catch (e) {} };
+helloBack.onclick = () => { hello.hidden = false; helloBack.hidden = true; };
 
 let current = 'All';
 function paintChips() {

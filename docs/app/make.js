@@ -1,5 +1,5 @@
 // Make or edit a keycard: /make/ (new) or /make/?id=<doc id> (edit). Never a blank page: start from a shape or a copy.
-import { onUser, signIn, signInSheet, noteStart, searchKeycards, saveAsk, loadKeycard, saveKeycard, deleteKeycard, keycardUrl, esc, toast, ROOT, live, SUBJECTS, catOf, aiUrl, askAI } from './app.js';
+import { onUser, signIn, signInSheet, noteStart, searchKeycards, saveAsk, loadKeycard, saveKeycard, deleteKeycard, keycardUrl, esc, toast, ROOT, live, SUBJECTS, catOf, aiUrl, askAI, itemRow, myName, SHAPE_LABEL } from './app.js';
 
 const box = document.getElementById('ed');
 const params = new URLSearchParams(location.search);
@@ -175,6 +175,8 @@ box.addEventListener('click', async e => {
   if (e.target.closest('[data-blank]')) { e.preventDefault(); start('picks'); return; }
   if (e.target.closest('[data-ivquit]')) { e.preventDefault(); iv = null; pick = null; try { sessionStorage.removeItem(IV); } catch (x) {} starters(); return; }
   if (e.target.closest('[data-rsstop]')) { e.preventDefault(); finishReasons(); return; }
+  const rvt = e.target.closest('[data-rvtitle],[data-rvvis],[data-rvsave],[data-rvtweak],[data-rvagain],[data-rvmore],[data-rvquit]');
+  if (rvt && rv) { e.preventDefault(); return revealClick(rvt); }
   if (e.target.closest('[data-back]')) { e.preventDefault(); pick = null; into = null; starters(); scrollTo(0, 0); return; }
   const t = e.target.closest('button'); if (!t) return;
   const d = t.dataset;
@@ -250,7 +252,7 @@ function payload() {
     shape: k.shape || '', tested: (k.tested || '').trim(), watch: (k.watch || '').trim(),
     visibility: k.visibility, copiedFrom: k.copiedFrom || null, edited: !!(k.edited || (k.copiedFrom && dirty) || !k.copiedFrom),
   };
-  if (!docId && made) data.made = { how: made.how, secs: Math.round((Date.now() - made.t0) / 1000) };
+  if (!docId && made) data.made = { how: made.how, secs: Math.round((Date.now() - made.t0) / 1000), ...(made.takes > 1 ? { takes: made.takes } : {}), ...(made.tweaked ? { tweaked: true } : {}) };
   return data;
 }
 async function save(btn) {
@@ -260,6 +262,7 @@ async function save(btn) {
   try {
     const id = await saveKeycard(docId, data);
     dirty = false;
+    try { sessionStorage.removeItem(IV); } catch (e) {}
     location.href = keycardUrl('user:' + id);
   } catch (e) { console.error(e); toast("Couldn't save. Check your connection and try again."); btn.disabled = false; btn.textContent = 'Save'; }
 }
@@ -383,22 +386,109 @@ async function ivAsk() {
   } catch (e) { renderIv(null, e.message); }
 }
 
-async function ivDraft() {
-  renderIv('drafting');
+// The draft, as a keycard the editor understands.
+function kFromDraft(kd) {
+  const shape = ['picks', 'sources', 'playbook'].includes(kd.shape) ? kd.shape : 'playbook';
+  const item = i => ({ name: i.name || '', why: i.why || '', url: i.url || '', ...(i.copy ? { copy: i.copy } : {}) });
+  const nk = { title: kd.title || (rv || iv).topic, tagline: kd.tagline || '', subject: SUBJECTS.includes(kd.subject) ? kd.subject : '',
+               visibility: 'public', copiedFrom: null, kind: shape, shape, tested: '',
+               sections: (kd.sections || []).map(x => ({ title: x.title || '', items: (x.items || []).map(item) })).filter(x => x.items.length),
+               sources: (kd.sources || []).map(item), instruction: kd.instruction || STARTERS[shape].k.instruction };
+  if (!nk.sections.length && !nk.sources.length) nk.sections = [{ title: 'My picks', items: [blankItem()] }];
+  return nk;
+}
+
+async function ivDraft(again) {
+  const base = again ? rv : iv;
+  const take = again ? rv.take + 1 : 1;
+  if (again) {
+    const b = box.querySelector('[data-rvagain]'); if (b) { b.disabled = true; b.textContent = 'Trying another take…'; }
+  } else renderIv('drafting');
   try {
-    const kd = (await askAI('draft', iv.topic, iv.turns)).keycard || {};
-    made = { how: 'interview', t0: iv.t0 || Date.now() };
-    const shape = ['picks', 'sources', 'playbook'].includes(kd.shape) ? kd.shape : 'playbook';
-    const item = i => ({ name: i.name || '', why: i.why || '', url: i.url || '', ...(i.copy ? { copy: i.copy } : {}) });
-    k = { title: kd.title || iv.topic, tagline: kd.tagline || '', subject: SUBJECTS.includes(kd.subject) ? kd.subject : '',
-          visibility: 'public', copiedFrom: null, kind: shape, shape, tested: '',
-          sections: (kd.sections || []).map(x => ({ title: x.title || '', items: (x.items || []).map(item) })).filter(x => x.items.length),
-          sources: (kd.sources || []).map(item), instruction: kd.instruction || STARTERS[shape].k.instruction };
-    if (!k.sections.length && !k.sources.length) k.sections = [{ title: 'My picks', items: [blankItem()] }];
+    const avoid = again ? `last time the title was "${rv.k.title}" and the sections were: ${rv.k.sections.map(x => x.title).join(', ')}` : '';
+    const kd = (await askAI('draft', base.topic, base.turns, take > 1 ? { take, avoid } : {})).keycard || {};
+    const titles = [...new Set([kd.title, ...(Array.isArray(kd.titles) ? kd.titles : [])].map(t => String(t || '').trim()).filter(Boolean))].slice(0, 3);
+    const more = (Array.isArray(kd.more) ? kd.more : []).filter(x => x && x.title && x.start).slice(0, 3);
+    rv = { topic: base.topic, turns: base.turns, t0: base.t0 || Date.now(), take, titles, noticed: String(kd.noticed || '').trim(), more, k: null };
+    rv.k = kFromDraft(kd);
+    k = rv.k; made = { how: 'interview', t0: rv.t0, takes: take };
+    iv = null;
+    try { sessionStorage.setItem(IV, JSON.stringify({ reveal: rv })); } catch (e) {}
+    renderReveal();
+    window.scrollTo(0, 0);
+  } catch (e) {
+    if (again) { toast(e.message || "Couldn't make another take. Try again."); renderReveal(); }
+    else renderIv(null, e.message);
+  }
+}
+
+// ---------- the reveal: "Your keycard is ready" ----------
+// The payoff of the interview: the keycard exactly as a friend will see it, what the AI noticed, a choice of titles,
+// and more keycards hiding in what they said. Editing is optional ("Tweak it"), not the first thing they see.
+let rv = null;   // { topic, turns, t0, take, titles, noticed, more, k }
+const TYPE_WORD = { picks: 'picks', sources: 'sources', playbook: 'steps' };
+function renderReveal() {
+  k = rv.k;
+  const label = SHAPE_LABEL[k.shape] || 'Keycard';
+  const n = k.sections.reduce((a, x) => a + x.items.length, 0) + k.sources.length;
+  const first = (myName() || '').split(' ')[0] || 'you';
+  box.innerHTML = `<section class="rv">
+    <div class="rv-ready"><span class="rv-spark">✦</span> Your keycard is ready${rv.take > 1 ? ` <small>· take ${rv.take}</small>` : ''}</div>
+    ${rv.noticed ? `<div class="rv-noticed"><span class="label">What I noticed</span><p>${esc(rv.noticed)}</p></div>` : ''}
+    ${rv.titles.length > 1 ? `<div class="rv-titles"><span class="label">Pick a title</span>
+      ${rv.titles.map((t, i) => `<button type="button" class="rv-t${t === k.title ? ' on' : ''}" data-rvtitle="${i}">${esc(t)}</button>`).join('')}</div>` : ''}
+    <article class="rv-card">
+      <div class="eyebrow">${esc(label)}${k.subject ? ' · ' + esc(k.subject) : ''}</div>
+      <h1 class="display kc-title">${esc(k.title)}</h1>
+      ${k.tagline ? `<p class="kc-body">${esc(k.tagline)}</p>` : ''}
+      <div class="rv-by">by ${esc(first)}</div>
+      ${k.sections.map(sec => `<div class="rv-sec"><div class="label">${esc(sec.title)}</div>${sec.items.map(it => itemRow(it)).join('')}</div>`).join('')}
+      ${k.sources.length ? `<div class="rv-sec"><div class="label">Sources I follow</div>${k.sources.map(it => itemRow(it)).join('')}</div>` : ''}
+    </article>
+    <div class="rv-share"><span class="label">When you share it</span>
+      <div class="rv-wa"><b>${esc(k.title)}</b><span>${esc(label)} by ${esc(first)} · ${n} ${TYPE_WORD[k.shape] || 'things'} · Keycard</span></div></div>
+    <div class="rv-actions">
+      <div class="rv-vis" role="radiogroup" aria-label="Who can see it"><span class="label">Who can see it</span>
+        ${[['public', 'Everyone', 'on Discover'], ['unlisted', 'Link only', 'people you send it to'], ['private', 'Just me', '']].map(([v, l, h]) =>
+          `<button type="button" role="radio" aria-checked="${k.visibility === v}" class="rv-v${k.visibility === v ? ' on' : ''}" data-rvvis="${v}"><b>${l}</b>${h ? `<small>${h}</small>` : ''}</button>`).join('')}</div>
+      <button class="kc-btn kc-btn-main" type="button" data-rvsave>Looks good: save it</button>
+      <div class="rv-two"><button class="kc-btn" type="button" data-rvtweak>Tweak it</button>
+      <button class="kc-btn" type="button" data-rvagain>Try another take</button></div>
+      <p class="kc-fine">Everything on it came from your answers. Another take changes the shape and titles, never your picks or reasons.</p>
+    </div>
+    ${rv.more.length ? `<section class="rv-more"><span class="label">I spotted more keycards in what you said</span>
+      ${rv.more.map((m, i) => `<button type="button" class="mk-idea mk-idea-typed" data-rvmore="${i}"><span class="mk-type">${esc(SHAPE_LABEL[m.type] || 'Keycard')}</span><b>${esc(m.title)}</b></button>`).join('')}
+      <p class="kc-fine">Tapping one saves this keycard first, then starts the next interview.</p></section>` : ''}
+    <p class="kc-fine" style="text-align:center"><a href="#" data-rvquit style="color:var(--faint)">Start over</a></p>
+  </section>`;
+}
+async function revealClick(t) {
+  if (t.dataset.rvtitle !== undefined) { rv.k.title = rv.titles[+t.dataset.rvtitle]; return renderReveal(); }
+  if (t.dataset.rvvis !== undefined) { rv.k.visibility = t.dataset.rvvis; try { sessionStorage.setItem(IV, JSON.stringify({ reveal: rv })); } catch (e) {} return renderReveal(); }
+  if (t.dataset.rvsave !== undefined) return save(t);
+  if (t.dataset.rvtweak !== undefined) {
+    made.tweaked = true; dirty = true;
     try { sessionStorage.removeItem(IV); } catch (e) {}
-    iv = null; dirty = true; render();
-    toast("Here's your draft. Fix anything that's off, then Save.");
-  } catch (e) { renderIv(null, e.message); }
+    rv = null; render(); window.scrollTo(0, 0);
+    return toast('Change anything, then Save.');
+  }
+  if (t.dataset.rvagain !== undefined) return ivDraft(true);
+  if (t.dataset.rvmore !== undefined) {
+    const next = rv.more[+t.dataset.rvmore];
+    t.disabled = true;
+    try {
+      await saveKeycard(null, payload());
+      toast(`Saved “${k.title}”. On to the next one.`);
+    } catch (e) { t.disabled = false; return toast("Couldn't save this one. Check your connection."); }
+    try { sessionStorage.removeItem(IV); } catch (e) {}
+    rv = null; k = null; dirty = false; made = null;
+    window.scrollTo(0, 0);
+    return startInterview(next.start);
+  }
+  if (t.dataset.rvquit !== undefined) {
+    try { sessionStorage.removeItem(IV); } catch (e) {}
+    rv = null; k = null; dirty = false; return starters();
+  }
 }
 
 // One obvious way in: the interview (or a paste, until the interview is switched on). No shapes to choose:
@@ -493,7 +583,7 @@ function starters() {
     </section>`;
   box.innerHTML = `<section class="kc-hero">
       <h1 class="display kc-title">EVERYONE KNOWS SOMETHING.</h1>
-      <p class="kc-body">Turn something you've figured out into a keycard someone else can borrow.</p></section>
+      <p class="kc-body">Turn something you've figured out into a keycard someone else can borrow. Answer a few questions and AI writes it up in your words; you check everything before it's saved. About 3 minutes.</p></section>
     ${aiUrl ? `<section class="ed-sec ed-start mk-into">
       <span class="label">What are you into?</span>
       <div class="mk-into-row"><input id="into" placeholder="e.g. 7-a-side tactics, Bali" maxlength="80" enterkeyhint="go">
@@ -583,6 +673,7 @@ onUser(async u => {
       if (pend.act === 'find' && aiUrl) { pick = 'find'; found = { answers: pend.answers || [] }; starters(); return findIdeas(pend.answers || []); }
     }
     try { iv = JSON.parse(sessionStorage.getItem(IV) || 'null'); } catch (e) { iv = null; }
+    if (iv && iv.reveal) { rv = iv.reveal; iv = null; made = { how: 'interview', t0: rv.t0, takes: rv.take }; return renderReveal(); }
     if (iv && iv.q && aiUrl) return renderIv();
     if (params.get('into') && aiUrl) return startInto(params.get('into'));
     return starters();

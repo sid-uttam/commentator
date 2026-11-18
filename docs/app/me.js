@@ -8,13 +8,13 @@ onUser(async u => {
   if (!live()) { box.innerHTML = `<section class="card"><p class="kc-body">Sign-in opens very soon.</p></section>`; return; }
   if (!u) {
     box.innerHTML = `<section class="disc-h"><h1 class="display">MINE</h1></section>
-      <section class="card"><p class="kc-body">Sign in to keep the keycards you make, copy and follow in one place.</p>
+      <section class="card"><p class="kc-body">Your keycards live here: the ones you make, the copies you've made your own, and the ones you follow for updates.</p>
       <button class="kc-btn kc-btn-main" type="button" id="si">Sign in with Google</button></section>`;
     document.getElementById('si').onclick = () => signIn();
     return;
   }
-  box.innerHTML = `<section class="disc-h"><h1 class="display">MINE</h1></section>
-    <div class="sec-l">Made by you</div><div class="grid" id="mine"><div class="grid-empty">Loading…</div></div>
+  box.innerHTML = `<section class="disc-h"><h1 class="display">MINE</h1><p class="kc-fine" style="margin:4px 0 0">Everything you've made, copied and followed, in one place.</p></section>
+    <div class="sec-l">Made or copied by you</div><div class="grid" id="mine"><div class="grid-empty">Loading…</div></div>
     <div class="sec-l">Following</div><div class="grid" id="fol"><div class="grid-empty">Loading…</div></div>
     ${isAdmin() ? '<div class="sec-l">Beta results <small style="text-transform:none;letter-spacing:0">only you see this</small></div><div id="beta" class="card"><p class="kc-fine">Loading…</p></div>' : ''}
     <div class="kc-toggle"><span><b>Your name on keycards</b><small>How friends see you, e.g. "Sid".</small></span>
@@ -71,6 +71,19 @@ async function betaResults() {
   const hows = by(made.filter(k => k.made), 'made'); const howCount = {};
   made.forEach(k => { const h = (k.made || {}).how; if (h) howCount[h] = (howCount[h] || 0) + 1; });
   if (Object.keys(howCount).length) html += row('How they made them', Object.entries(howCount).map(([h, n]) => `${h} ${n}`).join(' · '));
+  // The creation hook: do people play with the reveal, share what they made, and make another?
+  const ivMade = madeOwn.filter(k => (k.made || {}).how === 'interview');
+  if (ivMade.length) html += row('Interview keycards: tried another take', `${ivMade.filter(k => (k.made.takes || 1) > 1).length} of ${ivMade.length}`)
+    + row('Tweaked before saving', `${ivMade.filter(k => k.made.tweaked).length} of ${ivMade.length}`);
+  const tms = t => t && t.toMillis ? t.toMillis() : (t && t.__ts) || 0;
+  const byOwner = {};
+  madeOwn.forEach(k => { const t = tms(k.created); if (t) (byOwner[k.owner] = byOwner[k.owner] || []).push(t); });
+  const makers = Object.keys(byOwner).length;
+  if (makers) {
+    const second = Object.values(byOwner).filter(ts => { ts.sort((a, b) => a - b); return ts.length > 1 && ts[1] - ts[0] < 864e5; }).length;
+    const sharers = d.users.filter(u => (u.shared || []).some(id => madeOwn.some(k => k.owner === u.id && k.id === id))).length;
+    html += row('Made a second keycard within a day', `${second} of ${makers} makers`) + row('Shared their own keycard', `${sharers} of ${makers} makers`);
+  }
 
   // Coming back: did people return on another day, and a week later? (Opens are recorded once a day per keycard.)
   const daysBy = {};

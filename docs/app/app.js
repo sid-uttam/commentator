@@ -414,11 +414,23 @@ export function toast(msg) {
   clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), 2600);
 }
 
+// For Beta results: which keycards someone has shared (read-modify-write on their own user record; no new rules).
+async function noteShare(url) {
+  try {
+    const m = url.match(/\/u\/([^/?#]+)/) || url.match(/[?&]id=([^&#]+)/);
+    if (!m || !me) return;
+    const id = decodeURIComponent(m[1]).replace(/^user:/, '');
+    const f = await ready, ref = f.F.doc(f.db, 'users', me.uid);
+    const cur = ((await f.F.getDoc(ref)).data() || {}).shared || [];
+    if (!cur.includes(id)) await f.F.setDoc(ref, { shared: [...cur, id].slice(-50) }, { merge: true });
+  } catch (e) {}
+}
 export async function share(title, url) {
   // A friend's keycard gets its own preview page at the next update (every 30 minutes). Until then, share the
   // live page link, which has a general Keycard preview, so WhatsApp always shows a card.
   const m = url.match(/\/u\/([^/]+)\/?$/);
   if (m) { try { const r = await fetch(url, { method: 'HEAD', cache: 'no-store' }); if (!r.ok) url = ROOT + 'k/?id=' + encodeURIComponent(m[1]); } catch (e) {} }
+  noteShare(url);
   if (navigator.share) { try { await navigator.share({ title, url }); return; } catch (e) { if (e.name === 'AbortError') return; } }
   try { await navigator.clipboard.writeText(url); toast('Link copied'); } catch (e) { prompt('Copy this link', url); }
 }
@@ -462,7 +474,7 @@ export function mountActions(el, id, opts = {}) {
   const paint = () => { fBtn.textContent = following ? 'Following ✓' : 'Follow'; fBtn.classList.toggle('on', following); };
   const showCounts = async () => {
     const out = el.querySelector('.kc-counts'); const c = await counts(id);
-    out.textContent = opts.copyNote ? `${opts.followNote || 'Follow to get its updates.'} ${opts.copyNote}` : 'Follow to get its updates. Copy to make your own version: change anything, and the original stays as it is.';
+    out.textContent = opts.copyNote ? `${opts.followNote || 'Follow to see what changes.'} ${opts.copyNote}` : 'Follow: they keep it up to date, and you see what changes. Copy: your own version to change however you like; the original keeps the credit.';
     // Copies are the proof a keycard is worth borrowing, so they lead, big and bold.
     const st = el.querySelector('.kc-stats');
     const bits = c ? [c.copies ? `<span><b>${c.copies}</b> ${c.copies === 1 ? 'person has' : 'people have'} copied this</span>` : '',

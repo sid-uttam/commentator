@@ -135,6 +135,13 @@ body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 .ed-more[open]{display:flex;flex-direction:column;gap:14px}
 .hello p b.k{font:inherit;font-weight:700;color:var(--accent);text-transform:none;letter-spacing:0}
 .hello .eg{font-size:13px;color:var(--accent-ink);opacity:.9;margin-top:4px;line-height:1.5}
+.hello-two{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.hello-two div{display:flex;flex-direction:column;gap:2px;background:rgba(0,0,0,.18);border-radius:12px;padding:8px 10px}
+.hello-two b.k{font:700 15px/1.2 Inter,system-ui,sans-serif;text-transform:none;letter-spacing:0;color:var(--accent)}
+.hello-two span{font-size:13px;line-height:1.35;color:var(--accent-ink)}
+.hello-kinds{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;margin-top:6px;font-size:12.5px;line-height:1.35;color:var(--accent-ink)}
+.hello-kinds i{display:block;font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--accent)}
+.hello-back{align-self:flex-start;font:600 13px Inter,system-ui,sans-serif;color:var(--muted);background:none;border:0;padding:0;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .hello .eg a{color:var(--accent-ink);font-weight:600;text-underline-offset:2px}
 .kc-toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;cursor:pointer}
 .kc-toggle span{display:flex;flex-direction:column;gap:2px}.kc-toggle b{font-size:15px;color:var(--ink)}.kc-toggle small{font-size:12px;color:var(--faint);line-height:1.4}
@@ -268,3 +275,31 @@ body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 .kc-versions{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin:-6px 0 12px;font:500 14px/1.3 Inter,system-ui,sans-serif;color:var(--ink2)}
 .kc-versions a{color:var(--accent);font-weight:600;text-decoration:none}
 .kc-versions i{font-style:normal;color:var(--faint)}
+
+/* The reveal: "Your keycard is ready" */
+.rv{display:flex;flex-direction:column;gap:14px}
+.rv-ready{font:700 13px/1.2 Inter,system-ui,sans-serif;letter-spacing:.8px;text-transform:uppercase;color:var(--accent);animation:rvIn .5s ease both}
+.rv-ready small{color:var(--muted);letter-spacing:0;text-transform:none;font-weight:600}
+.rv-spark{display:inline-block;animation:rvSpin 1.2s ease both}
+.rv-noticed{background:var(--accent-bg);border:1px solid var(--accent-line);border-radius:16px;padding:12px 14px;animation:rvIn .5s .1s ease both}
+.rv-noticed p{margin:4px 0 0;font:500 16px/1.45 Inter,system-ui,sans-serif;color:var(--accent-ink)}
+.rv-titles{display:flex;flex-direction:column;gap:6px;animation:rvIn .5s .2s ease both}
+.rv-t{text-align:left;font:600 15px/1.3 Inter,system-ui,sans-serif;color:var(--ink2);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer}
+.rv-t.on{color:var(--ink);border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
+.rv-card{background:var(--card);border:1px solid var(--line2);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:8px;animation:rvIn .6s .3s ease both}
+.rv-card .kc-title{margin:0}
+.rv-by{font-size:13px;color:var(--muted)}
+.rv-sec{display:flex;flex-direction:column;gap:2px;margin-top:6px}
+.rv-share .rv-wa{margin-top:6px;display:flex;flex-direction:column;gap:2px;background:#1f2c33;border-left:4px solid var(--accent);border-radius:10px;padding:10px 12px}
+.rv-wa b{font:700 15px/1.25 Inter,system-ui,sans-serif;color:#e9edef}.rv-wa span{font-size:13px;color:#8696a0}
+.rv-actions{display:flex;flex-direction:column;gap:8px}
+.rv-two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rv-vis{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.rv-vis .label{grid-column:1/-1}
+.rv-v{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 10px;cursor:pointer;color:var(--ink2)}
+.rv-v b{font:600 14px/1.2 Inter,system-ui,sans-serif}.rv-v small{font-size:11px;line-height:1.3;color:var(--faint)}
+.rv-v.on{border-color:var(--accent);color:var(--ink);box-shadow:inset 0 0 0 1px var(--accent)}
+.rv-more{display:flex;flex-direction:column;gap:8px}
+@keyframes rvIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes rvSpin{from{transform:rotate(-90deg) scale(.4);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion: reduce){.rv *{animation:none!important}}
