@@ -1,20 +1,9 @@
 {
- "headline": "Gameweek 11 transfer talk is everywhere, but you only need one short weekly decision window and a safe, simple plan.",
+ "headline": "Gameweek 11 transfer talk is heavy, so keep your 15-minute window simple and decide on your gut.",
  "points": [
   {
-   "text": "Most of this material is video content from one FPL creator, and several videos carry paid ad links. Treat their advice as one person's view.",
-   "label": "reported",
-   "sources": [
-    {
-     "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=dyB2_hpVP1Y",
-     "date": "2026-11-19T08:44:01Z"
-    }
-   ]
-  },
-  {
-   "text": "The creator is weighing whether to sell Haaland and whether to keep or sell Man United attackers. Both are open questions, not settled advice.",
-   "label": "reported",
+   "text": "Several creators are debating Gameweek 11 moves, including whether to sell Haaland and whether to keep or sell Man United attackers.",
+   "label": "opinion",
    "sources": [
     {
      "name": "Let's Talk FPL",
@@ -24,8 +13,8 @@
    ]
   },
   {
-   "text": "One video discusses which Gameweek to use a Free Hit chip in, but compares several options without picking a single answer.",
-   "label": "reported",
+   "text": "Creators disagree on whether to use a Free Hit chip, and on which week would suit it best.",
+   "label": "opinion",
    "sources": [
     {
      "name": "Let's Talk FPL",
@@ -35,19 +24,41 @@
    ]
   },
   {
-   "text": "A recent video says the creator has already made a transfer for Gameweek 11. Viewers can use that as a sign of what one person is doing, not a rule.",
+   "text": "One creator shares a full Gameweek 11 team and says to hold off on the chip choice for now.",
    "label": "opinion",
    "sources": [
     {
      "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=5vj-PtywhMw",
-     "date": "2026-11-09T09:03:03Z"
+     "url": "https://www.youtube.com/watch?v=dyB2_hpVP1Y",
+     "date": "2026-11-19T08:44:01Z"
     }
    ]
   },
   {
-   "text": "For a 15-minute weekly routine, pick one video or none, make your transfers once, and avoid chasing every hot take.",
-   "label": "ai interpretation",
+   "text": "Many videos in this set are paid promotions for a fantasy football tool, marked as ads.",
+   "label": "reported",
+   "sources": [
+    {
+     "name": "Let's Talk FPL",
+     "url": "https://www.youtube.com/watch?v=z_cC3pS9jVQ",
+     "date": "2026-11-19T15:41:10Z"
+    }
+   ]
+  }
+ ],
+ "differences": [
+  {
+   "text": "One creator asks whether selling Haaland is crazy. Another frames the Man United attackers as a keep-or-sell choice.",
+   "sources": [
+    {
+     "name": "Let's Talk FPL",
+     "url": "https://www.youtube.com/watch?v=srWgsUqLBew",
+     "date": "2026-11-18T08:56:07Z"
+    }
+   ]
+  },
+  {
+   "text": "One video asks whether to play a transfer or chip now, or wait. Another says the Free Hit week should be chosen after comparing several weeks.",
    "sources": [
     {
      "name": "Let's Talk FPL",
@@ -57,20 +68,8 @@
    ]
   }
  ],
- "differences": [
-  {
-   "text": "Videos disagree on timing. Some frame the talk as ahead of Gameweek 11, while one says Gameweek 10 in its description.",
-   "sources": [
-    {
-     "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=srWgsUqLBew",
-     "date": "2026-11-18T08:56:07Z"
-    }
-   ]
-  }
- ],
  "angles": [],
- "updated": "2026-11-19T11:50:48Z",
+ "updated": "2026-11-19T18:03:32Z",
  "model": "claude-haiku-5-5",
  "items": 8
 }
