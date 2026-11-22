@@ -1,19 +1,19 @@
 {
- "headline": "Gameweek 11 deadline is close, so pick your team within a short window and keep changes simple.",
+ "headline": "Gameweek 12 is the focus now, and the creators here mostly talk about injuries and transfers, not a fixed plan.",
  "points": [
   {
-   "text": "The Gameweek 11 deadline is today, and several videos this week cover team picks and transfers.",
+   "text": "Raya is reported injured, according to one video that reacts to Gameweek 11 and looks ahead to Gameweek 12.",
    "label": "reported",
    "sources": [
     {
      "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=82Zjp6yrf_g",
-     "date": "2026-11-21T11:07:06Z"
+     "url": "https://www.youtube.com/watch?v=gezr1X2E7MA",
+     "date": "2026-11-22T15:46:14Z"
     }
    ]
   },
   {
-   "text": "One creator says João Pedro is out for Gameweek 11.",
+   "text": "João Pedro is reported out, according to one video ahead of Gameweek 11.",
    "label": "reported",
    "sources": [
     {
@@ -24,7 +24,7 @@
    ]
   },
   {
-   "text": "One creator asks whether selling Haaland now would be a mistake, and suggests people think about it before the deadline.",
+   "text": "One creator says selling Haaland soon might be a crazy move. Treat this as one person's take, not a rule.",
    "label": "opinion",
    "sources": [
     {
@@ -35,31 +35,8 @@
    ]
   },
   {
-   "text": "One creator says a Man United attacker is being discussed as a keep or sell choice, with no clear answer given.",
+   "text": "Several videos discuss whether to take a transfer now or wait. Most stress keeping transfers simple and planned.",
    "label": "opinion",
-   "sources": [
-    {
-     "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=CO30HT3gD4E",
-     "date": "2026-11-17T08:57:29Z"
-    }
-   ]
-  },
-  {
-   "text": "A short, simple plan fits a 15-minute window: check team news, make at most one or two moves, then go with your gut.",
-   "label": "ai interpretation",
-   "sources": [
-    {
-     "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=82Zjp6yrf_g",
-     "date": "2026-11-21T11:07:06Z"
-    }
-   ]
-  }
- ],
- "differences": [
-  {
-   "text": "One creator's team and transfer picks for Gameweek 11 differ from another's, and one leans toward holding transfers.",
    "sources": [
     {
      "name": "Let's Talk FPL",
@@ -67,10 +44,33 @@
      "date": "2026-11-19T08:44:01Z"
     }
    ]
+  },
+  {
+   "text": "For a 15-minute weekly window, check injury news first, then make one planned change at most.",
+   "label": "ai interpretation",
+   "sources": [
+    {
+     "name": "Let's Talk FPL",
+     "url": "https://www.youtube.com/watch?v=gezr1X2E7MA",
+     "date": "2026-11-22T15:46:14Z"
+    }
+   ]
+  }
+ ],
+ "differences": [
+  {
+   "text": "Some videos push selling key players, while others lean toward holding or saving transfers. The advice is not consistent.",
+   "sources": [
+    {
+     "name": "Let's Talk FPL",
+     "url": "https://www.youtube.com/watch?v=srWgsUqLBew",
+     "date": "2026-11-18T08:56:07Z"
+    }
+   ]
   }
  ],
  "angles": [],
- "updated": "2026-11-21T12:16:14Z",
+ "updated": "2026-11-22T17:08:04Z",
  "model": "claude-haiku-5-5",
  "items": 8
 }
