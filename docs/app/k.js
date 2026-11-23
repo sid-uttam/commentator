@@ -1,7 +1,7 @@
 // A keycard someone made: /k/?id=<doc id>  (also /u/<id>/, the shareable page with a proper link preview)
 // One layout for every shape: who made it and how fresh it is, then the most useful thing first.
 //   Picks: the list first, "what's new" after it.  Sources: "right now" first.  Playbook: numbered steps + copy boxes.
-import { loadKeycard, mountActions, onUser, esc, itemRow, fold, briefingCard, keycardUrl, makeUrl, share, kcHash,
+import { loadKeycard, mountActions, onUser, esc, itemRow, fold, isRules, rulesCard, briefingCard, keycardUrl, makeUrl, share, kcHash,
          markChecked, ago, toast, ROOT, live, SHAPE_LABEL, whoFor, mountAsk, askContext, versionsOf, versionsHTML, markNew, hasLive, LIVE_BADGE, saveKeycard } from './app.js';
 
 const box = document.getElementById('kc');
@@ -43,8 +43,10 @@ async function show() {
   const fresh = touched && !(cf && !k.edited) ? `Updated by ${esc(first)} ${esc(ago(new Date(touched).toISOString()))}` : '';
   const stale = touched && days > 90 && shape !== 'sources';
 
-  const folds = sections.length || sources.length ? `<section class="kc-folds">
-      ${sections.map((s, i) => fold(s.title || 'Picks', s.items.map(it => itemRow(it, cf && `added by ${first}`)), i === 0,
+  // The owner's rules come first as short lines; with rules showing, every other section starts folded (big idea → rules → explore).
+  const rules = sections.filter(isRules), rest = sections.filter(x => !isRules(x));
+  const folds = rest.length || sources.length ? `<section class="kc-folds">
+      ${rest.map((s, i) => fold(s.title || 'Picks', s.items.map(it => itemRow(it, cf && `added by ${first}`)), i === 0 && (!rules.length || s.items.length <= 4),
                                      shape === 'playbook' && i === 0)).join('')}
       ${sources.length ? fold('Sources', sources.map(it => itemRow(it, cf && `added by ${first}`)), !sections.length) : ''}
     </section>` : `<section class="card"><p class="kc-body">Nothing on here yet.</p></section>`;
@@ -64,12 +66,14 @@ async function show() {
       ${k.tested ? `<div class="kc-tested">Tested with ${esc(k.tested)}</div>` : ''}
       ${vis ? `<div class="kc-fine" id="vis" hidden>${esc(vis)}</div>` : ''}
     </section>
+    ${k.idea ? `<p class="kc-idea">${esc(k.idea)}</p>` : ''}
     ${k.tagline ? `<p class="kc-body" style="margin-top:-6px">${esc(k.tagline)}</p>` : ''}
     <div class="kc-actions" id="acts"></div>
     <div id="ask"></div>
     <div id="mine"></div>
     <div id="links"></div>
     ${start}
+    ${rules.map(rulesCard).join('')}
     ${shape === 'picks' && !k.watch ? folds + '<div id="live"></div>' : '<div id="live"></div>' + folds}`;
   // Ask this keycard: answers only from what's on it, plus whatever update is showing.
   let shownBrief = null;

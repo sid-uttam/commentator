@@ -1,5 +1,5 @@
 // Make or edit a keycard: /make/ (new) or /make/?id=<doc id> (edit). Never a blank page: start from a shape or a copy.
-import { onUser, signIn, signInSheet, noteStart, searchKeycards, saveAsk, loadKeycard, saveKeycard, deleteKeycard, keycardUrl, esc, toast, ROOT, live, SUBJECTS, catOf, aiUrl, askAI, itemRow, myName, SHAPE_LABEL } from './app.js';
+import { onUser, signIn, signInSheet, noteStart, searchKeycards, saveAsk, loadKeycard, saveKeycard, deleteKeycard, keycardUrl, esc, toast, ROOT, live, SUBJECTS, catOf, aiUrl, askAI, itemRow, myName, SHAPE_LABEL, fold, isRules, rulesCard } from './app.js';
 
 const box = document.getElementById('ed');
 const params = new URLSearchParams(location.search);
@@ -112,6 +112,7 @@ function render() {
     <form class="ed" onsubmit="return false">
       <input class="ed-title" data-p="title" value="${esc(k.title)}" placeholder="Name it" maxlength="80" aria-label="Name">
       <input data-p="tagline" value="${esc(k.tagline)}" placeholder="${k.copiedFrom ? 'What makes your version yours?' : 'In one line: what should someone get out of it?'}" maxlength="160" aria-label="One line">
+      <input data-p="idea" value="${esc(k.idea || '')}" placeholder="The big idea, in one line (shown large at the top)" maxlength="140" aria-label="Big idea">
       ${(k.sections || []).map((s, i) => listBox(s.title, s.items, `sections.${i}.items`, '', `sections.${i}.title`)).join('')}
       ${showSources ? listBox('Sources I follow', k.sources, 'sources', 'Paste links to YouTube channels, websites or podcasts (Apple or Spotify) and you get a short AI update from them every few hours. Say why each one is good. X, Instagram and Reddit links can go here too, but they can\'t feed updates.') : ''}
       <div class="ed-row">
@@ -258,8 +259,8 @@ function payload() {
   const keep = it => (it.name || '').trim() || (it.url || '').trim() || (it.copy || '').trim();
   const tidy = it => ({ name: (it.name || '').trim(), why: (it.why || '').trim(), url: (it.url || '').trim(), ...(it.type ? { type: it.type } : {}), ...(it.copy ? { copy: it.copy.trim() } : {}), ...(it.star ? { star: true } : {}), ...(it.from ? { from: true } : {}) });
   const data = {
-    title: k.title.trim(), tagline: k.tagline.trim(), subject: k.subject || '',
-    sections: k.sections.map(s => ({ title: s.title.trim() || 'Picks', items: s.items.filter(keep).map(tidy) })).filter(s => s.items.length),
+    title: k.title.trim(), tagline: k.tagline.trim(), idea: (k.idea || '').trim(), subject: k.subject || '',
+    sections: k.sections.map(s => ({ title: s.title.trim() || 'Picks', items: s.items.filter(keep).map(tidy), ...(s.principles || s.kind === 'principles' ? { kind: 'principles' } : {}) })).filter(s => s.items.length),
     sources: k.sources.filter(keep).map(tidy), instruction: k.instruction.trim(),
     shape: k.shape || '', tested: (k.tested || '').trim(), watch: (k.watch || '').trim(),
     visibility: k.visibility, copiedFrom: k.copiedFrom || null, edited: !!(k.edited || (k.copiedFrom && dirty) || !k.copiedFrom),
@@ -442,6 +443,7 @@ function kFromDraft(kd) {
                sections: (kd.sections || []).map(x => ({ title: x.title || '', items: (x.items || []).map(item) })).filter(x => x.items.length),
                sources: (kd.sources || []).map(item), instruction: kd.instruction || STARTERS[shape].k.instruction };
   if (!nk.sections.length && !nk.sources.length) nk.sections = [{ title: 'My picks', items: [blankItem()] }];
+  nk.idea = String(kd.idea || '').trim().replace(/^["“”]+|["“”]+$/g, '');
   const pr = (Array.isArray(kd.principles) ? kd.principles : []).filter(x => x && x.name).slice(0, 4).map(item);
   if (pr.length) nk.sections.unshift({ title: shape === 'picks' ? 'How I choose' : 'How I think about it', items: pr, principles: true });
   return nk;
@@ -459,7 +461,7 @@ async function ivDraft(again) {
     const titles = [...new Set([kd.title, ...(Array.isArray(kd.titles) ? kd.titles : [])].map(t => String(t || '').trim()).filter(Boolean))].slice(0, 3);
     const more = (Array.isArray(kd.more) ? kd.more : []).filter(x => x && x.title && x.start).slice(0, 3);
     const fresh = (Array.isArray(kd.reads) ? kd.reads : []).filter(r => r && r.text).slice(0, 3)
-      .map(r => ({ kind: ['pattern', 'guess', 'tension'].includes(r.kind) ? r.kind : 'pattern', text: String(r.text).trim(), evidence: String(r.evidence || '').trim(), r: '' }));
+      .map(r => ({ kind: ['pattern', 'guess', 'tension'].includes(r.kind) ? r.kind : 'pattern', text: String(r.text).trim(), evidence: cleanEv(r.evidence), rule: String(r.rule || '').trim(), r: '' }));
     const kept = again && rv.reads.some(r => r.r);   // they've already rated these: keep them, and what they confirmed
     rv = { topic: base.topic, turns: base.turns, t0: base.t0 || Date.now(), take, titles, mode: base.mode || '', more, k: null,
            noticed: String(kd.noticed || '').trim(), anticipation: kept ? rv.anticipation : String(kd.anticipation || '').trim(),
@@ -495,7 +497,7 @@ function renderReveal() {
     ${(rv.reads || []).length ? `<div class="rv-reads"><span class="label">What I noticed about how you choose</span>
       ${rv.reads.map((r, i) => `<div class="rv-read${r.r === 'wrong' ? ' off' : ''}">
         <span class="rv-kind">${READ_LABEL[r.kind]}</span><p>${esc(r.text)}</p>
-        ${r.evidence ? `<small class="rv-ev">From what you said: “${esc(r.evidence.replace(/^["“”']+|["“”']+$/g, ''))}”</small>` : ''}
+        ${r.evidence ? `<small class="rv-ev">From what you said: “${esc(cleanEv(r.evidence))}”</small>` : ''}
         ${r.r ? `<small class="rv-done">${READ_DONE[r.r](r)}</small>`
           : `<div class="rv-rate">${[['spot', 'Spot on'], ['notquite', 'Not quite'], ['wrong', 'Wrong']].map(([v, l]) => `<button type="button" data-rvrate="${i}:${v}">${l}</button>`).join('')}</div>`}
       </div>`).join('')}
@@ -506,11 +508,12 @@ function renderReveal() {
     <article class="rv-card">
       <div class="eyebrow">${esc(label)}${k.subject ? ' · ' + esc(k.subject) : ''}</div>
       <h1 class="display kc-title">${esc(k.title)}</h1>
-      ${k.tagline ? `<p class="kc-body">${esc(k.tagline)}</p>` : ''}
       <div class="rv-by">by ${esc(first)}</div>
+      ${k.idea ? `<p class="kc-idea">${esc(k.idea)}</p>` : k.tagline ? `<p class="kc-body">${esc(k.tagline)}</p>` : ''}
       ${(() => { const top = k.sections.flatMap(x => x.items.filter(i => i.star)).slice(0, 3);
         return top.length ? `<div class="rv-sec kc-start-in"><div class="label">Start here: ${esc(first)}'s top ${top.length}</div>${top.map(it => itemRow(it)).join('')}</div>` : ''; })()}
-      ${k.sections.map(sec => `<div class="rv-sec"><div class="label">${esc(sec.title)}</div>${sec.items.map(it => itemRow(it)).join('')}</div>`).join('')}
+      ${k.sections.filter(isRules).map(sec => rulesCard(sec)).join('')}
+      ${k.sections.filter(sec => !isRules(sec)).map((sec, i) => fold(sec.title, sec.items.map(it => itemRow(it)), i === 0 && sec.items.length <= 4)).join('')}
       ${k.sources.length ? `<div class="rv-sec"><div class="label">Sources I follow</div>${k.sources.map(it => itemRow(it)).join('')}</div>` : ''}
     </article>
     <div class="rv-share"><span class="label">When you share it</span>
@@ -530,6 +533,8 @@ function renderReveal() {
     <p class="kc-fine" style="text-align:center"><a href="#" data-rvquit style="color:var(--faint)">Start over</a></p>
   </section>`;
 }
+// Evidence as one clean phrase: no stray quote marks, several quotes joined with " · ".
+const cleanEv = e => String(e || '').replace(/["“”]/g, '').replace(/\s*;\s*/g, ' · ').replace(/\s+/g, ' ').trim();
 const READ_LABEL = { pattern: 'A pattern I noticed', guess: 'My guess: is this right?', tension: 'Something that pulls two ways' };
 const READ_DONE = { spot: r => r.kind === 'tension' ? 'Glad that landed.' : 'Added to your keycard, under how you choose.',
                     notquite: () => "Thanks. Fix it with Tweak it if you'd like it on your keycard.", wrong: () => "Got it. I've left that out." };
@@ -537,8 +542,8 @@ const READ_DONE = { spot: r => r.kind === 'tension' ? 'Glad that landed.' : 'Add
 function addPrinciple(r) {
   let sec = rv.k.sections.find(x => x.principles);
   if (!sec) { sec = { title: rv.k.shape === 'picks' ? 'How I choose' : 'How I think about it', items: [], principles: true }; rv.k.sections.unshift(sec); }
-  const name = r.text.replace(/^(is it that|maybe|i think)\s+/i, '').replace(/\?$/, '').replace(/^you\s+/i, 'I ').replace(/^./, c => c.toUpperCase());
-  if (sec.items.length < 6 && !sec.items.some(i => i.name === name)) sec.items.push({ name, why: r.evidence ? r.evidence.replace(/^["“”']+|["“”']+$/g, '') : '', url: '' });
+  const name = r.rule ? r.rule.replace(/[.]$/, '') : r.text.replace(/^(is it that|maybe|i think)\s+/i, '').replace(/\?$/, '').replace(/^you\s+/i, 'I ').replace(/^./, c => c.toUpperCase());
+  if (sec.items.length < 5 && !sec.items.some(i => i.name === name)) sec.items.push({ name, why: r.evidence || '', url: '' });
 }
 async function revealClick(t) {
   if (t.dataset.rvrate !== undefined) {

@@ -177,6 +177,16 @@ a{color:var(--accent)} a:hover{color:#FFC56B}
 .kc-row:first-child{border-top:0}
 .kc-row-t{font-size:14px;line-height:1.4;color:var(--ink2)}
 .kc-row-m{font-size:12px;color:var(--faint)}
+.kc-morebtn{background:none;border:0;padding:0;font:inherit;color:var(--accent);cursor:pointer}
+.kc-fold-t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.kc-prev{font-size:12px;font-weight:400;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:62vw}
+.kc-idea{margin:4px 0 2px;font:700 26px/1.18 'Barlow Condensed',sans-serif;letter-spacing:.2px;color:var(--ink);border-left:3px solid var(--accent);padding-left:12px}
+.kc-rules{display:flex;flex-direction:column;gap:6px;margin:6px 0}
+.kc-rule{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 13px}
+.kc-rule summary{cursor:pointer;list-style:none;font:600 15px/1.35 Inter,system-ui,sans-serif;color:var(--ink)}
+.kc-rule summary::-webkit-details-marker{display:none}
+.kc-rule p{margin:6px 0 0;font-size:13px;line-height:1.45;color:var(--muted)}
+.kc-rule b{font:600 15px/1.35 Inter,system-ui,sans-serif;color:var(--ink)}
 a.kc-row:hover .kc-row-t{color:var(--ink)}
 .kc-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .kc-fact{background:var(--card2);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}

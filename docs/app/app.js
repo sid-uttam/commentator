@@ -305,6 +305,16 @@ export async function counts(id) {
 }
 
 // ---------- the interviewer (Cloudflare worker; checks your sign-in) ----------
+// The one thing that works signed out: a keycard's Quick summary (the worker caps it per address and per day).
+async function askFree(context) {
+  if (!aiUrl) throw new Error('unavailable');
+  const r = await fetch(aiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+                                 body: JSON.stringify({ action: 'askcard', free: true, topic: 'Quick summary', turns: [], context }) });
+  const d = await r.json().catch(() => ({}));
+  if (r.status === 401 || r.status === 429) { signInSheet('Sign in to ask more', "It's free, and you carry on right where you were."); throw new Error(d.error || 'Sign in to ask.'); }
+  if (!r.ok) throw new Error(d.error || 'The interviewer hit a snag. Try again in a moment.');
+  return d;
+}
 export async function askAI(action, topic, turns, extra = {}) {
   if (!aiUrl || !me) throw new Error('unavailable');
   const r = await fetch(aiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + await me.getIdToken() },
@@ -340,7 +350,7 @@ export function askContext(k, brief) {
   return L.join('\n').slice(0, 15000);
 }
 
-const ASK_SECOND = { live: 'Where do sources disagree?', picks: 'Where should I start?', playbook: 'Where do I start?', sources: 'Who should I follow first?' };
+const ASK_SECOND = { live: 'Where do sources disagree?', picks: 'Where should I start?', playbook: 'How would I apply this to my own situation?', sources: 'Who should I follow first?' };
 // getCtx: async () => context text. kind: live | picks | playbook | sources.
 export function mountAsk(el, id, getCtx, kind, ownerFirst) {
   const second = ASK_SECOND[kind] || ASK_SECOND.picks;
@@ -372,11 +382,12 @@ export function mountAsk(el, id, getCtx, kind, ownerFirst) {
   };
   const run = async q => {
     q = String(q || '').trim(); if (!q) return;
-    if (!me) return withUser('ask:' + id, q);
+    const quick = /^Quick summary/.test(q);
+    if (!me && !quick) return withUser('ask:' + id, q);   // one free taste: Quick summary works signed out
     input.value = ''; input.blur(); open(false); go.disabled = hot.disabled = true;
     out.innerHTML = `<div class="ask-q"><span>${esc(q)}</span></div><div class="ask-a ask-wait">Reading the keycard…</div>`;
     try {
-      const d = await askAI('askcard', q.slice(0, 120), [], { question: q, context: await getCtx() });
+      const d = me ? await askAI('askcard', q.slice(0, 120), [], { question: q, context: await getCtx() }) : await askFree(await getCtx());
       render(q, d.answer || "Couldn't find an answer on this keycard.", d.covered !== false);
     } catch (e) {
       const msg = /unknown action/i.test(e.message) ? 'Asking switches on very soon.' : e.message === 'unavailable' ? 'Asking is not available right now.' : e.message;
@@ -482,7 +493,7 @@ function mountMine() {
 
 // The plain categories people filter by. Older subjects map onto them.
 const CATS = { Football: 'Sport', FPL: 'Sport', UFC: 'Sport', Markets: 'Money & tech', Tech: 'Money & tech', Gaming: 'Pop culture', Games: 'Pop culture', Film: 'Pop culture', Music: 'Pop culture' };
-export const SUBJECTS = ['Food', 'Travel', 'Sport', 'Fitness', 'Money & tech', 'Pop culture', 'Learning', 'Other'];
+export const SUBJECTS = ['Food', 'Travel', 'Sport', 'Fitness', 'Money & tech', 'Pop culture', 'Learning', 'Life & work', 'Other'];
 export const catOf = s => CATS[s] || (SUBJECTS.includes(s) || s === 'News' ? s : 'Other');
 
 export const SHAPE_LABEL = { picks: 'Picks', sources: 'Sources', playbook: 'Playbook' };
@@ -554,7 +565,7 @@ const SHARE_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" 
 export function itemRow(it, mark) {
   const u = safeUrl(it.url);
   // A reason is the owner's words; a Maps category ("Ramen restaurant") is just a label, so it shows as a small tag.
-  const meta = it.why ? esc(it.why) : it.type ? `<span class="kc-tag">${esc(it.type)}</span>` : esc(u ? new URL(u).hostname.replace(/^www\./, '') : '');
+  const meta = it.why ? clampWhy(it.why) : it.type ? `<span class="kc-tag">${esc(it.type)}</span>` : esc(u ? new URL(u).hostname.replace(/^www\./, '') : '');
   const yours = mark && !it.from ? `<span class="kc-yours">${esc(mark)}</span>` : '';   // mark: e.g. "added by Arjun"
   const t = `<span class="kc-row-t">${esc(it.name || u)}${yours}</span>${meta ? `<span class="kc-row-m">${meta}</span>` : ''}`;
   if (it.copy) {
@@ -563,8 +574,29 @@ export function itemRow(it, mark) {
   }
   return u ? `<a class="kc-row" href="${esc(u)}" target="_blank" rel="noopener">${t}</a>` : `<div class="kc-row">${t}</div>`;
 }
+// A long reason shows its first sentence; tap "more" for the rest. Nothing is cut, it just isn't all on screen at once.
+function clampWhy(why) {
+  const w = String(why), m = w.match(/^(.{40,180}?[.!?])\s+(.+)$/s);
+  return m && w.length > 160 ? `${esc(m[1])}<span class="kc-rest" hidden> ${esc(m[2])}</span> <button type="button" class="kc-morebtn" data-more>more</button>` : esc(w);
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-more]'); if (!b) return;
+  e.preventDefault(); e.stopPropagation();
+  const r = b.previousElementSibling; if (r) r.hidden = false; b.remove();
+}, true);
+// The owner's rules ("How I choose"): short lines first, their own words one tap away.
+export const isRules = s => s && (s.kind === 'principles' || s.principles || /^how i (choose|think about it)$/i.test((s.title || '').trim()));
+export function rulesCard(s) {
+  return `<section class="kc-rules"><span class="label">${esc(s.title || 'How I choose')}</span>
+    ${(s.items || []).slice(0, 5).map(it => it.why ? `<details class="kc-rule"><summary>${esc(it.name)}</summary><p>In my words: “${esc(String(it.why).replace(/["“”]/g, ''))}”</p></details>`
+      : `<div class="kc-rule"><b>${esc(it.name)}</b></div>`).join('')}
+    ${(s.items || []).some(i => i.why) ? '<small class="kc-fine">Tap a rule to see it in their words.</small>' : ''}</section>`;
+}
+// A folded section shows a one-line taste of what's inside, so people know whether to open it.
+const preview = rows => { const m = String(rows[0] || '').match(/class="kc-row-t">([^<]*)/); return m ? m[1] : ''; };
 export function fold(title, rows, open, steps) {
-  return `<details class="kc-fold"${open ? ' open' : ''}><summary><span>${esc(title)}</span><span class="kc-count">${rows.length}</span></summary><div class="kc-fold-body${steps ? ' kc-steps' : ''}">${rows.join('')}</div></details>`;
+  const p = !open && rows.length ? preview(rows) : '';
+  return `<details class="kc-fold"${open ? ' open' : ''}><summary><span class="kc-fold-t"><span>${esc(title)}</span>${p ? `<small class="kc-prev">${p}${rows.length > 1 ? '…' : ''}</small>` : ''}</span><span class="kc-count">${rows.length}</span></summary><div class="kc-fold-body${steps ? ' kc-steps' : ''}">${rows.join('')}</div></details>`;
 }
 export function briefingCard(b, title, note) {
   const fl = (b && b.from_list) || [];
