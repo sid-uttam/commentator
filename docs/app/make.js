@@ -740,11 +740,44 @@ async function findIdeas(answers) {
 // Lists of favourites get one fixed question: the top 3 become "Start here" on the keycard.
 const TOP3_Q = 'If someone only tried three, which would they be?';
 const guessKind = topic => (pick === 'places' || /\b(favou?rite|best|top \d|spots?|restaurants?|places|caf[eé]s?|bars?|where (i|to)|picks|eats)\b/i.test(topic)) ? 'picks' : '';
-function startInterview(topic, kind, mode) {
-  iv = { topic, turns: [], q: '', t0: Date.now(), kind: mode === 'open' ? '' : (kind || guessKind(topic)), ...(mode ? { mode } : {}) }; noteStart(mode === 'open' ? 'surprise' : 'interview'); ivAsk();
+function startInterview(topic, kind, mode, firstQ) {
+  iv = { topic, turns: [], q: '', t0: Date.now(), kind: mode === 'open' ? '' : (kind || guessKind(topic)), ...(mode ? { mode } : {}) }; noteStart(mode === 'open' ? 'surprise' : 'interview');
+  if (firstQ) { iv.q = firstQ; ivSave(); return renderIv(); }
+  ivAsk();
 }
 // "Surprise me": no topic. The interview finds what they know, and the keycard comes out of the conversation.
-function startSurprise() { pick = null; into = null; window.scrollTo(0, 0); startInterview('Surprise me', '', 'open'); }
+// The first question is picked here (no AI call needed), different each time, so Surprise me never feels like a form.
+const OPENERS = [
+  'What do people usually come to you for?',
+  "What's something you do differently from most people you know?",
+  "What's a decision you made that you're quietly proud of?",
+  "What's something you've spent years getting good at, even if it's not your job?",
+  'What do you find yourself explaining to friends again and again?',
+  "What's an opinion you hold that most people around you don't?",
+  "What's a small habit that made a big difference to your life?",
+  "What's something you know a lot about that might surprise people?",
+  'When friends visit your city, where do you take them, and why there?',
+  "What's the best advice you've ever ignored, or followed?",
+  "What's something you'd happily spend an hour telling someone about?",
+  "What's a mistake you made once and never made again?",
+  'Who or what do you trust when you need to learn something new?',
+  "What's something most people overpay for, or get wrong, that you don't?",
+  "What's your go-to recommendation when someone asks you for one?",
+  "What's a rule you live by that you've never written down?",
+  'What does a really good weekend look like for you?',
+  "What's something you changed your mind about in the last few years?",
+  "What's a skill you picked up that you think everyone should have?",
+  "What's a place, meal or experience you still think about?",
+];
+function startSurprise() {
+  pick = null; into = null; window.scrollTo(0, 0);
+  // Never the same opener twice in a row for one person: remember the ones this browser has seen, and reset once all are used.
+  let seen = []; try { seen = JSON.parse(localStorage.getItem('kc-openers') || '[]'); } catch (e) {}
+  let left = OPENERS.filter(q => !seen.includes(q)); if (!left.length) { seen = []; left = OPENERS; }
+  const q = left[Math.floor(Math.random() * left.length)];
+  try { localStorage.setItem('kc-openers', JSON.stringify([...seen, q])); } catch (e) {}
+  startInterview('Surprise me', '', 'open', q);
+}
 
 window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
 
