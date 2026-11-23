@@ -1,7 +1,7 @@
 // A keycard someone made: /k/?id=<doc id>  (also /u/<id>/, the shareable page with a proper link preview)
 // One layout for every shape: who made it and how fresh it is, then the most useful thing first.
 //   Picks: the list first, "what's new" after it.  Sources: "right now" first.  Playbook: numbered steps + copy boxes.
-import { loadKeycard, mountActions, onUser, esc, itemRow, fold, isRules, rulesCard, briefingCard, keycardUrl, makeUrl, share, kcHash,
+import { loadKeycard, mountActions, onUser, esc, itemRow, fold, isRules, rulesCard, sectionTabs, briefingCard, keycardUrl, makeUrl, share, kcHash,
          markChecked, ago, toast, ROOT, live, SHAPE_LABEL, whoFor, mountAsk, askContext, versionsOf, versionsHTML, markNew, hasLive, LIVE_BADGE, saveKeycard } from './app.js';
 
 const box = document.getElementById('kc');
@@ -51,6 +51,11 @@ async function show() {
       ${sources.length ? fold('Sources', sources.map(it => itemRow(it, cf && `added by ${first}`)), !sections.length) : ''}
     </section>` : `<section class="card"><p class="kc-body">Nothing on here yet.</p></section>`;
 
+  // The calmer layout (big idea → top rules → one section at a time → ask) for keycards with two or more sections.
+  const tabbed = rest.length >= 2;
+  const tabs = tabbed ? sectionTabs(rest, it => itemRow(it, cf && `added by ${first}`)) : '';
+  const sourcesFold = tabbed && sources.length ? `<section class="kc-folds">${fold('Sources', sources.map(it => itemRow(it)), false)}</section>` : '';
+
   // Start here: the owner's own top 3, so a long list opens with their taste, not item 1 of 94.
   const top = shape === 'picks' ? sections.flatMap(x => x.items.filter(i => i.star)).slice(0, 3) : [];
   const start = top.length ? `<section class="card kc-start"><div class="kc-h"><span class="label">Start here: ${esc(first)}'s top ${top.length}</span></div>
@@ -67,14 +72,15 @@ async function show() {
       ${vis ? `<div class="kc-fine" id="vis" hidden>${esc(vis)}</div>` : ''}
     </section>
     ${k.idea ? `<p class="kc-idea">${esc(k.idea)}</p>` : ''}
-    ${k.tagline ? `<p class="kc-body" style="margin-top:-6px">${esc(k.tagline)}</p>` : ''}
+    ${k.tagline && !k.idea ? `<p class="kc-body" style="margin-top:-6px">${esc(k.tagline)}</p>` : ''}
     <div class="kc-actions" id="acts"></div>
-    <div id="ask"></div>
+    ${tabbed ? '' : '<div id="ask"></div>'}
     <div id="mine"></div>
     <div id="links"></div>
     ${start}
     ${rules.map(rulesCard).join('')}
-    ${shape === 'picks' && !k.watch ? folds + '<div id="live"></div>' : '<div id="live"></div>' + folds}`;
+    ${tabbed ? tabs + '<div id="live"></div>' + sourcesFold + '<div id="ask" class="kc-ask-end"></div>'
+      : shape === 'picks' && !k.watch ? folds + '<div id="live"></div>' : '<div id="live"></div>' + folds}`;
   // Ask this keycard: answers only from what's on it, plus whatever update is showing.
   let shownBrief = null;
   if (all.length) mountAsk(document.getElementById('ask'), k.id, async () => askContext({ ...k, sections, sources }, shownBrief), cf && cf.live ? 'live' : shape, first);

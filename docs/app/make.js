@@ -1,5 +1,5 @@
 // Make or edit a keycard: /make/ (new) or /make/?id=<doc id> (edit). Never a blank page: start from a shape or a copy.
-import { onUser, signIn, signInSheet, noteStart, searchKeycards, saveAsk, loadKeycard, saveKeycard, deleteKeycard, keycardUrl, esc, toast, ROOT, live, SUBJECTS, catOf, aiUrl, askAI, itemRow, myName, SHAPE_LABEL, fold, isRules, rulesCard } from './app.js';
+import { onUser, signIn, signInSheet, noteStart, searchKeycards, saveAsk, loadKeycard, saveKeycard, deleteKeycard, keycardUrl, esc, toast, ROOT, live, SUBJECTS, catOf, aiUrl, askAI, itemRow, myName, SHAPE_LABEL, fold, isRules, rulesCard, sectionTabs } from './app.js';
 
 const box = document.getElementById('ed');
 const params = new URLSearchParams(location.search);
@@ -446,6 +446,13 @@ function kFromDraft(kd) {
   nk.idea = String(kd.idea || '').trim().replace(/^["“”]+|["“”]+$/g, '');
   const pr = (Array.isArray(kd.principles) ? kd.principles : []).filter(x => x && x.name).slice(0, 4).map(item);
   if (pr.length) nk.sections.unshift({ title: shape === 'picks' ? 'How I choose' : 'How I think about it', items: pr, principles: true });
+  // Say each thing once: drop any item that repeats one already shown (same name, or the same reason), then empty sections.
+  const key = t => String(t || '').toLowerCase().replace(/^\d+\.\s*/, '').replace(/[^a-z0-9 ]/g, '').replace(/\b(i|my|the|a|to|it)\b/g, ' ').replace(/\s+/g, ' ').trim();
+  const seen = new Set();
+  nk.sections.forEach(sec => { sec.items = sec.items.filter(it => {
+    const ks = [key(it.name), it.why && key(it.why).length > 25 ? key(it.why) : ''].filter(Boolean);
+    if (ks.some(x => seen.has(x))) return false; ks.forEach(x => seen.add(x)); return true; }); });
+  nk.sections = nk.sections.filter(sec => sec.items.length);
   return nk;
 }
 
@@ -513,7 +520,7 @@ function renderReveal() {
       ${(() => { const top = k.sections.flatMap(x => x.items.filter(i => i.star)).slice(0, 3);
         return top.length ? `<div class="rv-sec kc-start-in"><div class="label">Start here: ${esc(first)}'s top ${top.length}</div>${top.map(it => itemRow(it)).join('')}</div>` : ''; })()}
       ${k.sections.filter(isRules).map(sec => rulesCard(sec)).join('')}
-      ${k.sections.filter(sec => !isRules(sec)).map((sec, i) => fold(sec.title, sec.items.map(it => itemRow(it)), i === 0 && sec.items.length <= 4)).join('')}
+      ${sectionTabs(k.sections.filter(sec => !isRules(sec)), it => itemRow(it))}
       ${k.sources.length ? `<div class="rv-sec"><div class="label">Sources I follow</div>${k.sources.map(it => itemRow(it)).join('')}</div>` : ''}
     </article>
     <div class="rv-share"><span class="label">When you share it</span>

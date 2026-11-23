@@ -380,6 +380,8 @@ export function mountAsk(el, id, getCtx, kind, ownerFirst) {
       <div class="ask-a${covered ? '' : ' ask-gap'}">${html}</div><div class="kc-fine">From ${from} only.</div>`;
     out.querySelector('.ask-x').onclick = () => { out.innerHTML = ''; };
   };
+  // Signed out, say up front that asking needs a (free) sign-in; Quick summary is the one free taste.
+  if (!me) input.placeholder = 'Ask this keycard (free, with sign-in)';
   const run = async q => {
     q = String(q || '').trim(); if (!q) return;
     const quick = /^Quick summary/.test(q);
@@ -528,7 +530,9 @@ export function mountActions(el, id, opts = {}) {
   const paint = () => { fBtn.textContent = following ? 'Following ✓' : 'Follow'; fBtn.classList.toggle('on', following); };
   const showCounts = async () => {
     const out = el.querySelector('.kc-counts'); const c = await counts(id);
-    out.textContent = opts.copyNote ? `${opts.followNote || 'Follow to see what changes.'} ${opts.copyNote}` : 'Follow: they keep it up to date, and you see what changes. Copy: your own version to change however you like; the original keeps the credit.';
+    // The Follow / Copy explanation shows the first few times only; after that it's clutter.
+    let seenN = 0; try { seenN = +localStorage.getItem('kc-actnote') || 0; localStorage.setItem('kc-actnote', seenN + 1); } catch (e) {}
+    out.textContent = seenN >= 3 ? '' : opts.copyNote ? `${opts.followNote || 'Follow to see what changes.'} ${opts.copyNote}` : 'Follow: they keep it up to date, and you see what changes. Copy: your own version to change however you like; the original keeps the credit.';
     // Copies are the proof a keycard is worth borrowing, so they lead, big and bold.
     const st = el.querySelector('.kc-stats');
     const bits = c ? [c.copies ? `<span><b>${c.copies}</b> ${c.copies === 1 ? 'person has' : 'people have'} copied this</span>` : '',
@@ -587,11 +591,32 @@ document.addEventListener('click', e => {
 // The owner's rules ("How I choose"): short lines first, their own words one tap away.
 export const isRules = s => s && (s.kind === 'principles' || s.principles || /^how i (choose|think about it)$/i.test((s.title || '').trim()));
 export function rulesCard(s) {
+  const items = (s.items || []).slice(0, 5);
+  const rule = (it, i) => `<details class="kc-rule"${i >= 3 ? ' data-extra hidden' : ''}><summary>${esc(it.name)}</summary>${it.why ? `<p>“${esc(String(it.why).replace(/["“”]/g, ''))}”</p>` : ''}</details>`;
   return `<section class="kc-rules"><span class="label">${esc(s.title || 'How I choose')}</span>
-    ${(s.items || []).slice(0, 5).map(it => it.why ? `<details class="kc-rule"><summary>${esc(it.name)}</summary><p>In my words: “${esc(String(it.why).replace(/["“”]/g, ''))}”</p></details>`
-      : `<div class="kc-rule"><b>${esc(it.name)}</b></div>`).join('')}
-    ${(s.items || []).some(i => i.why) ? '<small class="kc-fine">Tap a rule to see it in their words.</small>' : ''}</section>`;
+    ${items.map(rule).join('')}
+    ${items.length > 3 ? `<button type="button" class="kc-seeall" data-seeall>See all ${items.length}</button>` : ''}</section>`;
 }
+// Sections as tabs: one at a time, headlines first, the reason one tap away. Prompts and links keep their own rows.
+export function sectionTabs(sections, rowFn) {
+  if (!sections.length) return '';
+  const row = it => (it.copy || it.url) ? rowFn(it)
+    : `<details class="kc-item"><summary>${esc(it.name)}</summary>${it.why ? `<p>${esc(it.why)}</p>` : ''}</details>`;
+  const panel = (s, i) => `<div class="kc-panel" data-panel="${i}"${i ? ' hidden' : ''}>${(s.items || []).map(row).join('')}</div>`;
+  if (sections.length === 1) return `<section class="kc-tabs"><span class="label">${esc(sections[0].title || 'Picks')}</span>${panel(sections[0], 0)}</section>`;
+  return `<section class="kc-tabs"><div class="kc-tabbar" role="tablist">${sections.map((s, i) =>
+      `<button type="button" role="tab" class="kc-tab${i ? '' : ' on'}" data-tab="${i}">${esc(s.title || 'Picks')}</button>`).join('')}</div>
+    ${sections.map(panel).join('')}</section>`;
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-tab]');
+  if (t) { const box = t.closest('.kc-tabs');
+    box.querySelectorAll('.kc-tab').forEach(b => b.classList.toggle('on', b === t));
+    box.querySelectorAll('.kc-panel').forEach(p => { p.hidden = p.dataset.panel !== t.dataset.tab; });
+    t.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' }); return; }
+  const a = e.target.closest('[data-seeall]');
+  if (a) { a.closest('.kc-rules').querySelectorAll('[data-extra]').forEach(x => { x.hidden = false; }); a.remove(); }
+});
 // A folded section shows a one-line taste of what's inside, so people know whether to open it.
 const preview = rows => { const m = String(rows[0] || '').match(/class="kc-row-t">([^<]*)/); return m ? m[1] : ''; };
 export function fold(title, rows, open, steps) {
