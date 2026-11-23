@@ -220,6 +220,12 @@ box.addEventListener('click', async e => {
     if (!topic) { toast('What would you like to share?'); return; }
     startInterview(topic); return;
   }
+  // Not feeling the question: Surprise me's opener swaps for another; later questions ask the AI for a different one.
+  if (d.ivskip !== undefined) {
+    iv.skipped = [...(iv.skipped || []), iv.q].slice(-6);
+    if (iv.mode === 'open' && !iv.turns.length) { iv.q = nextOpener(); ivSave(); return renderIv(); }
+    iv.q = ''; ivSave(); ivAsk(); return;
+  }
   if (d.ivnext !== undefined) {
     const a = document.getElementById('iv-a').value.trim();
     if (!a) { toast('Type an answer, even a short one'); return; }
@@ -379,6 +385,7 @@ const ivSave = () => { try { sessionStorage.setItem(IV, JSON.stringify(iv)); } c
 function renderIv(state, err) {
   const n = iv.turns.length;
   box.innerHTML = `<section class="iv">
+      <a href="#" data-ivquit class="iv-back">‹ Other ways to make one</a>
       <div class="eyebrow">Interview · ${esc(iv.topic)}</div>
       ${n ? `<details class="iv-past"${n <= 2 ? ' open' : ''}><summary>Your answers so far (${n})</summary>
         ${iv.turns.map(t => `<div class="iv-turn"><span>${esc(t.q)}</span><p>${esc(t.a)}</p></div>`).join('')}</details>` : ''}
@@ -389,6 +396,7 @@ function renderIv(state, err) {
            <div class="ed-row">
              <button class="kc-btn kc-btn-main" type="button" data-ivnext>Next</button>
              ${n >= 3 ? '<button class="kc-btn" type="button" data-ivdone>Make my keycard</button>' : ''}
+             <button class="kc-btn kc-btn-quiet" type="button" data-ivskip>Ask me something else</button>
            </div>`}
       ${err ? `<div class="kc-banner">${esc(err)} <button class="kc-btn kc-btn-quiet" type="button" data-ivretry>Try again</button></div>` : ''}
       <p class="kc-fine">${state ? '' : `Question ${n + 1} of about 5. `}You'll see and edit everything before it's saved.
@@ -409,7 +417,7 @@ async function ivAsk() {
   renderIv('thinking');
   try {
     const clean = d => String((d && d.question) || '').trim().replace(/^["'“”]+|["'“”]+$/g, '').trim();
-    const mode = iv.mode ? { mode: iv.mode } : {};
+    const mode = { ...(iv.mode ? { mode: iv.mode } : {}), ...(iv.skipped && iv.skipped.length ? { skipped: iv.skipped } : {}) };
     let d = await askAI('ask', iv.topic, iv.turns, mode);
     let q = clean(d);
     if (!d.done && !q && iv.turns.length < 4) { d = await askAI('ask', iv.topic, iv.turns, mode); q = clean(d); }   // an empty reply: ask once more
@@ -788,14 +796,17 @@ const OPENERS = [
   "What's a skill you picked up that you think everyone should have?",
   "What's a place, meal or experience you still think about?",
 ];
-function startSurprise() {
-  pick = null; into = null; window.scrollTo(0, 0);
-  // Never the same opener twice in a row for one person: remember the ones this browser has seen, and reset once all are used.
+// Never the same opener twice for one person: remember the ones this browser has seen, and reset once all are used.
+function nextOpener() {
   let seen = []; try { seen = JSON.parse(localStorage.getItem('kc-openers') || '[]'); } catch (e) {}
   let left = OPENERS.filter(q => !seen.includes(q)); if (!left.length) { seen = []; left = OPENERS; }
   const q = left[Math.floor(Math.random() * left.length)];
   try { localStorage.setItem('kc-openers', JSON.stringify([...seen, q])); } catch (e) {}
-  startInterview('Surprise me', '', 'open', q);
+  return q;
+}
+function startSurprise() {
+  pick = null; into = null; window.scrollTo(0, 0);
+  startInterview('Surprise me', '', 'open', nextOpener());
 }
 
 window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });

@@ -1,8 +1,8 @@
 {
- "headline": "Keep your FPL routine short: one weekly check, then make a calm, safe-leaning final call before the deadline.",
+ "headline": "Gameweek 12 is near, and this channel's creator is sharing early thoughts, news on injuries, and tips for planning your team.",
  "points": [
   {
-   "text": "Creator Let's Talk FPL posts several weekly videos on team news, injuries and transfers. Each one is a sponsored video.",
+   "text": "Raya is reported injured. One creator reacted to this in a live stream ahead of Gameweek 12.",
    "label": "reported",
    "sources": [
     {
@@ -13,18 +13,40 @@
    ]
   },
   {
-   "text": "Recent team news includes a Raya injury and a João Pedro absence, according to video titles. Check the official squad news before you lock your team.",
+   "text": "João Pedro is reported out. One creator flagged this in a final-thoughts video before Gameweek 11.",
    "label": "reported",
    "sources": [
     {
      "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=gezr1X2E7MA",
-     "date": "2026-11-22T19:46:04Z"
+     "url": "https://www.youtube.com/watch?v=_YkkZBv5aS0",
+     "date": "2026-11-20T15:13:16Z"
     }
    ]
   },
   {
-   "text": "One creator says the Gameweek 11 team is set and suggests waiting before making a transfer, with a short 'more this week or next?' question.",
+   "text": "One creator shares early thoughts on whether Wirtz is essential for Gameweek 12. Treat this as one person's opinion.",
+   "label": "opinion",
+   "sources": [
+    {
+     "name": "Let's Talk FPL",
+     "url": "https://www.youtube.com/watch?v=cIuOhZHFccA",
+     "date": "2026-11-23T10:17:07Z"
+    }
+   ]
+  },
+  {
+   "text": "One creator posts a 13-point preview of what they have learned before Gameweek 12.",
+   "label": "opinion",
+   "sources": [
+    {
+     "name": "Let's Talk FPL",
+     "url": "https://www.youtube.com/watch?v=IXpuxYLUNqo",
+     "date": "2026-11-23T17:25:55Z"
+    }
+   ]
+  },
+  {
+   "text": "One creator asks whether to make a transfer now or wait, and shows their Gameweek 11 team.",
    "label": "opinion",
    "sources": [
     {
@@ -33,33 +55,11 @@
      "date": "2026-11-19T08:44:01Z"
     }
    ]
-  },
-  {
-   "text": "A creator asks whether selling Haaland soon is crazy. This is a question, not a recommendation.",
-   "label": "opinion",
-   "sources": [
-    {
-     "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=srWgsUqLBew",
-     "date": "2026-11-18T08:56:07Z"
-    }
-   ]
   }
  ],
- "differences": [
-  {
-   "text": "One creator treats Wirtz as a key question for Gameweek 12, while another frames the week around injuries and a possible Haaland sale. Each one is one creator's view.",
-   "sources": [
-    {
-     "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=cIuOhZHFccA",
-     "date": "2026-11-23T10:17:07Z"
-    }
-   ]
-  }
- ],
+ "differences": [],
  "angles": [],
- "updated": "2026-11-23T12:43:23Z",
+ "updated": "2026-11-23T18:44:03Z",
  "model": "claude-haiku-5-5",
  "items": 8
 }
