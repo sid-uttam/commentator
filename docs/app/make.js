@@ -159,10 +159,10 @@ box.addEventListener('change', e => { if (e.target.name === 'vis') k.visibility 
 const MAKE_PENDING = 'kc-make-pending';
 box.addEventListener('click', e => {
   if (owner) return;
-  const b = e.target.closest('[data-ivstart],[data-frompaste],[data-blank],[data-idea],[data-findideas],[data-intoideas],[data-ask]'); if (!b) return;
+  const b = e.target.closest('[data-ivstart],[data-frompaste],[data-blank],[data-idea],[data-findideas],[data-intoideas],[data-ask],[data-surprise]'); if (!b) return;
   if (b.matches('[data-idea]') && b.dataset.idea.includes('…')) return;   // just fills the box; no need to sign in yet
   e.preventDefault(); e.stopImmediatePropagation();
-  const act = b.matches('[data-ivstart],[data-idea]') ? 'ivstart' : b.matches('[data-findideas]') ? 'find' : b.matches('[data-intoideas]') ? 'into'
+  const act = b.matches('[data-surprise]') ? 'surprise' : b.matches('[data-ivstart],[data-idea]') ? 'ivstart' : b.matches('[data-findideas]') ? 'find' : b.matches('[data-intoideas]') ? 'into'
     : b.matches('[data-ask]') ? 'ask' : b.matches('[data-frompaste]') ? 'frompaste' : 'blank';
   const topic = b.matches('[data-idea]') ? b.dataset.idea : ((document.getElementById('iv-topic') || {}).value || '').trim();
   if (act === 'ivstart' && !topic) { toast('What would you like to share?'); return; }
@@ -179,12 +179,13 @@ box.addEventListener('click', async e => {
   if (e.target.closest('[data-blank]')) { e.preventDefault(); start('picks'); return; }
   if (e.target.closest('[data-ivquit]')) { e.preventDefault(); iv = null; pick = null; try { sessionStorage.removeItem(IV); } catch (x) {} starters(); return; }
   if (e.target.closest('[data-rsstop]')) { e.preventDefault(); finishReasons(); return; }
-  const rvt = e.target.closest('[data-rvtitle],[data-rvvis],[data-rvsave],[data-rvtweak],[data-rvagain],[data-rvmore],[data-rvquit]');
+  const rvt = e.target.closest('[data-rvtitle],[data-rvvis],[data-rvsave],[data-rvtweak],[data-rvagain],[data-rvmore],[data-rvquit],[data-rvrate]');
   if (rvt && rv) { e.preventDefault(); return revealClick(rvt); }
   if (e.target.closest('[data-back]')) { e.preventDefault(); pick = null; into = null; starters(); scrollTo(0, 0); return; }
   const t = e.target.closest('button'); if (!t) return;
   const d = t.dataset;
   if (d.starter) { start(d.starter); return; }
+  if (d.surprise !== undefined) { startSurprise(); return; }
   if (d.ivchip) { const t = document.getElementById('iv-topic'); t.value = d.ivchip.replace('…', ' '); t.focus(); return; }
   if (d.rsnext !== undefined || d.rsskip !== undefined) {
     const v = document.getElementById('rs-why').value.trim();
@@ -263,7 +264,7 @@ function payload() {
     shape: k.shape || '', tested: (k.tested || '').trim(), watch: (k.watch || '').trim(),
     visibility: k.visibility, copiedFrom: k.copiedFrom || null, edited: !!(k.edited || (k.copiedFrom && dirty) || !k.copiedFrom),
   };
-  if (!docId && made) data.made = { how: made.how, secs: Math.round((Date.now() - made.t0) / 1000), ...(made.takes > 1 ? { takes: made.takes } : {}), ...(made.tweaked ? { tweaked: true } : {}) };
+  if (!docId && made) data.made = { how: made.how, secs: Math.round((Date.now() - made.t0) / 1000), ...(made.takes > 1 ? { takes: made.takes } : {}), ...(made.tweaked ? { tweaked: true } : {}), ...(made.reads ? { reads: made.reads } : {}), ...(made.mode ? { mode: made.mode } : {}) };
   return data;
 }
 async function save(btn) {
@@ -396,9 +397,10 @@ async function ivAsk() {
   renderIv('thinking');
   try {
     const clean = d => String((d && d.question) || '').trim().replace(/^["'“”]+|["'“”]+$/g, '').trim();
-    let d = await askAI('ask', iv.topic, iv.turns);
+    const mode = iv.mode ? { mode: iv.mode } : {};
+    let d = await askAI('ask', iv.topic, iv.turns, mode);
     let q = clean(d);
-    if (!d.done && !q && iv.turns.length < 4) { d = await askAI('ask', iv.topic, iv.turns); q = clean(d); }   // an empty reply: ask once more
+    if (!d.done && !q && iv.turns.length < 4) { d = await askAI('ask', iv.topic, iv.turns, mode); q = clean(d); }   // an empty reply: ask once more
     // The AI says it's done in different ways ("DONE", "Done.", quotes, nothing at all once there's enough): all mean finish.
     if (d.done || /^\W*done\W*$/i.test(q) || (!q && iv.turns.length >= 4)) return ivDraft();
     const asked = new Set(iv.turns.map(t => qKey(t.q)));
@@ -407,7 +409,8 @@ async function ivAsk() {
     // Stand-ins name their topic, so they never read as random.
     const raw = iv.topic.trim().replace(/[.?!]+$/, '');
     const t = /^how i\s+/i.test(raw) ? 'how you ' + raw.replace(/^how i\s+/i, '') : /^my\s+/i.test(raw) ? 'your ' + raw.replace(/^my\s+/i, '') : raw;
-    const fallback = iv.kind === 'picks'
+    const fallback = iv.mode === 'open' ? [...FIND_QS, 'Tell me more about that. Why do you do it that way?', 'Anything else someone should know?']
+      : iv.kind === 'picks'
       ? [`Which ones would you send a friend to first, and why?`, `Which one is overrated, or one to skip?`, 'Anything else someone should know?']
       : [`Take me through ${t}, from start to finish. What do you actually do?`, "What's the one step you'd never skip, and why?",
          'What did you get wrong when you started?', 'Anything else someone should know?'];
@@ -439,6 +442,8 @@ function kFromDraft(kd) {
                sections: (kd.sections || []).map(x => ({ title: x.title || '', items: (x.items || []).map(item) })).filter(x => x.items.length),
                sources: (kd.sources || []).map(item), instruction: kd.instruction || STARTERS[shape].k.instruction };
   if (!nk.sections.length && !nk.sources.length) nk.sections = [{ title: 'My picks', items: [blankItem()] }];
+  const pr = (Array.isArray(kd.principles) ? kd.principles : []).filter(x => x && x.name).slice(0, 4).map(item);
+  if (pr.length) nk.sections.unshift({ title: shape === 'picks' ? 'How I choose' : 'How I think about it', items: pr, principles: true });
   return nk;
 }
 
@@ -450,13 +455,20 @@ async function ivDraft(again) {
   } else renderIv('drafting');
   try {
     const avoid = again ? `last time the title was "${rv.k.title}" and the sections were: ${rv.k.sections.map(x => x.title).join(', ')}` : '';
-    const kd = (await askAI('draft', base.topic, base.turns, take > 1 ? { take, avoid } : {})).keycard || {};
+    const kd = (await askAI('draft', base.topic, base.turns, { ...(take > 1 ? { take, avoid } : {}), ...(base.mode ? { mode: base.mode } : {}) })).keycard || {};
     const titles = [...new Set([kd.title, ...(Array.isArray(kd.titles) ? kd.titles : [])].map(t => String(t || '').trim()).filter(Boolean))].slice(0, 3);
     const more = (Array.isArray(kd.more) ? kd.more : []).filter(x => x && x.title && x.start).slice(0, 3);
-    rv = { topic: base.topic, turns: base.turns, t0: base.t0 || Date.now(), take, titles, noticed: String(kd.noticed || '').trim(), more, k: null };
+    const fresh = (Array.isArray(kd.reads) ? kd.reads : []).filter(r => r && r.text).slice(0, 3)
+      .map(r => ({ kind: ['pattern', 'guess', 'tension'].includes(r.kind) ? r.kind : 'pattern', text: String(r.text).trim(), evidence: String(r.evidence || '').trim(), r: '' }));
+    const kept = again && rv.reads.some(r => r.r);   // they've already rated these: keep them, and what they confirmed
+    rv = { topic: base.topic, turns: base.turns, t0: base.t0 || Date.now(), take, titles, mode: base.mode || '', more, k: null,
+           noticed: String(kd.noticed || '').trim(), anticipation: kept ? rv.anticipation : String(kd.anticipation || '').trim(),
+           reads: kept ? rv.reads : fresh };
     rv.k = kFromDraft(kd);
+    rv.reads.filter(r => r.r === 'spot' && r.kind !== 'tension').forEach(r => addPrinciple(r));
     starTop3(rv.k, base.turns);
-    k = rv.k; made = { how: 'interview', t0: rv.t0, takes: take };
+    k = rv.k; made = { how: 'interview', t0: rv.t0, takes: take, ...(rv.mode ? { mode: rv.mode } : {}) };
+    if (rv.reads.some(r => r.r)) made.reads = { shown: rv.reads.length, spot: rv.reads.filter(x => x.r === 'spot').length, notquite: rv.reads.filter(x => x.r === 'notquite').length, wrong: rv.reads.filter(x => x.r === 'wrong').length };
     iv = null;
     try { sessionStorage.setItem(IV, JSON.stringify({ reveal: rv })); } catch (e) {}
     renderReveal();
@@ -479,7 +491,16 @@ function renderReveal() {
   const first = (myName() || '').split(' ')[0] || 'you';
   box.innerHTML = `<section class="rv">
     <div class="rv-ready"><span class="rv-spark">✦</span> Your keycard is ready${rv.take > 1 ? ` <small>· take ${rv.take}</small>` : ''}</div>
-    ${rv.noticed ? `<div class="rv-noticed"><span class="label">What I noticed</span><p>${esc(rv.noticed)}</p></div>` : ''}
+    ${rv.anticipation ? `<div class="rv-antic"><span class="label">Here's what I think you're making</span><p>${esc(rv.anticipation)}</p></div>` : ''}
+    ${(rv.reads || []).length ? `<div class="rv-reads"><span class="label">What I noticed about how you choose</span>
+      ${rv.reads.map((r, i) => `<div class="rv-read${r.r === 'wrong' ? ' off' : ''}">
+        <span class="rv-kind">${READ_LABEL[r.kind]}</span><p>${esc(r.text)}</p>
+        ${r.evidence ? `<small class="rv-ev">From what you said: “${esc(r.evidence.replace(/^["“”']+|["“”']+$/g, ''))}”</small>` : ''}
+        ${r.r ? `<small class="rv-done">${READ_DONE[r.r](r)}</small>`
+          : `<div class="rv-rate">${[['spot', 'Spot on'], ['notquite', 'Not quite'], ['wrong', 'Wrong']].map(([v, l]) => `<button type="button" data-rvrate="${i}:${v}">${l}</button>`).join('')}</div>`}
+      </div>`).join('')}
+      <p class="kc-fine">Everything on the keycard is what you said. These are my reads on it: tell me if I've got you right.</p></div>`
+    : rv.noticed ? `<div class="rv-noticed"><span class="label">What I noticed</span><p>${esc(rv.noticed)}</p></div>` : ''}
     ${rv.titles.length > 1 ? `<div class="rv-titles"><span class="label">Pick a title</span>
       ${rv.titles.map((t, i) => `<button type="button" class="rv-t${t === k.title ? ' on' : ''}" data-rvtitle="${i}">${esc(t)}</button>`).join('')}</div>` : ''}
     <article class="rv-card">
@@ -509,7 +530,25 @@ function renderReveal() {
     <p class="kc-fine" style="text-align:center"><a href="#" data-rvquit style="color:var(--faint)">Start over</a></p>
   </section>`;
 }
+const READ_LABEL = { pattern: 'A pattern I noticed', guess: 'My guess: is this right?', tension: 'Something that pulls two ways' };
+const READ_DONE = { spot: r => r.kind === 'tension' ? 'Glad that landed.' : 'Added to your keycard, under how you choose.',
+                    notquite: () => "Thanks. Fix it with Tweak it if you'd like it on your keycard.", wrong: () => "Got it. I've left that out." };
+// A read they confirm becomes one of their principles (the first section). Tensions don't: they're questions, not rules.
+function addPrinciple(r) {
+  let sec = rv.k.sections.find(x => x.principles);
+  if (!sec) { sec = { title: rv.k.shape === 'picks' ? 'How I choose' : 'How I think about it', items: [], principles: true }; rv.k.sections.unshift(sec); }
+  const name = r.text.replace(/^(is it that|maybe|i think)\s+/i, '').replace(/\?$/, '').replace(/^you\s+/i, 'I ').replace(/^./, c => c.toUpperCase());
+  if (sec.items.length < 6 && !sec.items.some(i => i.name === name)) sec.items.push({ name, why: r.evidence ? r.evidence.replace(/^["“”']+|["“”']+$/g, '') : '', url: '' });
+}
 async function revealClick(t) {
+  if (t.dataset.rvrate !== undefined) {
+    const [i, v] = t.dataset.rvrate.split(':'); const r = rv.reads[+i]; if (!r || r.r) return;
+    r.r = v;
+    if (v === 'spot' && r.kind !== 'tension') addPrinciple(r);
+    made.reads = { shown: rv.reads.length, spot: rv.reads.filter(x => x.r === 'spot').length, notquite: rv.reads.filter(x => x.r === 'notquite').length, wrong: rv.reads.filter(x => x.r === 'wrong').length };
+    try { sessionStorage.setItem(IV, JSON.stringify({ reveal: rv })); } catch (e) {}
+    return renderReveal();
+  }
   if (t.dataset.rvtitle !== undefined) { rv.k.title = rv.titles[+t.dataset.rvtitle]; return renderReveal(); }
   if (t.dataset.rvvis !== undefined) { rv.k.visibility = t.dataset.rvvis; try { sessionStorage.setItem(IV, JSON.stringify({ reveal: rv })); } catch (e) {} return renderReveal(); }
   if (t.dataset.rvsave !== undefined) return save(t);
@@ -631,7 +670,10 @@ function starters() {
   box.innerHTML = `<section class="kc-hero">
       <h1 class="display kc-title">EVERYONE KNOWS SOMETHING.</h1>
       <p class="kc-body">Turn something you've figured out into a keycard someone else can borrow. Answer a few questions and AI writes it up in your words; you check everything before it's saved. About 3 minutes.</p></section>
-    ${aiUrl ? `<section class="ed-sec ed-start mk-into">
+    ${aiUrl ? `<button type="button" class="mk-surprise" data-surprise><b>✦ Surprise me</b>
+      <span>No topic needed. Just chat, and I'll find what you know that's worth sharing.</span></button>
+    <span class="label" style="display:block;margin:14px 4px 8px">Or, if you know what you want to make</span>
+    <section class="ed-sec ed-start mk-into">
       <span class="label">What are you into?</span>
       <div class="mk-into-row"><input id="into" placeholder="e.g. 7-a-side tactics, Bali" maxlength="80" enterkeyhint="go">
       <button class="kc-btn kc-btn-main" type="button" data-into>Go</button></div>
@@ -693,9 +735,11 @@ async function findIdeas(answers) {
 // Lists of favourites get one fixed question: the top 3 become "Start here" on the keycard.
 const TOP3_Q = 'If someone only tried three, which would they be?';
 const guessKind = topic => (pick === 'places' || /\b(favou?rite|best|top \d|spots?|restaurants?|places|caf[eé]s?|bars?|where (i|to)|picks|eats)\b/i.test(topic)) ? 'picks' : '';
-function startInterview(topic, kind) {
-  iv = { topic, turns: [], q: '', t0: Date.now(), kind: kind || guessKind(topic) }; noteStart('interview'); ivAsk();
+function startInterview(topic, kind, mode) {
+  iv = { topic, turns: [], q: '', t0: Date.now(), kind: mode === 'open' ? '' : (kind || guessKind(topic)), ...(mode ? { mode } : {}) }; noteStart(mode === 'open' ? 'surprise' : 'interview'); ivAsk();
 }
+// "Surprise me": no topic. The interview finds what they know, and the keycard comes out of the conversation.
+function startSurprise() { pick = null; into = null; window.scrollTo(0, 0); startInterview('Surprise me', '', 'open'); }
 
 window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
 
@@ -718,12 +762,15 @@ onUser(async u => {
       if (pend.act === 'blank') return start('picks');
       if (pend.act === 'frompaste') return startFromPaste(pend.paste);
       if (pend.act === 'ivstart' && aiUrl) return startInterview(pend.topic);
+      if (pend.act === 'surprise' && aiUrl) return startSurprise();
       if (pend.act === 'into' && aiUrl) return startInto(pend.topic);
       if (pend.act === 'ask') { await startInto(pend.topic); await saveAsk(pend.topic).catch(() => {}); into.asked = true; return renderInto(); }
       if (pend.act === 'find' && aiUrl) { pick = 'find'; found = { answers: pend.answers || [] }; starters(); return findIdeas(pend.answers || []); }
     }
     try { iv = JSON.parse(sessionStorage.getItem(IV) || 'null'); } catch (e) { iv = null; }
-    if (iv && iv.reveal) { rv = iv.reveal; iv = null; made = { how: 'interview', t0: rv.t0, takes: rv.take }; return renderReveal(); }
+    if (iv && iv.reveal) { rv = iv.reveal; rv.reads = rv.reads || []; iv = null; made = { how: 'interview', t0: rv.t0, takes: rv.take };
+      if (rv.reads.some(r => r.r)) made.reads = { shown: rv.reads.length, spot: rv.reads.filter(x => x.r === 'spot').length, notquite: rv.reads.filter(x => x.r === 'notquite').length, wrong: rv.reads.filter(x => x.r === 'wrong').length };
+      return renderReveal(); }
     if (iv && iv.q && aiUrl) return renderIv();
     if (params.get('into') && aiUrl) return startInto(params.get('into'));
     return starters();

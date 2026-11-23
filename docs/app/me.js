@@ -75,6 +75,12 @@ async function betaResults() {
   const ivMade = madeOwn.filter(k => (k.made || {}).how === 'interview');
   if (ivMade.length) html += row('Interview keycards: tried another take', `${ivMade.filter(k => (k.made.takes || 1) > 1).length} of ${ivMade.length}`)
     + row('Tweaked before saving', `${ivMade.filter(k => k.made.tweaked).length} of ${ivMade.length}`);
+  // Is the AI reading people well? Every rated read: spot on / not quite / wrong. Target: at least half spot on.
+  const rd = madeOwn.map(k => (k.made || {}).reads).filter(Boolean);
+  if (rd.length) { const sum = f => rd.reduce((a, r) => a + (r[f] || 0), 0), rated = sum('spot') + sum('notquite') + sum('wrong');
+    if (rated) html += row('AI reads: spot on', `${sum('spot')} of ${rated} (${Math.round(sum('spot') / rated * 100)}%) · not quite ${sum('notquite')} · wrong ${sum('wrong')}`); }
+  const sm = madeOwn.filter(k => (k.made || {}).mode === 'open').length;
+  if (sm) html += row('Made with Surprise me', String(sm));
   const tms = t => t && t.toMillis ? t.toMillis() : (t && t.__ts) || 0;
   const byOwner = {};
   madeOwn.forEach(k => { const t = tms(k.created); if (t) (byOwner[k.owner] = byOwner[k.owner] || []).push(t); });

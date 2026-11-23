@@ -270,6 +270,19 @@ body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 .rv-spark{display:inline-block;animation:rvSpin 1.2s ease both}
 .rv-noticed{background:var(--accent-bg);border:1px solid var(--accent-line);border-radius:16px;padding:12px 14px;animation:rvIn .5s .1s ease both}
 .rv-noticed p{margin:4px 0 0;font:500 16px/1.45 Inter,system-ui,sans-serif;color:var(--accent-ink)}
+.rv-antic{animation:rvIn .5s .05s ease both}
+.rv-antic p{margin:4px 0 0;font:600 19px/1.4 Inter,system-ui,sans-serif;color:var(--ink)}
+.rv-reads{display:flex;flex-direction:column;gap:8px;animation:rvIn .5s .15s ease both}
+.rv-read{background:var(--accent-bg);border:1px solid var(--accent-line);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;transition:opacity .3s}
+.rv-read.off{opacity:.45}
+.rv-read p{margin:0;font:500 16px/1.45 Inter,system-ui,sans-serif;color:var(--accent-ink)}
+.rv-kind{font:700 11px/1.2 Inter,system-ui,sans-serif;letter-spacing:.6px;text-transform:uppercase;color:var(--accent)}
+.rv-ev,.rv-done{font-size:13px;color:var(--muted)}
+.rv-rate{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.rv-rate button{font:600 13px/1.2 Inter,system-ui,sans-serif;color:var(--ink2);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 4px;cursor:pointer}
+.mk-surprise{display:flex;flex-direction:column;gap:4px;text-align:left;width:100%;background:var(--accent-bg);border:1px solid var(--accent-line);border-radius:18px;padding:16px;cursor:pointer;margin-top:6px}
+.mk-surprise b{font:700 18px/1.2 Inter,system-ui,sans-serif;color:var(--accent-ink)}
+.mk-surprise span{font-size:14px;color:var(--ink2)}
 .rv-titles{display:flex;flex-direction:column;gap:6px;animation:rvIn .5s .2s ease both}
 .rv-t{text-align:left;font:600 15px/1.3 Inter,system-ui,sans-serif;color:var(--ink2);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer}
 .rv-t.on{color:var(--ink);border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
