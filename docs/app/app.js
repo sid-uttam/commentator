@@ -606,15 +606,17 @@ export function rulesCard(s) {
     ${items.length > 3 ? `<button type="button" class="kc-seeall" data-seeall>See all ${items.length}</button>` : ''}</section>`;
 }
 // A Quick tip: the whole card on one screen, like a postcard. Fact chips, the why, and one button to act.
-export const isTip = k => k.format === 'tip' || (!k.format && (k.shape || 'picks') === 'picks'
-  && (k.sections || []).filter(s => !isRules(s)).reduce((n, s) => n + (s.items || []).length, 0) <= 2);
+export const isTip = k => { const n = (k.sections || []).filter(s => !isRules(s)).reduce((a, s) => a + (s.items || []).length, 0);
+  return n <= 3 && (k.format === 'tip' || (!k.format && (k.shape || 'picks') === 'picks' && n <= 2)); };
 export function tipBlock(k) {
   const items = (k.sections || []).filter(s => !isRules(s)).flatMap(s => s.items || []);
   const place = (items.find(i => /\bat\s+[A-Z]/.test(i.name || '')) || {}).name;
-  const where = place ? place.replace(/^.*?\bat\s+/, '') : (['Food', 'Travel'].includes(k.subject) ? k.title.replace(/^.*?\bat\s+/, '').split(',')[0] : '');
+  // Maps only when there's a real "something at Place" to search for, never a guess from a vague phrase.
+  const where = place ? place.replace(/^.*?\bat\s+/, '') : (['Food', 'Travel'].includes(k.subject) && /\bat\s+[A-Z]/.test(k.title || '') ? k.title.replace(/^.*?\bat\s+/, '').split(',')[0] : '');
   return `<section class="kc-tip">
     ${(k.facts || []).length ? `<div class="kc-facts">${k.facts.map(f => `<span>${esc(f)}</span>`).join('')}</div>` : ''}
     ${items.map(it => `<div class="kc-tip-i"><b>${esc(it.name)}</b>${it.why ? `<p>${esc(it.why)}</p>` : ''}</div>`).join('')}
+    ${(k.sections || []).filter(isRules).flatMap(s => s.items || []).slice(0, 3).map(it => `<div class="kc-tip-rule">✓ ${esc(it.name)}</div>`).join('')}
     ${where ? `<a class="kc-btn kc-btn-main kc-tip-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(where)}" target="_blank" rel="noopener">Open in Maps</a>` : ''}
   </section>`;
 }

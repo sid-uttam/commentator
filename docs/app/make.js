@@ -181,7 +181,7 @@ box.addEventListener('click', async e => {
   if (e.target.closest('[data-blank]')) { e.preventDefault(); start('picks'); return; }
   if (e.target.closest('[data-ivquit]')) { e.preventDefault(); iv = null; pick = null; try { sessionStorage.removeItem(IV); } catch (x) {} starters(); return; }
   if (e.target.closest('[data-rsstop]')) { e.preventDefault(); finishReasons(); return; }
-  const rvt = e.target.closest('[data-rvtitle],[data-rvvis],[data-rvsave],[data-rvtweak],[data-rvagain],[data-rvmore],[data-rvquit],[data-rvrate]');
+  const rvt = e.target.closest('[data-rvtitle],[data-rvvis],[data-rvsave],[data-rvtweak],[data-rvagain],[data-rvmore],[data-rvquit],[data-rvrate],[data-rvfix],[data-rvgrow]');
   if (rvt && rv) { e.preventDefault(); return revealClick(rvt); }
   if (e.target.closest('[data-back]')) { e.preventDefault(); pick = null; into = null; starters(); scrollTo(0, 0); return; }
   const t = e.target.closest('button'); if (!t) return;
@@ -233,7 +233,7 @@ box.addEventListener('click', async e => {
     iv.turns.push({ q: iv.q, a }); iv.q = ''; iv.skipped = []; ivSave(); ivAsk(); return;   // skips only matter for the question they skipped
   }
   if (d.ivdone !== undefined) { const a = document.getElementById('iv-a'); if (a && a.value.trim()) iv.turns.push({ q: iv.q, a: a.value.trim() }); ivDraft(); return; }
-  if (d.ivretry !== undefined) { iv.q ? renderIv() : ivAsk(); return; }
+  if (d.ivretry !== undefined) { if (iv.draftFailed) { iv.draftFailed = false; return ivDraft(); } iv.q ? renderIv() : ivAsk(); return; }
   if (d.frompaste !== undefined) { startFromPaste(document.getElementById('paste0').value); return; }
   if (d.copyopen) { copyOpen.add(d.copyopen); const it = getPath(d.copyopen); if (it.copy === undefined) it.copy = ''; render(); box.querySelector(`[data-p="${d.copyopen}.copy"]`).focus(); return; }
   if (d.link) { linkOpen.add(d.link); render(); box.querySelector(`[data-p="${d.link}.url"]`).focus(); return; }
@@ -400,7 +400,7 @@ function renderIv(state, err) {
   const n = iv.turns.length;
   box.innerHTML = `<section class="iv">
       <a href="#" data-ivquit class="iv-back">‹ Other ways to make one</a>
-      <div class="eyebrow">Interview · ${esc(iv.topic)}</div>
+      <div class="eyebrow">Interview · ${esc(iv.topic.length > 34 ? iv.topic.slice(0, 32).trim() + '…' : iv.topic)}</div>
       ${n ? `<details class="iv-past"${n <= 2 ? ' open' : ''}><summary>Your answers so far (${n})</summary>
         ${iv.turns.map(t => `<div class="iv-turn"><span>${esc(t.q)}</span><p>${esc(t.a)}</p></div>`).join('')}</details>` : ''}
       ${state === 'drafting' ? `<p class="iv-q">Writing your keycard, in your words…</p><div class="iv-dots"><i></i><i></i><i></i></div>`
@@ -499,15 +499,22 @@ async function ivDraft(again) {
   } else renderIv('drafting');
   try {
     const avoid = again ? `last time the title was "${rv.k.title}" and the sections were: ${rv.k.sections.map(x => x.title).join(', ')}` : '';
-    const kd = (await askAI('draft', base.topic, base.turns, { ...(take > 1 ? { take, avoid } : {}), ...(base.mode ? { mode: base.mode } : {}) })).keycard || {};
+    const ask = () => askAI('draft', base.topic, base.turns, { ...(take > 1 ? { take, avoid } : {}), ...(base.mode ? { mode: base.mode } : {}) }).then(d => d.keycard || {});
+    const hasItems = d => (Array.isArray(d.sections) ? d.sections : []).some(x => x && Array.isArray(x.items) && x.items.length) || (Array.isArray(d.principles) && d.principles.length);
+    // Never show an empty card: if the draft comes back with nothing in it, try once more before giving up.
+    let kd = await ask(); if (!hasItems(kd)) kd = await ask();
+    if (!hasItems(kd)) throw new Error("The write-up came back empty. Tap Try again: your answers are all still here.");
+    if (!kd.title || /^surprise me$/i.test(String(kd.title).trim())) kd.title = (Array.isArray(kd.titles) && kd.titles.find(t => t && !/^surprise me$/i.test(t))) || 'My keycard';
     const titles = [...new Set([kd.title, ...(Array.isArray(kd.titles) ? kd.titles : [])].map(t => String(t || '').trim()).filter(Boolean))].slice(0, 3);
     const more = (Array.isArray(kd.more) ? kd.more : []).filter(x => x && x.title && x.start).slice(0, 3);
     const fresh = (Array.isArray(kd.reads) ? kd.reads : []).filter(r => r && r.text).slice(0, 3)
       .map(r => ({ kind: ['pattern', 'guess', 'tension'].includes(r.kind) ? r.kind : 'pattern', text: String(r.text).trim(), evidence: cleanEv(r.evidence), rule: String(r.rule || '').trim(), r: '' }));
-    const kept = again && rv.reads.some(r => r.r);   // they've already rated these: keep them, and what they confirmed
+    const grown = !again && (base.keptReads || []).some(r => r.r);   // a tip that grew into a list keeps what they rated
+    const kept = (again && rv.reads.some(r => r.r)) || grown;   // they've already rated these: keep them, and what they confirmed
+    const prev = grown ? { anticipation: base.keptAntic || '', reads: base.keptReads } : rv;
     rv = { topic: base.topic, turns: base.turns, t0: base.t0 || Date.now(), take, titles, mode: base.mode || '', more, k: null,
-           noticed: String(kd.noticed || '').trim(), anticipation: kept ? rv.anticipation : String(kd.anticipation || '').trim(),
-           reads: kept ? rv.reads : fresh };
+           noticed: String(kd.noticed || '').trim(), anticipation: kept ? prev.anticipation : String(kd.anticipation || '').trim(),
+           reads: kept ? prev.reads : fresh };
     rv.k = kFromDraft(kd);
     rv.reads.filter(r => r.r === 'spot' && r.kind !== 'tension').forEach(r => addPrinciple(r));
     starTop3(rv.k, base.turns);
@@ -519,7 +526,7 @@ async function ivDraft(again) {
     window.scrollTo(0, 0);
   } catch (e) {
     if (again) { toast(e.message || "Couldn't make another take. Try again."); renderReveal(); }
-    else renderIv(null, e.message);
+    else { if (iv) iv.draftFailed = true; renderIv(null, e.message); }
   }
 }
 
@@ -540,17 +547,18 @@ function renderReveal() {
       ${rv.reads.map((r, i) => `<div class="rv-read${r.r === 'wrong' ? ' off' : ''}">
         <span class="rv-kind">${READ_LABEL[r.kind]}</span><p>${esc(r.text)}</p>
         ${r.evidence ? `<small class="rv-ev">From what you said: “${esc(cleanEv(r.evidence))}”</small>` : ''}
-        ${r.r ? `<small class="rv-done">${READ_DONE[r.r](r)}</small>`
+        ${r.r === 'notquite' && !r.fixed ? `<div class="rv-fix"><input data-rvfixin="${i}" maxlength="120" placeholder="What's closer? (optional)"><button type="button" class="kc-btn" data-rvfix="${i}">Add</button></div>`
+          : r.r ? `<small class="rv-done">${READ_DONE[r.r](r)}</small>`
           : `<div class="rv-rate">${[['spot', 'Spot on'], ['notquite', 'Not quite'], ['wrong', 'Wrong']].map(([v, l]) => `<button type="button" data-rvrate="${i}:${v}">${l}</button>`).join('')}</div>`}
       </div>`).join('')}
-      <p class="kc-fine">Everything on the keycard is what you said. These are my reads on it: tell me if I've got you right.</p></div>`
+      <p class="kc-fine">Everything on the keycard is what you said. ${rv.reads.length === 1 ? 'This is my read' : 'These are my reads'} on it: tell me if I've got you right.</p></div>`
     : rv.noticed ? `<div class="rv-noticed"><span class="label">What I noticed</span><p>${esc(rv.noticed)}</p></div>` : ''}
     ${rv.titles.length > 1 ? `<div class="rv-titles"><span class="label">Pick a title</span>
       ${rv.titles.map((t, i) => `<button type="button" class="rv-t${t === k.title ? ' on' : ''}" data-rvtitle="${i}">${esc(t)}</button>`).join('')}</div>` : ''}
     <article class="rv-card">
       <div class="eyebrow">${esc(isTip(k) ? 'Quick tip' : label)}${k.subject ? ' · ' + esc(k.subject) : ''}</div>
       <h1 class="display kc-title">${esc(k.title)}</h1>
-      <div class="rv-by">by ${esc(first)}</div>
+      <div class="rv-by">by ${owner ? esc(first) : 'you'}</div>
       ${k.idea ? `<p class="kc-idea">${esc(k.idea)}</p>` : k.tagline ? `<p class="kc-body">${esc(k.tagline)}</p>` : ''}
       ${(() => { const top = k.sections.flatMap(x => x.items.filter(i => i.star)).slice(0, 3);
         return top.length ? `<div class="rv-sec kc-start-in"><div class="label">Start here: ${esc(first)}'s top ${top.length}</div>${top.map(it => itemRow(it)).join('')}</div>` : ''; })()}
@@ -568,6 +576,9 @@ function renderReveal() {
       <button class="kc-btn" type="button" data-rvagain>Try another take</button></div>
       <p class="kc-fine">Everything on it came from your answers. Another take changes the shape and titles, never your picks or reasons.</p>
     </div>
+    ${isTip(k) && (k.shape || 'picks') === 'picks' ? `<section class="rv-grow"><b>Make this the first of your go-to spots?</b>
+      <p>One tip is nice. A list people can come back to, and follow as you add to it, is better. Two quick questions.</p>
+      <button type="button" class="kc-btn" data-rvgrow>Grow it into a list</button></section>` : ''}
     ${rv.more.length ? `<section class="rv-more"><span class="label">I spotted more keycards in what you said</span>
       ${rv.more.map((m, i) => `<button type="button" class="mk-idea mk-idea-typed" data-rvmore="${i}"><span class="mk-type">${esc(SHAPE_LABEL[m.type] || 'Keycard')}</span><b>${esc(m.title)}</b></button>`).join('')}
       <p class="kc-fine">Tapping one saves this keycard first, then starts the next interview.</p></section>` : ''}
@@ -578,15 +589,28 @@ function renderReveal() {
 const cleanEv = e => String(e || '').replace(/["“”]/g, '').replace(/\s*;\s*/g, ' · ').replace(/\s+/g, ' ').trim();
 const READ_LABEL = { pattern: 'A pattern I noticed', guess: 'My guess: is this right?', tension: 'Something that pulls two ways' };
 const READ_DONE = { spot: r => r.kind === 'tension' ? 'Glad that landed.' : 'Added to your keycard, under how you choose.',
-                    notquite: () => "Thanks. Fix it with Tweak it if you'd like it on your keycard.", wrong: () => "Got it. I've left that out." };
+                    notquite: r => r.fixed ? 'Added your version to your keycard, under how you choose.' : '', wrong: () => "Got it. I've left that out." };
 // A read they confirm becomes one of their principles (the first section). Tensions don't: they're questions, not rules.
 function addPrinciple(r) {
   let sec = rv.k.sections.find(x => x.principles);
   if (!sec) { sec = { title: rv.k.shape === 'picks' ? 'How I choose' : 'How I think about it', items: [], principles: true }; rv.k.sections.unshift(sec); }
   const name = r.rule ? r.rule.replace(/[.]$/, '') : r.text.replace(/^(is it that|maybe|i think)\s+/i, '').replace(/\?$/, '').replace(/^you\s+/i, 'I ').replace(/^./, c => c.toUpperCase());
-  if (sec.items.length < 5 && !sec.items.some(i => i.name === name)) sec.items.push({ name, why: r.evidence || '', url: '' });
+  if (sec.items.length < 5 && !sec.items.some(i => i.name === name)) sec.items.unshift({ name, why: r.evidence || '', url: '' });   // first, so it's visible
 }
 async function revealClick(t) {
+  if (t.dataset.rvgrow !== undefined) {   // the same interview carries on: their first tip stays, a few more picks join it
+    iv = { topic: rv.k.title, turns: rv.turns, t0: rv.t0, kind: 'picks', grow: true, keptReads: rv.reads, keptAntic: rv.anticipation,
+           q: "Love it. What are 3 or 4 more places like this you'd send a friend to, and what makes each one worth it?" };
+    rv = null; try { sessionStorage.setItem(IV, JSON.stringify(iv)); } catch (e) {}
+    window.scrollTo(0, 0); return renderIv();
+  }
+  if (t.dataset.rvfix !== undefined) {   // "not quite" → their own words become the rule
+    const r = rv.reads[+t.dataset.rvfix], v = (box.querySelector(`[data-rvfixin="${t.dataset.rvfix}"]`) || {}).value || '';
+    if (!r || !v.trim()) return;
+    r.fixed = v.trim(); addPrinciple({ ...r, rule: r.fixed.replace(/^./, c => c.toUpperCase()), evidence: '' });
+    try { sessionStorage.setItem(IV, JSON.stringify({ reveal: rv })); } catch (e) {}
+    return renderReveal();
+  }
   if (t.dataset.rvrate !== undefined) {
     const [i, v] = t.dataset.rvrate.split(':'); const r = rv.reads[+i]; if (!r || r.r) return;
     r.r = v;
@@ -732,7 +756,7 @@ function starters() {
     </div>` : ''}
     ${paste}
     <p class="kc-fine" style="text-align:center">${aiUrl ? '<a href="#" data-showpaste>Already have a list? Paste it</a> · ' : ''}<a href="#" data-blank>Start blank</a> · <a href="${ROOT}">Copy one from Discover</a></p>
-    ${owner ? '' : '<p class="kc-fine" style="text-align:center">Free. You\'ll sign in with Google when you start, so it\'s saved.</p>'}`;
+    ${owner ? '' : '<p class="kc-fine" style="text-align:center">Free, and no sign-in to try. You sign in with Google only when you save it.</p>'}`;
 }
 
 document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'into' && pick !== 'into') { e.preventDefault(); startInto(e.target.value); } });
@@ -791,6 +815,7 @@ function startInterview(topic, kind, mode, firstQ) {
 const OPENERS = [
   'What do people usually come to you for?',
   "What's something you do differently from most people you know?",
+  "What's your go-to order at the places you keep going back to?",
   "What's a decision you made that you're quietly proud of?",
   "What's something you've spent years getting good at, even if it's not your job?",
   'What do you find yourself explaining to friends again and again?',
@@ -798,9 +823,9 @@ const OPENERS = [
   "What's a small habit that made a big difference to your life?",
   "What's something you know a lot about that might surprise people?",
   'When friends visit your city, where do you take them, and why there?',
-  "What's the best advice you've ever ignored, or followed?",
+  "What's a routine you actually stick to, and why does it work for you?",
   "What's something you'd happily spend an hour telling someone about?",
-  "What's a mistake you made once and never made again?",
+  'Where do you always send people when they ask you for a recommendation?',
   'Who or what do you trust when you need to learn something new?',
   "What's something most people overpay for, or get wrong, that you don't?",
   "What's your go-to recommendation when someone asks you for one?",
@@ -808,7 +833,7 @@ const OPENERS = [
   'What does a really good weekend look like for you?',
   "What's something you changed your mind about in the last few years?",
   "What's a skill you picked up that you think everyone should have?",
-  "What's a place, meal or experience you still think about?",
+  'How do you get ready for something big: a trip, a match, a big day?',
 ];
 // Never the same opener twice for one person: remember the ones this browser has seen, and reset once all are used.
 function nextOpener() {

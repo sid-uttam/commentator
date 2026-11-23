@@ -54,7 +54,7 @@ async function show() {
   // The calmer layout (big idea → top rules → one section at a time → ask) for keycards with two or more sections.
   // Places on picks keycards get "Open in Maps" (a search for the name, never a guessed address).
   if (shape === 'picks' && ['Food', 'Travel'].includes(k.subject)) rest.forEach(sec => sec.items.forEach(it => {
-    if (!it.url && !it.copy && /\b(at|in)\s+[A-Z]|^[A-Z][\w'&.-]+(\s+[A-Z][\w'&.-]+)*(,|$)/.test(it.name || '')) it.map = it.name.replace(/^.*?\bat\s+/, '');
+    if (!it.url && !it.copy && /\bat\s+[A-Z][\w'&.-]+/.test(it.name || '')) it.map = it.name.replace(/^.*?\bat\s+/, '');
   }));
   const tip = isTip({ ...k, sections });   // one place, dish or trick: the postcard layout
   const tabbed = !tip && (rest.length >= 2 || rest.reduce((n, x) => n + x.items.length, 0) <= 7);
@@ -84,7 +84,8 @@ async function show() {
     <div id="links"></div>
     ${start}
     ${tip ? '' : rules.map(rulesCard).join('')}
-    ${tip ? tipBlock({ ...k, sections }) + '<div id="live"></div><div id="ask" class="kc-ask-end"></div>'
+    ${tip ? tipBlock({ ...k, sections }) + `<p class="kc-fine" id="grownudge" hidden>Add a few more and this becomes a list people can follow. <a href="${esc(makeUrl(docId))}" style="color:var(--accent)">Add more ›</a></p>`
+        + '<div id="live"></div><div id="ask" class="kc-ask-end"></div>'
       : tabbed ? tabs + '<div id="live"></div>' + sourcesFold + '<div id="ask" class="kc-ask-end"></div>'
       : shape === 'picks' && !k.watch ? folds + '<div id="live"></div>' : '<div id="live"></div>' + folds}`;
   // Ask this keycard: answers only from what's on it, plus whatever update is showing.
@@ -107,6 +108,7 @@ async function show() {
     const copyNote = `Copy to get ${what} as your own, credited to ${first}. Change anything; ${first}'s stays as it is.`;
     if (!own) { mountActions(acts, k.id, { title: k.title, url: ROOT + 'u/' + docId + '/', copyNote, owner: k.owner,
       followNote: sources.length || (cf && cf.live) ? 'Follow to get its updates.' : `Follow to hear when ${first} changes it.` }); return; }
+    { const g = document.getElementById('grownudge'); if (g) g.hidden = false; }   // owners of a tip: nudge it towards a list
     acts.innerHTML = `<div class="kc-act-row"><a class="kc-btn kc-btn-main" href="${esc(makeUrl(docId))}">Edit</a>
       <button class="kc-btn" type="button" id="sh">Share</button></div>`;
     document.getElementById('sh').onclick = () => share(k.title, ROOT + 'u/' + docId + '/');
