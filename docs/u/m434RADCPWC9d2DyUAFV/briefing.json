@@ -1,41 +1,30 @@
 {
- "headline": "Gameweek 12 is the focus now, and the creators here mostly talk about injuries and transfers, not a fixed plan.",
+ "headline": "Keep your FPL routine short: one weekly check, then make a calm, safe-leaning final call before the deadline.",
  "points": [
   {
-   "text": "Raya is reported injured, according to one video that reacts to Gameweek 11 and looks ahead to Gameweek 12.",
+   "text": "Creator Let's Talk FPL posts several weekly videos on team news, injuries and transfers. Each one is a sponsored video.",
    "label": "reported",
    "sources": [
     {
      "name": "Let's Talk FPL",
      "url": "https://www.youtube.com/watch?v=gezr1X2E7MA",
-     "date": "2026-11-22T15:46:14Z"
+     "date": "2026-11-22T19:46:04Z"
     }
    ]
   },
   {
-   "text": "João Pedro is reported out, according to one video ahead of Gameweek 11.",
+   "text": "Recent team news includes a Raya injury and a João Pedro absence, according to video titles. Check the official squad news before you lock your team.",
    "label": "reported",
    "sources": [
     {
      "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=_YkkZBv5aS0",
-     "date": "2026-11-20T15:13:16Z"
+     "url": "https://www.youtube.com/watch?v=gezr1X2E7MA",
+     "date": "2026-11-22T19:46:04Z"
     }
    ]
   },
   {
-   "text": "One creator says selling Haaland soon might be a crazy move. Treat this as one person's take, not a rule.",
-   "label": "opinion",
-   "sources": [
-    {
-     "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=srWgsUqLBew",
-     "date": "2026-11-18T08:56:07Z"
-    }
-   ]
-  },
-  {
-   "text": "Several videos discuss whether to take a transfer now or wait. Most stress keeping transfers simple and planned.",
+   "text": "One creator says the Gameweek 11 team is set and suggests waiting before making a transfer, with a short 'more this week or next?' question.",
    "label": "opinion",
    "sources": [
     {
@@ -46,20 +35,8 @@
    ]
   },
   {
-   "text": "For a 15-minute weekly window, check injury news first, then make one planned change at most.",
-   "label": "ai interpretation",
-   "sources": [
-    {
-     "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=gezr1X2E7MA",
-     "date": "2026-11-22T15:46:14Z"
-    }
-   ]
-  }
- ],
- "differences": [
-  {
-   "text": "Some videos push selling key players, while others lean toward holding or saving transfers. The advice is not consistent.",
+   "text": "A creator asks whether selling Haaland soon is crazy. This is a question, not a recommendation.",
+   "label": "opinion",
    "sources": [
     {
      "name": "Let's Talk FPL",
@@ -69,8 +46,20 @@
    ]
   }
  ],
+ "differences": [
+  {
+   "text": "One creator treats Wirtz as a key question for Gameweek 12, while another frames the week around injuries and a possible Haaland sale. Each one is one creator's view.",
+   "sources": [
+    {
+     "name": "Let's Talk FPL",
+     "url": "https://www.youtube.com/watch?v=cIuOhZHFccA",
+     "date": "2026-11-23T10:17:07Z"
+    }
+   ]
+  }
+ ],
  "angles": [],
- "updated": "2026-11-22T17:08:04Z",
+ "updated": "2026-11-23T12:43:23Z",
  "model": "claude-haiku-5-5",
  "items": 8
 }
