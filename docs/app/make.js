@@ -222,14 +222,14 @@ box.addEventListener('click', async e => {
   }
   // Not feeling the question: Surprise me's opener swaps for another; later questions ask the AI for a different one.
   if (d.ivskip !== undefined) {
+    if (iv.mode === 'open' && !iv.turns.length) { iv.q = nextOpener(); ivSave(); return renderIv(); }   // openers swap on the page; the AI never sees them
     iv.skipped = [...(iv.skipped || []), iv.q].slice(-6);
-    if (iv.mode === 'open' && !iv.turns.length) { iv.q = nextOpener(); ivSave(); return renderIv(); }
     iv.q = ''; ivSave(); ivAsk(); return;
   }
   if (d.ivnext !== undefined) {
     const a = document.getElementById('iv-a').value.trim();
     if (!a) { toast('Type an answer, even a short one'); return; }
-    iv.turns.push({ q: iv.q, a }); iv.q = ''; ivSave(); ivAsk(); return;
+    iv.turns.push({ q: iv.q, a }); iv.q = ''; iv.skipped = []; ivSave(); ivAsk(); return;   // skips only matter for the question they skipped
   }
   if (d.ivdone !== undefined) { const a = document.getElementById('iv-a'); if (a && a.value.trim()) iv.turns.push({ q: iv.q, a: a.value.trim() }); ivDraft(); return; }
   if (d.ivretry !== undefined) { iv.q ? renderIv() : ivAsk(); return; }
