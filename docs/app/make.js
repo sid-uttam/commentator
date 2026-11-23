@@ -1,5 +1,5 @@
 // Make or edit a keycard: /make/ (new) or /make/?id=<doc id> (edit). Never a blank page: start from a shape or a copy.
-import { onUser, signIn, signInSheet, noteStart, searchKeycards, saveAsk, loadKeycard, saveKeycard, deleteKeycard, keycardUrl, esc, toast, ROOT, live, SUBJECTS, catOf, aiUrl, askAI, itemRow, myName, SHAPE_LABEL, fold, isRules, rulesCard, sectionTabs } from './app.js';
+import { onUser, signIn, signInSheet, noteStart, searchKeycards, saveAsk, loadKeycard, saveKeycard, deleteKeycard, keycardUrl, esc, toast, ROOT, live, SUBJECTS, catOf, aiUrl, askAI, itemRow, myName, SHAPE_LABEL, fold, isRules, rulesCard, sectionTabs, isTip, tipBlock } from './app.js';
 
 const box = document.getElementById('ed');
 const params = new URLSearchParams(location.search);
@@ -260,12 +260,14 @@ function payload() {
   const tidy = it => ({ name: (it.name || '').trim(), why: (it.why || '').trim(), url: (it.url || '').trim(), ...(it.type ? { type: it.type } : {}), ...(it.copy ? { copy: it.copy.trim() } : {}), ...(it.star ? { star: true } : {}), ...(it.from ? { from: true } : {}) });
   const data = {
     title: k.title.trim(), tagline: k.tagline.trim(), idea: (k.idea || '').trim(), subject: k.subject || '',
+    format: k.format || '', facts: (k.facts || []).map(f => String(f).trim()).filter(Boolean).slice(0, 3),
     sections: k.sections.map(s => ({ title: s.title.trim() || 'Picks', items: s.items.filter(keep).map(tidy), ...(s.principles || s.kind === 'principles' ? { kind: 'principles' } : {}) })).filter(s => s.items.length),
     sources: k.sources.filter(keep).map(tidy), instruction: k.instruction.trim(),
     shape: k.shape || '', tested: (k.tested || '').trim(), watch: (k.watch || '').trim(),
     visibility: k.visibility, copiedFrom: k.copiedFrom || null, edited: !!(k.edited || (k.copiedFrom && dirty) || !k.copiedFrom),
   };
-  if (!docId && made) data.made = { how: made.how, secs: Math.round((Date.now() - made.t0) / 1000), ...(made.takes > 1 ? { takes: made.takes } : {}), ...(made.tweaked ? { tweaked: true } : {}), ...(made.reads ? { reads: made.reads } : {}), ...(made.mode ? { mode: made.mode } : {}) };
+  if (!docId && made) data.made = { how: made.how, secs: Math.round((Date.now() - made.t0) / 1000), ...(made.takes > 1 ? { takes: made.takes } : {}), ...(made.tweaked ? { tweaked: true } : {}), ...(made.reads ? { reads: { shown: made.reads.shown, spot: made.reads.spot, notquite: made.reads.notquite, wrong: made.reads.wrong },
+                     readsLog: made.reads.log || [] } : {}), ...(made.mode ? { mode: made.mode } : {}) };
   return data;
 }
 async function save(btn) {
@@ -347,6 +349,15 @@ function fromPaste(text) {
 }
 
 function startFromPaste(text) {
+  if (aiUrl && String(text || '').trim().length > 20) {
+    const t = String(text).trim();
+    iv = { topic: t.split('\n')[0].replace(/^#+\s*/, '').slice(0, 60) || 'My list', turns: [{ q: 'Here is what I already have', a: t.slice(0, 6000) }],
+           q: '', t0: Date.now(), kind: '', mode: 'paste' };
+    noteStart('paste'); return ivDraft().catch(() => startFromPasteForm(t));
+  }
+  return startFromPasteForm(text);
+}
+function startFromPasteForm(text) {
   const sections = fromPaste(text);
   if (!sections.length) return toast('Paste a few lines first');
   made = { how: 'paste', t0: Date.now() }; noteStart('paste');
@@ -444,6 +455,8 @@ function kFromDraft(kd) {
                sources: (kd.sources || []).map(item), instruction: kd.instruction || STARTERS[shape].k.instruction };
   if (!nk.sections.length && !nk.sources.length) nk.sections = [{ title: 'My picks', items: [blankItem()] }];
   nk.idea = String(kd.idea || '').trim().replace(/^["“”]+|["“”]+$/g, '');
+  nk.format = ['tip', 'list', 'playbook', 'story'].includes(kd.format) ? kd.format : '';
+  nk.facts = nk.format === 'tip' ? (Array.isArray(kd.facts) ? kd.facts : []).map(f => String(f).trim()).filter(Boolean).slice(0, 3) : [];
   const pr = (Array.isArray(kd.principles) ? kd.principles : []).filter(x => x && x.name).slice(0, 4).map(item);
   if (pr.length) nk.sections.unshift({ title: shape === 'picks' ? 'How I choose' : 'How I think about it', items: pr, principles: true });
   // Say each thing once: drop any item that repeats one already shown (same name, or the same reason), then empty sections.
@@ -477,7 +490,7 @@ async function ivDraft(again) {
     rv.reads.filter(r => r.r === 'spot' && r.kind !== 'tension').forEach(r => addPrinciple(r));
     starTop3(rv.k, base.turns);
     k = rv.k; made = { how: 'interview', t0: rv.t0, takes: take, ...(rv.mode ? { mode: rv.mode } : {}) };
-    if (rv.reads.some(r => r.r)) made.reads = { shown: rv.reads.length, spot: rv.reads.filter(x => x.r === 'spot').length, notquite: rv.reads.filter(x => x.r === 'notquite').length, wrong: rv.reads.filter(x => x.r === 'wrong').length };
+    if (rv.reads.some(r => r.r)) made.reads = { shown: rv.reads.length, spot: rv.reads.filter(x => x.r === 'spot').length, notquite: rv.reads.filter(x => x.r === 'notquite').length, wrong: rv.reads.filter(x => x.r === 'wrong').length , log: rv.reads.map(r => ({ kind: r.kind, text: r.text, evidence: r.evidence, r: r.r })) };
     iv = null;
     try { sessionStorage.setItem(IV, JSON.stringify({ reveal: rv })); } catch (e) {}
     renderReveal();
@@ -513,14 +526,13 @@ function renderReveal() {
     ${rv.titles.length > 1 ? `<div class="rv-titles"><span class="label">Pick a title</span>
       ${rv.titles.map((t, i) => `<button type="button" class="rv-t${t === k.title ? ' on' : ''}" data-rvtitle="${i}">${esc(t)}</button>`).join('')}</div>` : ''}
     <article class="rv-card">
-      <div class="eyebrow">${esc(label)}${k.subject ? ' · ' + esc(k.subject) : ''}</div>
+      <div class="eyebrow">${esc(isTip(k) ? 'Quick tip' : label)}${k.subject ? ' · ' + esc(k.subject) : ''}</div>
       <h1 class="display kc-title">${esc(k.title)}</h1>
       <div class="rv-by">by ${esc(first)}</div>
       ${k.idea ? `<p class="kc-idea">${esc(k.idea)}</p>` : k.tagline ? `<p class="kc-body">${esc(k.tagline)}</p>` : ''}
       ${(() => { const top = k.sections.flatMap(x => x.items.filter(i => i.star)).slice(0, 3);
         return top.length ? `<div class="rv-sec kc-start-in"><div class="label">Start here: ${esc(first)}'s top ${top.length}</div>${top.map(it => itemRow(it)).join('')}</div>` : ''; })()}
-      ${k.sections.filter(isRules).map(sec => rulesCard(sec)).join('')}
-      ${sectionTabs(k.sections.filter(sec => !isRules(sec)), it => itemRow(it))}
+      ${isTip(k) ? tipBlock(k) : k.sections.filter(isRules).map(sec => rulesCard(sec)).join('') + sectionTabs(k.sections.filter(sec => !isRules(sec)), it => itemRow(it))}
       ${k.sources.length ? `<div class="rv-sec"><div class="label">Sources I follow</div>${k.sources.map(it => itemRow(it)).join('')}</div>` : ''}
     </article>
     <div class="rv-share"><span class="label">When you share it</span>
@@ -557,7 +569,7 @@ async function revealClick(t) {
     const [i, v] = t.dataset.rvrate.split(':'); const r = rv.reads[+i]; if (!r || r.r) return;
     r.r = v;
     if (v === 'spot' && r.kind !== 'tension') addPrinciple(r);
-    made.reads = { shown: rv.reads.length, spot: rv.reads.filter(x => x.r === 'spot').length, notquite: rv.reads.filter(x => x.r === 'notquite').length, wrong: rv.reads.filter(x => x.r === 'wrong').length };
+    made.reads = { shown: rv.reads.length, spot: rv.reads.filter(x => x.r === 'spot').length, notquite: rv.reads.filter(x => x.r === 'notquite').length, wrong: rv.reads.filter(x => x.r === 'wrong').length , log: rv.reads.map(r => ({ kind: r.kind, text: r.text, evidence: r.evidence, r: r.r })) };
     try { sessionStorage.setItem(IV, JSON.stringify({ reveal: rv })); } catch (e) {}
     return renderReveal();
   }
@@ -814,7 +826,7 @@ onUser(async u => {
     }
     try { iv = JSON.parse(sessionStorage.getItem(IV) || 'null'); } catch (e) { iv = null; }
     if (iv && iv.reveal) { rv = iv.reveal; rv.reads = rv.reads || []; iv = null; made = { how: 'interview', t0: rv.t0, takes: rv.take };
-      if (rv.reads.some(r => r.r)) made.reads = { shown: rv.reads.length, spot: rv.reads.filter(x => x.r === 'spot').length, notquite: rv.reads.filter(x => x.r === 'notquite').length, wrong: rv.reads.filter(x => x.r === 'wrong').length };
+      if (rv.reads.some(r => r.r)) made.reads = { shown: rv.reads.length, spot: rv.reads.filter(x => x.r === 'spot').length, notquite: rv.reads.filter(x => x.r === 'notquite').length, wrong: rv.reads.filter(x => x.r === 'wrong').length , log: rv.reads.map(r => ({ kind: r.kind, text: r.text, evidence: r.evidence, r: r.r })) };
       return renderReveal(); }
     if (iv && iv.q && aiUrl) return renderIv();
     if (params.get('into') && aiUrl) return startInto(params.get('into'));

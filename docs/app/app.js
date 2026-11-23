@@ -161,11 +161,12 @@ export async function copyKeycard(id) {
   toast('Making your copy…');
   const src = await loadKeycard(id);
   const by = src.curator || src.ownerName || 'Keycard';
+  if (src.owner && src.owner === me.uid) { toast("This one's already yours. Tap Edit to change it."); return null; }
   const data = {
     owner: me.uid, ownerName: myName(), ownerPhoto: me.photoURL || '',
     title: `${myName().split(' ')[0]}'s ${(src.title || '').replace(/\s+by\s+[^]+$/i, '').trim() || src.title}`, tagline: '', subject: catOf(src.subject || ''),
     sections: clean(src.sections), sources: (src.sources || []).map(s => ({ name: s.name || '', why: s.why || '', url: s.url || '', from: true })),
-    shape: src.shape || '', tested: src.tested || '',
+    shape: src.shape || '', tested: src.tested || '', idea: src.idea || '',
     instruction: src.instruction || '', visibility: 'unlisted', edited: false,
     copiedFrom: { id, title: src.title, by, hash: kcHash(src), live: src.copiedFrom && src.copiedFrom.live || (id.startsWith('site:') ? id : null) },
     created: f.F.serverTimestamp(), updated: f.F.serverTimestamp(),
@@ -597,11 +598,29 @@ export function rulesCard(s) {
     ${items.map(rule).join('')}
     ${items.length > 3 ? `<button type="button" class="kc-seeall" data-seeall>See all ${items.length}</button>` : ''}</section>`;
 }
+// A Quick tip: the whole card on one screen, like a postcard. Fact chips, the why, and one button to act.
+export const isTip = k => k.format === 'tip' || (!k.format && (k.shape || 'picks') === 'picks'
+  && (k.sections || []).filter(s => !isRules(s)).reduce((n, s) => n + (s.items || []).length, 0) <= 2);
+export function tipBlock(k) {
+  const items = (k.sections || []).filter(s => !isRules(s)).flatMap(s => s.items || []);
+  const place = (items.find(i => /\bat\s+[A-Z]/.test(i.name || '')) || {}).name;
+  const where = place ? place.replace(/^.*?\bat\s+/, '') : (['Food', 'Travel'].includes(k.subject) ? k.title.replace(/^.*?\bat\s+/, '').split(',')[0] : '');
+  return `<section class="kc-tip">
+    ${(k.facts || []).length ? `<div class="kc-facts">${k.facts.map(f => `<span>${esc(f)}</span>`).join('')}</div>` : ''}
+    ${items.map(it => `<div class="kc-tip-i"><b>${esc(it.name)}</b>${it.why ? `<p>${esc(it.why)}</p>` : ''}</div>`).join('')}
+    ${where ? `<a class="kc-btn kc-btn-main kc-tip-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(where)}" target="_blank" rel="noopener">Open in Maps</a>` : ''}
+  </section>`;
+}
 // Sections as tabs: one at a time, headlines first, the reason one tap away. Prompts and links keep their own rows.
 export function sectionTabs(sections, rowFn) {
   if (!sections.length) return '';
+  const map = it => it.map ? `<a class="kc-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(it.map)}" target="_blank" rel="noopener">Open in Maps ›</a>` : '';
   const row = it => (it.copy || it.url) ? rowFn(it)
-    : `<details class="kc-item"><summary>${esc(it.name)}</summary>${it.why ? `<p>${esc(it.why)}</p>` : ''}</details>`;
+    : `<details class="kc-item"${small ? ' open' : ''}><summary>${esc(it.name)}</summary>${it.why ? `<p>${esc(it.why)}</p>` : ''}${map(it)}</details>`;
+  // A small keycard (7 items or fewer) shows everything at once: tabs and taps would only hide the good bits.
+  const small = sections.reduce((n, s) => n + (s.items || []).length, 0) <= 7;
+  if (small) return sections.map(s => `<section class="kc-tabs"><span class="label">${esc(s.title || 'Picks')}</span>
+    <div class="kc-panel">${(s.items || []).map(row).join('')}</div></section>`).join('');
   const panel = (s, i) => `<div class="kc-panel" data-panel="${i}"${i ? ' hidden' : ''}>${(s.items || []).map(row).join('')}</div>`;
   if (sections.length === 1) return `<section class="kc-tabs"><span class="label">${esc(sections[0].title || 'Picks')}</span>${panel(sections[0], 0)}</section>`;
   return `<section class="kc-tabs"><div class="kc-tabbar" role="tablist">${sections.map((s, i) =>

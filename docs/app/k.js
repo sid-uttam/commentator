@@ -1,7 +1,7 @@
 // A keycard someone made: /k/?id=<doc id>  (also /u/<id>/, the shareable page with a proper link preview)
 // One layout for every shape: who made it and how fresh it is, then the most useful thing first.
 //   Picks: the list first, "what's new" after it.  Sources: "right now" first.  Playbook: numbered steps + copy boxes.
-import { loadKeycard, mountActions, onUser, esc, itemRow, fold, isRules, rulesCard, sectionTabs, briefingCard, keycardUrl, makeUrl, share, kcHash,
+import { loadKeycard, mountActions, onUser, esc, itemRow, fold, isRules, rulesCard, sectionTabs, isTip, tipBlock, briefingCard, keycardUrl, makeUrl, share, kcHash,
          markChecked, ago, toast, ROOT, live, SHAPE_LABEL, whoFor, mountAsk, askContext, versionsOf, versionsHTML, markNew, hasLive, LIVE_BADGE, saveKeycard } from './app.js';
 
 const box = document.getElementById('kc');
@@ -52,7 +52,12 @@ async function show() {
     </section>` : `<section class="card"><p class="kc-body">Nothing on here yet.</p></section>`;
 
   // The calmer layout (big idea → top rules → one section at a time → ask) for keycards with two or more sections.
-  const tabbed = rest.length >= 2;
+  // Places on picks keycards get "Open in Maps" (a search for the name, never a guessed address).
+  if (shape === 'picks' && ['Food', 'Travel'].includes(k.subject)) rest.forEach(sec => sec.items.forEach(it => {
+    if (!it.url && !it.copy && /\b(at|in)\s+[A-Z]|^[A-Z][\w'&.-]+(\s+[A-Z][\w'&.-]+)*(,|$)/.test(it.name || '')) it.map = it.name.replace(/^.*?\bat\s+/, '');
+  }));
+  const tip = isTip({ ...k, sections });   // one place, dish or trick: the postcard layout
+  const tabbed = !tip && (rest.length >= 2 || rest.reduce((n, x) => n + x.items.length, 0) <= 7);
   const tabs = tabbed ? sectionTabs(rest, it => itemRow(it, cf && `added by ${first}`)) : '';
   const sourcesFold = tabbed && sources.length ? `<section class="kc-folds">${fold('Sources', sources.map(it => itemRow(it)), false)}</section>` : '';
 
@@ -63,23 +68,24 @@ async function show() {
 
   box.innerHTML = `
     <section class="kc-hero">
-      <div class="eyebrow">${esc([SHAPE_LABEL[shape], k.subject].filter(Boolean).join(' · ') || 'Keycard')}${hasLive(k) ? ' ' + LIVE_BADGE : ''}</div>
+      <div class="eyebrow">${esc([tip ? 'Quick tip' : SHAPE_LABEL[shape], k.subject].filter(Boolean).join(' · ') || 'Keycard')}${hasLive(k) ? ' ' + LIVE_BADGE : ''}</div>
       <h1 class="display kc-title">${esc(k.title)}</h1>
-      <div class="kc-cur kc-by">${k.ownerPhoto ? `<img src="${esc(k.ownerPhoto)}" alt="" referrerpolicy="no-referrer">` : `<span class="kc-av">${esc(first.slice(0, 1))}</span>`}<span>By <b>${esc(by)}</b>${cf ? ` · based on <a href="${esc(keycardUrl(cf.id))}" style="color:inherit">${esc(cf.by)}'s</a>` : ''}</span></div>
+      <div class="kc-cur kc-by">${k.ownerPhoto ? `<img src="${esc(k.ownerPhoto)}" alt="" referrerpolicy="no-referrer">` : `<span class="kc-av">${esc(first.slice(0, 1))}</span>`}<span>By <b>${esc(by)}</b>${cf ? ` · based on <a href="${esc(keycardUrl(cf.id))}" style="color:inherit">${esc(cf.by)}'s keycard</a>` : ''}</span></div>
       ${stale ? `<div class="kc-stale">Not checked for ${Math.round(days / 30)} months, so some of this may be out of date</div>` : fresh ? `<div class="kc-fresh">${fresh}</div>` : ''}
       ${cf && added ? `<div class="kc-fine">${inherited} from ${esc(cf.by)}${added ? ` · <span style="color:var(--good)">${added} added by ${esc(first)}</span>` : ''}</div>` : ''}
       ${k.tested ? `<div class="kc-tested">Tested with ${esc(k.tested)}</div>` : ''}
-      ${vis ? `<div class="kc-fine" id="vis" hidden>${esc(vis)}</div>` : ''}
+      
     </section>
     ${k.idea ? `<p class="kc-idea">${esc(k.idea)}</p>` : ''}
     ${k.tagline && !k.idea ? `<p class="kc-body" style="margin-top:-6px">${esc(k.tagline)}</p>` : ''}
     <div class="kc-actions" id="acts"></div>
-    ${tabbed ? '' : '<div id="ask"></div>'}
+    ${tabbed || tip ? '' : '<div id="ask"></div>'}
     <div id="mine"></div>
     <div id="links"></div>
     ${start}
-    ${rules.map(rulesCard).join('')}
-    ${tabbed ? tabs + '<div id="live"></div>' + sourcesFold + '<div id="ask" class="kc-ask-end"></div>'
+    ${tip ? '' : rules.map(rulesCard).join('')}
+    ${tip ? tipBlock({ ...k, sections }) + '<div id="live"></div><div id="ask" class="kc-ask-end"></div>'
+      : tabbed ? tabs + '<div id="live"></div>' + sourcesFold + '<div id="ask" class="kc-ask-end"></div>'
       : shape === 'picks' && !k.watch ? folds + '<div id="live"></div>' : '<div id="live"></div>' + folds}`;
   // Ask this keycard: answers only from what's on it, plus whatever update is showing.
   let shownBrief = null;
@@ -109,10 +115,13 @@ async function show() {
     whoFor(k.id).then(r => {
       const el = document.getElementById('res'); if (!el || !r) return;
       const list = (names, verb) => names.length ? `<div><b>${names.length}</b> ${verb} <span>${esc(names.slice(0, 4).join(', '))}${names.length > 4 ? ` and ${names.length - 4} more` : ''}</span></div>` : '';
-      const lines = [r.opens ? `<div><b>${r.opens}</b> open${r.opens === 1 ? '' : 's'}</div>` : '', list(r.copiers, r.copiers.length === 1 ? 'copy by' : 'copies by'), list(r.followers, 'following:')].filter(Boolean);
-      el.insertAdjacentHTML('afterend', `<a class="kc-fine kc-asfriend" href="?id=${encodeURIComponent(docId)}&as=friend">See it as a friend would ›</a>`);
+      // One quiet line (who can see it · opens · preview); a fuller box only once people actually copy or follow.
+      const lines = [list(r.copiers, r.copiers.length === 1 ? 'copy by' : 'copies by'), list(r.followers, 'following:')].filter(Boolean);
+      const visShort = { private: 'Only you', unlisted: 'Link only', public: 'Everyone' }[k.visibility] || '';
+      el.insertAdjacentHTML('beforebegin', `<div class="kc-fine kc-ownline">${[visShort, r.opens ? `${r.opens} open${r.opens === 1 ? '' : 's'}` : 'No opens yet',
+        `<a href="?id=${encodeURIComponent(docId)}&as=friend">See it as a friend would ›</a>`].filter(Boolean).join(' · ')}</div>`);
       if (r.copiers.length) versionsOf(k.id).then(v => { if (v.length) el.insertAdjacentHTML('beforeend', versionsHTML(v)); });
-      el.innerHTML = lines.length ? lines.join('') : `<div class="kc-fine">Your keycard is ready to travel. Share it with someone who'd find it useful, and you'll see here when people open, follow or make their own version.</div>`;
+      if (lines.length) el.innerHTML = lines.join(''); else el.remove();
     });
     const mine = document.getElementById('mine');
 
@@ -122,8 +131,8 @@ async function show() {
       const n = main.length, noun = shape === 'sources' ? 'source' : shape === 'playbook' ? 'step' : 'pick';
       mine.innerHTML = `<section class="kc-mine">
         <b>${params.get('new') ? 'This is yours now.' : 'Make it yours.'}</b>
-        <p>You got ${n} ${noun}${n === 1 ? '' : 's'}${groups}${cf.live ? ', plus live updates' : ''} from ${esc(cf.by.split(' ')[0])}. Change anything you like. ${esc(cf.by.split(' ')[0])}'s original stays as it is, and you'll hear if they update it.</p>
-        <div class="kc-act-row">
+        <p>${n} ${noun}${n === 1 ? '' : 's'}${groups}${cf.live ? ' plus live updates' : ''} from ${esc(cf.by.split(' ')[0])}. Change anything; theirs stays as it is.</p>
+        <div class="kc-act-row kc-chips">
           <a class="kc-btn" href="${esc(makeUrl(docId, '&focus=title'))}">Rename</a>
           <a class="kc-btn" href="${esc(makeUrl(docId, '&focus=add'))}">Add your own</a>
           <a class="kc-btn" href="${esc(makeUrl(docId, '&focus=remove'))}">Remove some</a>
