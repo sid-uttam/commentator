@@ -160,7 +160,8 @@ box.addEventListener('change', e => { if (e.target.name === 'vis') k.visibility 
 const MAKE_PENDING = 'kc-make-pending';
 box.addEventListener('click', e => {
   if (owner) return;
-  const b = e.target.closest('[data-ivstart],[data-frompaste],[data-blank],[data-idea],[data-findideas],[data-intoideas],[data-ask],[data-surprise]'); if (!b) return;
+  // Making is free to try signed out (interview, reveal, editor); only asking for a keycard and saving need an account.
+  const b = e.target.closest('[data-ask]'); if (!b) return;
   if (b.matches('[data-idea]') && b.dataset.idea.includes('…')) return;   // just fills the box; no need to sign in yet
   e.preventDefault(); e.stopImmediatePropagation();
   const act = b.matches('[data-surprise]') ? 'surprise' : b.matches('[data-ivstart],[data-idea]') ? 'ivstart' : b.matches('[data-findideas]') ? 'find' : b.matches('[data-intoideas]') ? 'into'
@@ -204,7 +205,7 @@ box.addEventListener('click', async e => {
     const n = starCount(); toast(n === 3 ? 'Top 3 set. They show first as “Start here”.' : `${n} of 3 starred`); return;
   }
   if (d.into !== undefined) { startInto(document.getElementById('into').value); return; }
-  if (d.intoideas !== undefined) { if (owner) loadIntoIdeas(into.topic); return; }
+  if (d.intoideas !== undefined) { if (aiUrl) loadIntoIdeas(into.topic); return; }
   if (d.ask !== undefined) { await saveAsk(into.topic).catch(() => {}); into.asked = true; renderInto(); toast("Asked. We'll let you know."); return; }
   if (d.choice) { pick = d.choice; starters(); scrollTo(0, 0); return; }
   if (d.idea) {
@@ -276,8 +277,21 @@ function payload() {
                      readsLog: made.reads.log || [] } : {}), ...(made.mode ? { mode: made.mode } : {}) };
   return data;
 }
+// "Ask for one" from an empty Discover search: register the ask (signing in first if needed), don't just open Make.
+async function askFromLink() {
+  if (!params.get('ask') || !into || into.asked) return;
+  history.replaceState(null, '', location.pathname + '?into=' + encodeURIComponent(into.topic));
+  if (!owner) { try { sessionStorage.setItem(MAKE_PENDING, JSON.stringify({ act: 'ask', topic: into.topic })); } catch (x) {}
+    return signInSheet('Sign in to ask', "It's free. We'll email you when someone makes one."); }
+  await saveAsk(into.topic).catch(() => {}); into.asked = true; renderInto(); toast("Asked. We'll tell you when someone makes one.");
+}
+const SAVE_PENDING = 'kc-make-save';
 async function save(btn) {
-  if (!k.title.trim()) { toast('Give it a name first'); box.querySelector('[data-p="title"]').focus(); return; }
+  if (!k.title.trim()) { toast('Give it a name first'); const f = box.querySelector('[data-p="title"]'); if (f) f.focus(); return; }
+  if (!owner) {   // signed out: keep everything, sign in, and save straight after
+    try { sessionStorage.setItem(SAVE_PENDING, JSON.stringify({ k, made, rv, docId })); } catch (e) {}
+    return signInSheet('Sign in to save it', "Free. It's saved to your account, and you'll land right back here.");
+  }
   const data = payload();
   btn.disabled = true; btn.textContent = 'Saving…';
   try {
@@ -642,7 +656,7 @@ async function startInto(topic) {
   into = { topic, matches: null, ideas: null, asked: false, state: 'loading' };
   pick = 'into'; renderInto(); scrollTo(0, 0);
   searchKeycards(topic).then(m => { if (into && into.topic === topic) { into.matches = m; renderInto(); } });
-  if (owner) loadIntoIdeas(topic);
+  if (aiUrl) loadIntoIdeas(topic);
 }
 async function loadIntoIdeas(topic) {
   into.state = 'loading'; renderInto();
@@ -661,7 +675,7 @@ function renderInto() {
   const matches = into.matches === null ? '<p class="kc-fine">Looking…</p>'
     : into.matches.length ? into.matches.map(k => `<a class="kc-row" href="${esc(k.url)}"><span class="kc-row-t">${esc(k.title)}</span><span class="kc-row-m">${esc([k.type, k.subject, k.by ? 'by ' + k.by : ''].filter(Boolean).join(' · '))}${k.live ? ' <span class="live-badge">● Live updates</span>' : ''}</span></a>`).join('')
     : `<p class="kc-body" style="font-size:15px">No one's made a keycard on “${esc(t)}” yet. You could be the first.</p>`;
-  const ideas = !owner ? `<p class="kc-body" style="font-size:15px">Get ideas for keycards you could make from your own experience.</p>
+  const ideas = !aiUrl ? `<p class="kc-body" style="font-size:15px">Get ideas for keycards you could make from your own experience.</p>
         <button class="kc-btn kc-btn-main" type="button" data-intoideas>Show me ideas</button>`
     : into.state === 'loading' ? '<div class="iv-dots"><i></i><i></i><i></i></div>'
     : into.state.startsWith('error:') ? `<div class="kc-banner">${esc(into.state.slice(6))} <button class="kc-btn kc-btn-quiet" type="button" data-intoideas>Try again</button></div>`
@@ -814,13 +828,30 @@ window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); 
 let started = false;
 onUser(async u => {
   if (!live()) { box.innerHTML = `<section class="card"><p class="kc-body">Making keycards opens very soon.</p></section>`; return; }
-  if (!u) { owner = null; if (params.get('into') && aiUrl && !into) return startInto(params.get('into')); return into ? renderInto() : starters(); }
+  if (!u) {
+    owner = null; started = false;
+    if (params.get('into') && aiUrl && !into) return startInto(params.get('into')).then(() => askFromLink());
+    if (into) return renderInto();
+    // Signed out mid-interview or at the reveal (a refresh): carry on where they were.
+    try { const sv = JSON.parse(sessionStorage.getItem(IV) || 'null');
+      if (sv && sv.reveal && aiUrl) { rv = sv.reveal; rv.reads = rv.reads || []; k = rv.k; made = { how: 'interview', t0: rv.t0, takes: rv.take }; return renderReveal(); }
+      if (sv && sv.q && aiUrl) { iv = sv; return renderIv(); } } catch (e) {}
+    return starters();
+  }
   if (started && owner === u.uid) return;
   started = true; owner = u.uid;
   const tpl = TEMPLATES[params.get('template')];
   if (!docId && tpl) {
     k = { tagline: '', visibility: 'public', copiedFrom: null, kind: tpl.shape, sources: [], instruction: STARTERS[tpl.shape].k.instruction, ...JSON.parse(JSON.stringify(tpl)) };
     return render();
+  }
+  // They made something signed out, then signed in to save it: put it back and save it.
+  let pendSave = null; try { pendSave = JSON.parse(sessionStorage.getItem(SAVE_PENDING) || 'null'); sessionStorage.removeItem(SAVE_PENDING); } catch (e) {}
+  if (pendSave && pendSave.k && !docId) {
+    k = pendSave.k; made = pendSave.made; rv = pendSave.rv;
+    rv ? renderReveal() : render();
+    const btn = box.querySelector('[data-rvsave],[data-save]') || { disabled: false, textContent: '' };
+    return save(btn);
   }
   if (!docId) {
     let pend = null;
@@ -840,7 +871,7 @@ onUser(async u => {
       if (rv.reads.some(r => r.r)) made.reads = { shown: rv.reads.length, spot: rv.reads.filter(x => x.r === 'spot').length, notquite: rv.reads.filter(x => x.r === 'notquite').length, wrong: rv.reads.filter(x => x.r === 'wrong').length , log: rv.reads.map(r => ({ kind: r.kind, text: r.text, evidence: r.evidence, r: r.r })) };
       return renderReveal(); }
     if (iv && iv.q && aiUrl) return renderIv();
-    if (params.get('into') && aiUrl) return startInto(params.get('into'));
+    if (params.get('into') && aiUrl) return startInto(params.get('into')).then(() => askFromLink());
     return starters();
   }
   try {

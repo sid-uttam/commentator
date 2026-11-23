@@ -317,10 +317,12 @@ async function askFree(context) {
   return d;
 }
 export async function askAI(action, topic, turns, extra = {}) {
-  if (!aiUrl || !me) throw new Error('unavailable');
-  const r = await fetch(aiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + await me.getIdToken() },
-                                 body: JSON.stringify({ ...extra, action, topic, turns }) });
+  if (!aiUrl) throw new Error('unavailable');
+  // Signed out, making still works (the worker caps it per address); only saving needs an account.
+  const headers = { 'Content-Type': 'application/json', ...(me ? { Authorization: 'Bearer ' + await me.getIdToken() } : {}) };
+  const r = await fetch(aiUrl, { method: 'POST', headers, body: JSON.stringify({ ...extra, action, topic, turns, ...(me ? {} : { free: true }) }) });
   const d = await r.json().catch(() => ({}));
+  if (!me && (r.status === 401 || r.status === 429)) throw new Error("You've tried a lot today. Sign in to keep going, it's free.");
   if (!r.ok) throw new Error(d.error || 'The interviewer hit a snag. Try again in a moment.');
   return d;
 }
@@ -386,7 +388,12 @@ export function mountAsk(el, id, getCtx, kind, ownerFirst) {
   const run = async q => {
     q = String(q || '').trim(); if (!q) return;
     const quick = /^Quick summary/.test(q);
-    if (!me && !quick) return withUser('ask:' + id, q);   // one free taste: Quick summary works signed out
+    if (!me && !quick) {   // say why, right where they're looking, instead of a sheet that may open off-screen
+      out.innerHTML = `<div class="ask-a ask-gap"><p>Asking your own question needs a free sign-in. Quick summary works without one.</p>
+        <button type="button" class="kc-btn kc-btn-main" data-asksign>Sign in to ask</button></div>`;
+      out.querySelector('[data-asksign]').onclick = () => withUser('ask:' + id, q);
+      return;
+    }
     input.value = ''; input.blur(); open(false); go.disabled = hot.disabled = true;
     out.innerHTML = `<div class="ask-q"><span>${esc(q)}</span></div><div class="ask-a ask-wait">Reading the keycard…</div>`;
     try {

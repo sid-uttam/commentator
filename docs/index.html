@@ -394,7 +394,7 @@ function filter() {
   if (!qempty.hidden) {
     const into = encodeURIComponent(term), safe = term.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     qempty.innerHTML = `<p>No one's made a keycard on <b>“${safe}”</b> yet.</p>
-      <div class="kc-act-row"><a class="kc-btn kc-btn-main" href="make/?into=${into}">Make the first one</a><a class="kc-btn" href="make/?into=${into}">Ask for one</a></div>`;
+      <div class="kc-act-row"><a class="kc-btn kc-btn-main" href="make/?into=${into}">Make the first one</a><a class="kc-btn" href="make/?into=${into}&ask=1">Ask for one</a></div>`;
   }
 }
 q.addEventListener('input', filter);
