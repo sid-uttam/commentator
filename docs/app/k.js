@@ -1,7 +1,7 @@
 // A keycard someone made: /k/?id=<doc id>  (also /u/<id>/, the shareable page with a proper link preview)
 // One layout for every shape: who made it and how fresh it is, then the most useful thing first.
 //   Picks: the list first, "what's new" after it.  Sources: "right now" first.  Playbook: numbered steps + copy boxes.
-import { loadKeycard, mountActions, onUser, esc, itemRow, fold, isRules, rulesCard, sectionTabs, isTip, tipBlock, briefingCard, keycardUrl, makeUrl, share, kcHash,
+import { loadKeycard, mountActions, onUser, esc, itemRow, fold, isRules, rulesCard, sectionTabs, isTip, tipBlock, factsRow, briefingCard, keycardUrl, makeUrl, share, kcHash,
          markChecked, ago, toast, ROOT, live, SHAPE_LABEL, whoFor, mountAsk, askContext, versionsOf, versionsHTML, markNew, hasLive, LIVE_BADGE, saveKeycard } from './app.js';
 
 const box = document.getElementById('kc');
@@ -40,7 +40,10 @@ async function show() {
   // Freshness: when the owner last edited or confirmed it. Picks and playbooks rot silently, so say so.
   const touched = [k.checked, k.updated].map(t => t && t.toMillis ? t.toMillis() : 0).reduce((a, b) => Math.max(a, b), 0);
   const days = touched ? (Date.now() - touched) / 864e5 : 0;
-  const fresh = touched && !(cf && !k.edited) ? `Updated by ${esc(first)} ${esc(ago(new Date(touched).toISOString()))}` : '';
+  // A date reads like a finished piece ("Updated 24 Nov"); "just now" only looked odd. Within a day of making it, say nothing.
+  const created = k.created && k.created.toMillis ? k.created.toMillis() : 0;
+  const fresh = touched && !(cf && !k.edited) && (!created || touched - created > 864e5)
+    ? `Updated ${new Date(touched).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}` : '';
   const stale = touched && days > 90 && shape !== 'sources';
 
   // The owner's rules come first as short lines; with rules showing, every other section starts folded (big idea → rules → explore).
@@ -77,6 +80,7 @@ async function show() {
       
     </section>
     ${k.idea ? `<p class="kc-idea">${esc(k.idea)}</p>` : ''}
+    ${!tip ? factsRow(k) : ''}
     ${k.tagline && !k.idea ? `<p class="kc-body" style="margin-top:-6px">${esc(k.tagline)}</p>` : ''}
     <div class="kc-actions" id="acts"></div>
     ${tabbed || tip ? '' : '<div id="ask"></div>'}
@@ -152,7 +156,7 @@ async function show() {
         <a class="kc-btn" href="${esc(makeUrl(docId))}">Edit</a></div></div>`;
       document.getElementById('ok').onclick = async () => {
         await markChecked(docId); mine.innerHTML = ''; toast('Thanks. Marked as checked today.');
-        const f = box.querySelector('.kc-fresh, .kc-stale'); if (f) { f.className = 'kc-fresh'; f.textContent = `Updated by ${first} just now`; }
+        const f = box.querySelector('.kc-fresh, .kc-stale'); if (f) { f.className = 'kc-fresh'; f.textContent = `Checked ${new Date().toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}`; }
       };
     };
     // Picks without a reason: the most useful thing an owner can add. Comes before "still accurate?".

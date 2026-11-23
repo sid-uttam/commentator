@@ -621,20 +621,23 @@ export function tipBlock(k) {
   </section>`;
 }
 // Sections as tabs: one at a time, headlines first, the reason one tap away. Prompts and links keep their own rows.
+export const factsRow = k => (k.facts || []).length ? `<div class="kc-facts">${k.facts.map(f => `<span>${esc(f)}</span>`).join('')}</div>` : '';
+// Sections, read lean-back: the most useful one is open and readable top to bottom (reasons showing, long ones
+// shortened with "more"); the rest fold underneath with a one-line preview. Collapsing is for the extras, not the point.
 export function sectionTabs(sections, rowFn) {
   if (!sections.length) return '';
   const map = it => it.map ? `<a class="kc-map" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(it.map)}" target="_blank" rel="noopener">Open in Maps ›</a>` : '';
   const row = it => (it.copy || it.url) ? rowFn(it)
-    : `<details class="kc-item"${small ? ' open' : ''}><summary>${esc(it.name)}</summary>${it.why ? `<p>${esc(it.why)}</p>` : ''}${map(it)}</details>`;
-  // A small keycard (7 items or fewer) shows everything at once: tabs and taps would only hide the good bits.
-  const small = sections.reduce((n, s) => n + (s.items || []).length, 0) <= 7;
-  if (small) return sections.map(s => `<section class="kc-tabs"><span class="label">${esc(s.title || 'Picks')}</span>
+    : `<div class="kc-read-i"><b>${esc(it.name)}</b>${it.why ? `<p>${clampWhy(it.why)}</p>` : ''}${map(it)}</div>`;
+  const score = s => (s.items || []).length + ((s.items || []).some(i => i.copy) ? 100 : 0);
+  const first = sections.reduce((b, s, i) => score(s) > score(sections[b]) ? i : b, 0);
+  // A small keycard (7 items or fewer) is simply read top to bottom, nothing folded.
+  if (sections.reduce((n, s) => n + (s.items || []).length, 0) <= 7) return sections.map(s => `<section class="kc-tabs"><span class="label">${esc(s.title || 'Picks')}</span>
     <div class="kc-panel">${(s.items || []).map(row).join('')}</div></section>`).join('');
-  const panel = (s, i) => `<div class="kc-panel" data-panel="${i}"${i ? ' hidden' : ''}>${(s.items || []).map(row).join('')}</div>`;
-  if (sections.length === 1) return `<section class="kc-tabs"><span class="label">${esc(sections[0].title || 'Picks')}</span>${panel(sections[0], 0)}</section>`;
-  return `<section class="kc-tabs"><div class="kc-tabbar" role="tablist">${sections.map((s, i) =>
-      `<button type="button" role="tab" class="kc-tab${i ? '' : ' on'}" data-tab="${i}">${esc(s.title || 'Picks')}</button>`).join('')}</div>
-    ${sections.map(panel).join('')}</section>`;
+  const main = sections[first], rest = sections.filter((_, i) => i !== first);
+  return `<section class="kc-tabs"><span class="label">${esc(main.title || 'Picks')}</span>
+      <div class="kc-panel">${(main.items || []).map(row).join('')}</div></section>
+    ${rest.length ? `<section class="kc-folds">${rest.map(s => fold(s.title || 'More', (s.items || []).map(row), false)).join('')}</section>` : ''}`;
 }
 document.addEventListener('click', e => {
   const t = e.target.closest('[data-tab]');
@@ -646,7 +649,7 @@ document.addEventListener('click', e => {
   if (a) { a.closest('.kc-rules').querySelectorAll('[data-extra]').forEach(x => { x.hidden = false; }); a.remove(); }
 });
 // A folded section shows a one-line taste of what's inside, so people know whether to open it.
-const preview = rows => { const m = String(rows[0] || '').match(/class="kc-row-t">([^<]*)/); return m ? m[1] : ''; };
+const preview = rows => { const m = String(rows[0] || '').match(/class="kc-row-t">([^<]*)|class="kc-read-i"><b>([^<]*)/); return m ? (m[1] || m[2] || '') : ''; };
 export function fold(title, rows, open, steps) {
   const p = !open && rows.length ? preview(rows) : '';
   return `<details class="kc-fold"${open ? ' open' : ''}><summary><span class="kc-fold-t"><span>${esc(title)}</span>${p ? `<small class="kc-prev">${p}${rows.length > 1 ? '…' : ''}</small>` : ''}</span><span class="kc-count">${rows.length}</span></summary><div class="kc-fold-body${steps ? ' kc-steps' : ''}">${rows.join('')}</div></details>`;

@@ -1,5 +1,5 @@
 // Make or edit a keycard: /make/ (new) or /make/?id=<doc id> (edit). Never a blank page: start from a shape or a copy.
-import { onUser, signIn, signInSheet, noteStart, searchKeycards, saveAsk, loadKeycard, saveKeycard, deleteKeycard, keycardUrl, esc, toast, ROOT, live, SUBJECTS, catOf, aiUrl, askAI, itemRow, myName, SHAPE_LABEL, fold, isRules, rulesCard, sectionTabs, isTip, tipBlock } from './app.js';
+import { onUser, signIn, signInSheet, noteStart, searchKeycards, saveAsk, loadKeycard, saveKeycard, deleteKeycard, keycardUrl, esc, toast, ROOT, live, SUBJECTS, catOf, aiUrl, askAI, itemRow, myName, SHAPE_LABEL, fold, isRules, rulesCard, sectionTabs, isTip, tipBlock, factsRow } from './app.js';
 
 const box = document.getElementById('ed');
 const params = new URLSearchParams(location.search);
@@ -478,12 +478,12 @@ function kFromDraft(kd) {
   if (!nk.sections.length && !nk.sources.length) nk.sections = [{ title: 'My picks', items: [blankItem()] }];
   nk.idea = String(kd.idea || '').trim().replace(/^["“”]+|["“”]+$/g, '');
   nk.format = ['tip', 'list', 'playbook', 'story'].includes(kd.format) ? kd.format : '';
-  nk.facts = nk.format === 'tip' ? (Array.isArray(kd.facts) ? kd.facts : []).map(f => String(f).trim()).filter(Boolean).slice(0, 3) : [];
+  nk.facts = (Array.isArray(kd.facts) ? kd.facts : []).map(f => String(f).trim()).filter(Boolean).slice(0, 3);
   const pr = (Array.isArray(kd.principles) ? kd.principles : []).filter(x => x && x.name).slice(0, 4).map(item);
   if (pr.length) nk.sections.unshift({ title: shape === 'picks' ? 'How I choose' : 'How I think about it', items: pr, principles: true });
   // Say each thing once: drop any item that repeats one already shown (same name, or the same reason), then empty sections.
   const key = t => String(t || '').toLowerCase().replace(/^\d+\.\s*/, '').replace(/[^a-z0-9 ]/g, '').replace(/\b(i|my|the|a|to|it)\b/g, ' ').replace(/\s+/g, ' ').trim();
-  const seen = new Set();
+  const seen = new Set(nk.idea && key(nk.idea).length > 20 ? [key(nk.idea)] : []);   // the big idea isn't repeated as an item either
   nk.sections.forEach(sec => { sec.items = sec.items.filter(it => {
     const ks = [key(it.name), it.why && key(it.why).length > 25 ? key(it.why) : ''].filter(Boolean);
     if (ks.some(x => seen.has(x))) return false; ks.forEach(x => seen.add(x)); return true; }); });
@@ -560,6 +560,7 @@ function renderReveal() {
       <h1 class="display kc-title">${esc(k.title)}</h1>
       <div class="rv-by">by ${owner ? esc(first) : 'you'}</div>
       ${k.idea ? `<p class="kc-idea">${esc(k.idea)}</p>` : k.tagline ? `<p class="kc-body">${esc(k.tagline)}</p>` : ''}
+      ${!isTip(k) ? factsRow(k) : ''}
       ${(() => { const top = k.sections.flatMap(x => x.items.filter(i => i.star)).slice(0, 3);
         return top.length ? `<div class="rv-sec kc-start-in"><div class="label">Start here: ${esc(first)}'s top ${top.length}</div>${top.map(it => itemRow(it)).join('')}</div>` : ''; })()}
       ${isTip(k) ? tipBlock(k) : k.sections.filter(isRules).map(sec => rulesCard(sec)).join('') + sectionTabs(k.sections.filter(sec => !isRules(sec)), it => itemRow(it))}
@@ -586,7 +587,7 @@ function renderReveal() {
   </section>`;
 }
 // Evidence as one clean phrase: no stray quote marks, several quotes joined with " · ".
-const cleanEv = e => String(e || '').replace(/["“”]/g, '').replace(/\s*;\s*/g, ' · ').replace(/\s+/g, ' ').trim();
+const cleanEv = e => String(e || '').replace(/["“”]/g, '').replace(/\s*;\s*/g, ' · ').replace(/\s+/g, ' ').trim().replace(/^./, c => c.toUpperCase());
 const READ_LABEL = { pattern: 'A pattern I noticed', guess: 'My guess: is this right?', tension: 'Something that pulls two ways' };
 const READ_DONE = { spot: r => r.kind === 'tension' ? 'Glad that landed.' : 'Added to your keycard, under how you choose.',
                     notquite: r => r.fixed ? 'Added your version to your keycard, under how you choose.' : '', wrong: () => "Got it. I've left that out." };
@@ -595,6 +596,8 @@ function addPrinciple(r) {
   let sec = rv.k.sections.find(x => x.principles);
   if (!sec) { sec = { title: rv.k.shape === 'picks' ? 'How I choose' : 'How I think about it', items: [], principles: true }; rv.k.sections.unshift(sec); }
   const name = r.rule ? r.rule.replace(/[.]$/, '') : r.text.replace(/^(is it that|maybe|i think)\s+/i, '').replace(/\?$/, '').replace(/^you\s+/i, 'I ').replace(/^./, c => c.toUpperCase());
+  const ev = (r.evidence || '').toLowerCase().slice(0, 40);
+  if (ev && sec.items.some(i => (i.why || '').toLowerCase().includes(ev))) return;   // a rule already rests on the same words
   if (sec.items.length < 5 && !sec.items.some(i => i.name === name)) sec.items.unshift({ name, why: r.evidence || '', url: '' });   // first, so it's visible
 }
 async function revealClick(t) {
