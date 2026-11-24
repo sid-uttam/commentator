@@ -1,19 +1,19 @@
 {
- "headline": "Keep your FPL week simple: check team news, make one or two safe moves, and trust your gut before the deadline.",
+ "headline": "Gameweek 12 is the focus: a Raya injury is the main talking point, so check team news before you decide.",
  "points": [
   {
-   "text": "Several videos discuss player injuries, including Raya and João Pedro. Check team news before you make changes.",
+   "text": "Several videos discuss Raya. One video title says Raya is injured, and another says there is a Raya update.",
    "label": "reported",
    "sources": [
     {
      "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=gezr1X2E7MA",
-     "date": "2026-11-22T19:46:04Z"
+     "url": "https://www.youtube.com/watch?v=Kc2K4Ppciew",
+     "date": "2026-11-24T08:51:10Z"
     }
    ]
   },
   {
-   "text": "One creator says a 'Gameweek 12 transfer tips' video covers popular players people are thinking about buying or selling.",
+   "text": "A creator says the video covers popular players people are thinking about buying or selling ahead of Gameweek 12.",
    "label": "opinion",
    "sources": [
     {
@@ -24,42 +24,53 @@
    ]
   },
   {
-   "text": "One creator says the key question this week is whether to make a transfer now or wait.",
-   "label": "opinion",
-   "sources": [
-    {
-     "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=dyB2_hpVP1Y",
-     "date": "2026-11-19T08:44:01Z"
-    }
-   ]
-  },
-  {
-   "text": "Creators are sharing their own team picks and early thoughts. Use these as ideas, not as instructions.",
+   "text": "One creator asks whether Wirtz is essential and shares early Gameweek 12 thoughts.",
    "label": "opinion",
    "sources": [
     {
      "name": "Let's Talk FPL",
      "url": "https://www.youtube.com/watch?v=cIuOhZHFccA",
      "date": "2026-11-23T10:17:07Z"
+    }
+   ]
+  },
+  {
+   "text": "One creator reviews thirteen things learned ahead of Gameweek 12.",
+   "label": "opinion",
+   "sources": [
+    {
+     "name": "Let's Talk FPL",
+     "url": "https://www.youtube.com/watch?v=IXpuxYLUNqo",
+     "date": "2026-11-23T17:25:55Z"
+    }
+   ]
+  },
+  {
+   "text": "Gameweek 11 had news of a João Pedro injury, which one creator says is out.",
+   "label": "reported",
+   "sources": [
+    {
+     "name": "Let's Talk FPL",
+     "url": "https://www.youtube.com/watch?v=_YkkZBv5aS0",
+     "date": "2026-11-20T15:13:16Z"
     }
    ]
   }
  ],
  "differences": [
   {
-   "text": "One creator makes a point of Wirtz being essential, while another discusses players to buy or sell. Views on which players to move differ between creators.",
+   "text": "Most videos are promoted by a paid partner offer for a sponsored tool. Treat their tips as one view, not a neutral guide.",
    "sources": [
     {
      "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=cIuOhZHFccA",
-     "date": "2026-11-23T10:17:07Z"
+     "url": "https://www.youtube.com/watch?v=n0O7tDvKHZM",
+     "date": "2026-11-24T18:04:33Z"
     }
    ]
   }
  ],
  "angles": [],
- "updated": "2026-11-24T10:45:48Z",
+ "updated": "2026-11-24T20:05:04Z",
  "model": "claude-haiku-5-5",
  "items": 8
 }
