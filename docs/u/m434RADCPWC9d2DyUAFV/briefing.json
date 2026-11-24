@@ -1,8 +1,8 @@
 {
- "headline": "Gameweek 12 is near, and this channel's creator is sharing early thoughts, news on injuries, and tips for planning your team.",
+ "headline": "Keep your FPL week simple: check team news, make one or two safe moves, and trust your gut before the deadline.",
  "points": [
   {
-   "text": "Raya is reported injured. One creator reacted to this in a live stream ahead of Gameweek 12.",
+   "text": "Several videos discuss player injuries, including Raya and João Pedro. Check team news before you make changes.",
    "label": "reported",
    "sources": [
     {
@@ -13,40 +13,18 @@
    ]
   },
   {
-   "text": "João Pedro is reported out. One creator flagged this in a final-thoughts video before Gameweek 11.",
-   "label": "reported",
-   "sources": [
-    {
-     "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=_YkkZBv5aS0",
-     "date": "2026-11-20T15:13:16Z"
-    }
-   ]
-  },
-  {
-   "text": "One creator shares early thoughts on whether Wirtz is essential for Gameweek 12. Treat this as one person's opinion.",
+   "text": "One creator says a 'Gameweek 12 transfer tips' video covers popular players people are thinking about buying or selling.",
    "label": "opinion",
    "sources": [
     {
      "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=cIuOhZHFccA",
-     "date": "2026-11-23T10:17:07Z"
+     "url": "https://www.youtube.com/watch?v=Kc2K4Ppciew",
+     "date": "2026-11-24T08:51:10Z"
     }
    ]
   },
   {
-   "text": "One creator posts a 13-point preview of what they have learned before Gameweek 12.",
-   "label": "opinion",
-   "sources": [
-    {
-     "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=IXpuxYLUNqo",
-     "date": "2026-11-23T17:25:55Z"
-    }
-   ]
-  },
-  {
-   "text": "One creator asks whether to make a transfer now or wait, and shows their Gameweek 11 team.",
+   "text": "One creator says the key question this week is whether to make a transfer now or wait.",
    "label": "opinion",
    "sources": [
     {
@@ -55,11 +33,33 @@
      "date": "2026-11-19T08:44:01Z"
     }
    ]
+  },
+  {
+   "text": "Creators are sharing their own team picks and early thoughts. Use these as ideas, not as instructions.",
+   "label": "opinion",
+   "sources": [
+    {
+     "name": "Let's Talk FPL",
+     "url": "https://www.youtube.com/watch?v=cIuOhZHFccA",
+     "date": "2026-11-23T10:17:07Z"
+    }
+   ]
   }
  ],
- "differences": [],
+ "differences": [
+  {
+   "text": "One creator makes a point of Wirtz being essential, while another discusses players to buy or sell. Views on which players to move differ between creators.",
+   "sources": [
+    {
+     "name": "Let's Talk FPL",
+     "url": "https://www.youtube.com/watch?v=cIuOhZHFccA",
+     "date": "2026-11-23T10:17:07Z"
+    }
+   ]
+  }
+ ],
  "angles": [],
- "updated": "2026-11-23T18:44:03Z",
+ "updated": "2026-11-24T10:45:48Z",
  "model": "claude-haiku-5-5",
  "items": 8
 }
