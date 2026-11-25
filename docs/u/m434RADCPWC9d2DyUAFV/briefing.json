@@ -1,8 +1,19 @@
 {
- "headline": "Gameweek 12 is the focus: a Raya injury is the main talking point, so check team news before you decide.",
+ "headline": "Gameweek 12 is near, and this creator's videos point to Raya and Wirtz as main talking points.",
  "points": [
   {
-   "text": "Several videos discuss Raya. One video title says Raya is injured, and another says there is a Raya update.",
+   "text": "One creator says Raya is injured, and posted a Gameweek 12 kneejerk stream on it.",
+   "label": "reported",
+   "sources": [
+    {
+     "name": "Let's Talk FPL",
+     "url": "https://www.youtube.com/watch?v=gezr1X2E7MA",
+     "date": "2026-11-22T19:46:04Z"
+    }
+   ]
+  },
+  {
+   "text": "The same creator says Raya has a news update. Check team news before deciding on him.",
    "label": "reported",
    "sources": [
     {
@@ -13,18 +24,7 @@
    ]
   },
   {
-   "text": "A creator says the video covers popular players people are thinking about buying or selling ahead of Gameweek 12.",
-   "label": "opinion",
-   "sources": [
-    {
-     "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=Kc2K4Ppciew",
-     "date": "2026-11-24T08:51:10Z"
-    }
-   ]
-  },
-  {
-   "text": "One creator asks whether Wirtz is essential and shares early Gameweek 12 thoughts.",
+   "text": "A creator asks whether Wirtz is essential. Their early thoughts lean on personal view, not hard facts.",
    "label": "opinion",
    "sources": [
     {
@@ -35,7 +35,7 @@
    ]
   },
   {
-   "text": "One creator reviews thirteen things learned ahead of Gameweek 12.",
+   "text": "A creator lists 13 things learned ahead of Gameweek 12. The list is their own view.",
    "label": "opinion",
    "sources": [
     {
@@ -46,31 +46,31 @@
    ]
   },
   {
-   "text": "Gameweek 11 had news of a João Pedro injury, which one creator says is out.",
-   "label": "reported",
+   "text": "For a 15-minute weekly check, start with team news, then pick a safe captain and make one small transfer at most.",
+   "label": "ai interpretation",
    "sources": [
     {
      "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=_YkkZBv5aS0",
-     "date": "2026-11-20T15:13:16Z"
+     "url": "https://www.youtube.com/watch?v=Kc2K4Ppciew",
+     "date": "2026-11-24T08:51:10Z"
     }
    ]
   }
  ],
  "differences": [
   {
-   "text": "Most videos are promoted by a paid partner offer for a sponsored tool. Treat their tips as one view, not a neutral guide.",
+   "text": "One video says Raya is injured. Another says Raya has an update. The material does not say how serious the issue is.",
    "sources": [
     {
      "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=n0O7tDvKHZM",
-     "date": "2026-11-24T18:04:33Z"
+     "url": "https://www.youtube.com/watch?v=Kc2K4Ppciew",
+     "date": "2026-11-24T08:51:10Z"
     }
    ]
   }
  ],
  "angles": [],
- "updated": "2026-11-24T20:05:04Z",
+ "updated": "2026-11-25T11:43:50Z",
  "model": "claude-haiku-5-5",
  "items": 8
 }
