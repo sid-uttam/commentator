@@ -1,19 +1,8 @@
 {
- "headline": "Gameweek 12 is near, and this creator's videos point to Raya and Wirtz as main talking points.",
+ "headline": "Gameweek 12 is about a goalkeeper and a Raya fitness question, so check the Raya news before you decide on transfers.",
  "points": [
   {
-   "text": "One creator says Raya is injured, and posted a Gameweek 12 kneejerk stream on it.",
-   "label": "reported",
-   "sources": [
-    {
-     "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=gezr1X2E7MA",
-     "date": "2026-11-22T19:46:04Z"
-    }
-   ]
-  },
-  {
-   "text": "The same creator says Raya has a news update. Check team news before deciding on him.",
+   "text": "Raya is the main talking point. One video says he is injured, and another says there is a Raya update. Check official team news before you act.",
    "label": "reported",
    "sources": [
     {
@@ -24,7 +13,29 @@
    ]
   },
   {
-   "text": "A creator asks whether Wirtz is essential. Their early thoughts lean on personal view, not hard facts.",
+   "text": "Several videos say it is time to buy a goalkeeper for Gameweek 12.",
+   "label": "opinion",
+   "sources": [
+    {
+     "name": "Let's Talk FPL",
+     "url": "https://www.youtube.com/watch?v=k177AGbv_6Y",
+     "date": "2026-11-26T08:49:22Z"
+    }
+   ]
+  },
+  {
+   "text": "One creator suggests Haaland is not the right captain choice this week.",
+   "label": "opinion",
+   "sources": [
+    {
+     "name": "Let's Talk FPL",
+     "url": "https://www.youtube.com/watch?v=RfI__JX5BRE",
+     "date": "2026-11-25T09:06:55Z"
+    }
+   ]
+  },
+  {
+   "text": "A creator says Wirtz may be an essential pick. This is an early view, not a confirmed plan.",
    "label": "opinion",
    "sources": [
     {
@@ -35,42 +46,31 @@
    ]
   },
   {
-   "text": "A creator lists 13 things learned ahead of Gameweek 12. The list is their own view.",
-   "label": "opinion",
+   "text": "Most videos in this list are sponsored. Each one links to a paid site, so weigh the advice with that in mind.",
+   "label": "reported",
    "sources": [
     {
      "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=IXpuxYLUNqo",
-     "date": "2026-11-23T17:25:55Z"
-    }
-   ]
-  },
-  {
-   "text": "For a 15-minute weekly check, start with team news, then pick a safe captain and make one small transfer at most.",
-   "label": "ai interpretation",
-   "sources": [
-    {
-     "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=Kc2K4Ppciew",
-     "date": "2026-11-24T08:51:10Z"
+     "url": "https://www.youtube.com/watch?v=k177AGbv_6Y",
+     "date": "2026-11-26T08:49:22Z"
     }
    ]
   }
  ],
  "differences": [
   {
-   "text": "One video says Raya is injured. Another says Raya has an update. The material does not say how serious the issue is.",
+   "text": "One video calls the goalkeeper pick a clear buy. Another says Raya is injured and a third mentions a Raya update. These point to different goalkeeper choices.",
    "sources": [
     {
      "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=Kc2K4Ppciew",
-     "date": "2026-11-24T08:51:10Z"
+     "url": "https://www.youtube.com/watch?v=k177AGbv_6Y",
+     "date": "2026-11-26T08:49:22Z"
     }
    ]
   }
  ],
  "angles": [],
- "updated": "2026-11-25T11:43:50Z",
+ "updated": "2026-11-26T09:57:21Z",
  "model": "claude-haiku-5-5",
  "items": 8
 }
