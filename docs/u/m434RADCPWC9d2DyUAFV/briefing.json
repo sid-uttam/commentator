@@ -1,9 +1,31 @@
 {
- "headline": "Gameweek 12 is the next deadline, and this creator's videos are about transfers, captains and a goalkeeper buy.",
+ "headline": "Gameweek 12 is close, and this channel's creators are split on Kinsky, Raya and Mbeumo, so keep your 15-minute decision simple.",
  "points": [
   {
-   "text": "Your 15-minute window: one creator's videos cover Gameweek 12 team news, transfers and captain picks. Most are sponsored, and each one ends with an ad link.",
+   "text": "Several videos from this channel discuss Kinsky as a possible buy for Gameweek 12.",
    "label": "reported",
+   "sources": [
+    {
+     "name": "Let's Talk FPL",
+     "url": "https://www.youtube.com/watch?v=kcp9hn471n4",
+     "date": "2026-11-27T16:26:13Z"
+    }
+   ]
+  },
+  {
+   "text": "Raya is in the news again. Videos mention an update, but the material does not say what it is.",
+   "label": "reported",
+   "sources": [
+    {
+     "name": "Let's Talk FPL",
+     "url": "https://www.youtube.com/watch?v=kcp9hn471n4",
+     "date": "2026-11-27T16:26:13Z"
+    }
+   ]
+  },
+  {
+   "text": "One creator suggests selling Mbeumo. This is a single personal view, so weigh it against your own team.",
+   "label": "opinion",
    "sources": [
     {
      "name": "Let's Talk FPL",
@@ -13,7 +35,7 @@
    ]
   },
   {
-   "text": "The creator says it's time to buy a goalkeeper. Their Gameweek 12 team video is one take, not a rule.",
+   "text": "One creator says it is time to buy a goalkeeper and shares a team for Gameweek 12.",
    "label": "opinion",
    "sources": [
     {
@@ -24,19 +46,30 @@
    ]
   },
   {
-   "text": "The creator suggests selling Mbeumo and buying Kinsky. They frame these as questions, not firm calls.",
-   "label": "opinion",
+   "text": "A 15-minute routine: check team news, pick one safe transfer or none, then choose your captain by gut.",
+   "label": "ai interpretation",
    "sources": [
     {
      "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=oDwxxMxSndc",
-     "date": "2026-11-27T08:50:07Z"
+     "url": "https://www.youtube.com/watch?v=kcp9hn471n4",
+     "date": "2026-11-27T16:26:13Z"
+    }
+   ]
+  }
+ ],
+ "differences": [
+  {
+   "text": "One creator says to buy Kinsky, while another frames him as a question mark. Both are one creator's view.",
+   "sources": [
+    {
+     "name": "Let's Talk FPL",
+     "url": "https://www.youtube.com/watch?v=kcp9hn471n4",
+     "date": "2026-11-27T16:26:13Z"
     }
    ]
   },
   {
-   "text": "The creator says Haaland is not their captain pick. Another video asks whether Wirtz is essential.",
-   "label": "opinion",
+   "text": "The Gameweek 12 captain view leans against Haaland, which another video does not mention.",
    "sources": [
     {
      "name": "Let's Talk FPL",
@@ -44,33 +77,10 @@
      "date": "2026-11-25T09:06:55Z"
     }
    ]
-  },
-  {
-   "text": "The creator's last season finished 588th. Their best ranks listed are 588 and 1294, so results vary.",
-   "label": "reported",
-   "sources": [
-    {
-     "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=k177AGbv_6Y",
-     "date": "2026-11-26T08:49:22Z"
-    }
-   ]
-  }
- ],
- "differences": [
-  {
-   "text": "Sources give different transfer ideas, such as buying Kinsky or a goalkeeper, and selling Mbeumo or keeping Wirtz. Pick the one that fits your team.",
-   "sources": [
-    {
-     "name": "Let's Talk FPL",
-     "url": "https://www.youtube.com/watch?v=oDwxxMxSndc",
-     "date": "2026-11-27T08:50:07Z"
-    }
-   ]
   }
  ],
  "angles": [],
- "updated": "2026-11-27T11:16:25Z",
+ "updated": "2026-11-27T18:09:40Z",
  "model": "claude-haiku-5-5",
  "items": 8
 }
